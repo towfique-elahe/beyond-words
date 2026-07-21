@@ -1,0 +1,1 @@
+[!] CAVEAT FOR THESIS: 8746 clips (the regional classes) have no source/speaker metadata. Their split is clip-level, so the same speaker/source may appear in train and test. Report test numbers for these classes as an UPPER BOUND, and add speaker clustering (Phase 3) for a stricter estimate.
