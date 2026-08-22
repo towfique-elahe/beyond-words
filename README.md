@@ -78,21 +78,21 @@ python baseline_whisper.py train --emb embeddings.npz --epochs 60
 
 ## Baseline results (v2, frozen Whisper-small embeddings + MLP)
 
-**Test macro-F1: 0.911** (accuracy 0.911, n = 1,378)
+**Test macro-F1: 0.917** (accuracy 0.916, n = 1,329; seed 42)
 
 | District | F1 |
 |---|---|
-| Khulna | 0.987 |
-| Rajshahi | 0.958 |
-| Formal | 0.954 |
-| Sylhet | 0.954 |
-| Dhaka | 0.921 |
-| Barishal | 0.886 |
-| Chattogram | 0.877 |
-| Noakhali | 0.841 |
-| Mymensingh | 0.826 |
+| Khulna | 0.986 |
+| Formal | 0.970 |
+| Sylhet | 0.951 |
+| Rajshahi | 0.947 |
+| Dhaka | 0.913 |
+| Mymensingh | 0.890 |
+| Chattogram | 0.880 |
+| Barishal | 0.871 |
+| Noakhali | 0.848 |
 
-Main confusion pairs: **Barishal ↔ Noakhali** (southern coastal dialects) and **Mymensingh ↔ Noakhali**, consistent with known dialectological proximity. Mymensingh, a transitional dialect zone, is the hardest class.
+Main confusion pair: **Barishal ↔ Noakhali** (southern coastal dialects), consistent with known dialectological proximity; Mymensingh, a transitional dialect zone, spreads its errors across several neighboring classes. Noakhali and Barishal are the hardest classes.
 
 <p align="center">
   <img src="reports/figures/confusion_matrix_baseline.png" alt="Baseline confusion matrix" width="49%" />
