@@ -44,6 +44,7 @@ build_manifest.py  →  manifest.csv          # scan, validate, standardize audi
 build_split.py     →  manifest_split.csv    # train/val/test (group-aware where possible)
 baseline_whisper.py cache  →  embeddings.npz  # Whisper-small encoder, mean-pooled, cached once
 baseline_whisper.py train                     # weighted MLP head + evaluation
+finetune_xlsr.py           →  xlsr_best.pt    # Phase 2: end-to-end XLS-R-300M (Kaggle T4)
 ```
 
 ### Setup
@@ -75,6 +76,29 @@ python build_split.py --manifest manifest.csv --out manifest_split.csv
 python baseline_whisper.py cache --manifest manifest_split.csv --out embeddings.npz
 python baseline_whisper.py train --emb embeddings.npz --epochs 60
 ```
+
+### Phase 2: fine-tune XLS-R on Kaggle (free T4)
+
+End-to-end fine-tuning of `facebook/wav2vec2-xls-r-300m` needs a CUDA GPU; a free
+Kaggle T4 (16 GB, 30 GPU-h/week) covers it in one ~2 h session. The run uses the
+**same split** as the baseline via [`splits/manifest_split_rel.csv`](splits/manifest_split_rel.csv)
+(relative paths, committed for reproducibility), so results are directly comparable.
+
+1. **Upload the dataset once (keep it private — the audio is not redistributable):**
+   a `dataset-metadata.json` is expected in the audio root; edit the `id` to your
+   Kaggle username, then:
+   ```bash
+   pip install kaggle          # + put your API token in ~/.kaggle/kaggle.json
+   kaggle datasets create -p path/to/bangla_accent_voice_data --dir-mode zip
+   ```
+   (Kaggle datasets are private by default; or use the website's *Create Dataset* UI.)
+2. **Run the notebook:** upload [`notebooks/kaggle_xlsr_finetune.ipynb`](notebooks/kaggle_xlsr_finetune.ipynb)
+   to Kaggle, attach the dataset, set accelerator to GPU T4 and Internet ON, *Save & Run All*.
+3. **Collect outputs** from the notebook's Output tab: `xlsr_best.pt`,
+   `metrics_xlsr.json`, `test_predictions_xlsr.csv`.
+
+`finetune_xlsr.py` also runs locally (auto-selects `cuda` > `mps` > `cpu`) — use
+`--limit 48 --epochs 1` for a smoke test; a full run on Apple Silicon is impractical.
 
 ## Baseline results (v2, frozen Whisper-small embeddings + MLP)
 
@@ -131,10 +155,14 @@ Phases 0–1 were developed on a single **NVIDIA GTX 1660 Ti (6 GB)** and later 
 ├── build_manifest.py      # Phase 0: scan + validate + standardize audio
 ├── build_split.py         # Phase 0: leakage-aware train/val/test split
 ├── baseline_whisper.py    # Phase 1: cache embeddings, train + evaluate head
+├── finetune_xlsr.py       # Phase 2: end-to-end XLS-R-300M fine-tuning
+├── splits/                # committed canonical split (relative paths)
+│   └── manifest_split_rel.csv
 ├── environment.yml        # conda environment (CUDA machines)
 ├── requirements.txt       # pip environment (macOS / Apple Silicon or any platform)
 ├── notebooks/             # analysis notebooks (EDA, figures)
-│   └── beyond-words.ipynb
+│   ├── beyond-words.ipynb
+│   └── kaggle_xlsr_finetune.ipynb
 ├── reports/figures/       # baseline result figures
 ├── docs/                  # thesis notes (leakage caveat, etc.)
 ├── LICENSE                # MIT
