@@ -48,6 +48,15 @@ baseline_whisper.py train                     # weighted MLP head + evaluation
 
 ### Setup
 
+**macOS (Apple Silicon) or any pip-based setup** — PyTorch uses the MPS backend on Apple GPUs automatically:
+
+```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+**Linux/Windows with NVIDIA GPU** (conda):
+
 ```bash
 conda env create -f environment.yml
 conda activate beyond-words
@@ -108,13 +117,13 @@ Planned mitigations: speaker clustering (ECAPA embeddings) to build pseudo-speak
 
 - [x] Phase 0 — data hygiene, manifest, leakage-aware splitting
 - [x] Phase 1 — cached Whisper-small embedding baseline
-- [ ] Phase 2 — fine-tune `facebook/wav2vec2-xls-r-300m` end-to-end (fp32, 6 GB VRAM budget)
+- [ ] Phase 2 — fine-tune `facebook/wav2vec2-xls-r-300m` end-to-end (fp16, Kaggle/Colab T4)
 - [ ] Phase 3 — ablation table (v1 features vs. frozen embeddings vs. fine-tuned), augmentation study, speaker-clustered strict split, data-efficiency curve
 - [ ] Phase 4 — thesis write-up, reproducible release, inference demo
 
 ## Hardware
 
-Developed and trained on a single **NVIDIA GTX 1660 Ti (6 GB)**. All configurations are sized for this budget: fp32 training, frozen feature encoder, small batches with gradient accumulation, and one-time embedding caching.
+Phases 0–1 were developed on a single **NVIDIA GTX 1660 Ti (6 GB)** and later reproduced on an **Apple M1 (16 GB unified memory)** via PyTorch's MPS backend — the device is auto-selected (`cuda` > `mps` > `cpu`). All configurations are sized for a small-memory budget: fp32, frozen feature encoder, small batches, and one-time embedding caching. Phase 2 end-to-end fine-tuning targets a free cloud GPU (Kaggle/Colab T4, 16 GB VRAM).
 
 ## Repository layout
 
@@ -122,7 +131,8 @@ Developed and trained on a single **NVIDIA GTX 1660 Ti (6 GB)**. All configurati
 ├── build_manifest.py      # Phase 0: scan + validate + standardize audio
 ├── build_split.py         # Phase 0: leakage-aware train/val/test split
 ├── baseline_whisper.py    # Phase 1: cache embeddings, train + evaluate head
-├── environment.yml        # conda environment
+├── environment.yml        # conda environment (CUDA machines)
+├── requirements.txt       # pip environment (macOS / Apple Silicon or any platform)
 ├── notebooks/             # analysis notebooks (EDA, figures)
 │   └── beyond-words.ipynb
 ├── reports/figures/       # baseline result figures

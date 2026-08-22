@@ -27,12 +27,21 @@ MODEL = "openai/whisper-small"        # encoder hidden size = 768
 SR = 16000
 
 
+def pick_device():
+    """cuda > mps (Apple Silicon) > cpu."""
+    if torch.cuda.is_available():
+        return "cuda"
+    if torch.backends.mps.is_available():
+        return "mps"
+    return "cpu"
+
+
 # ----------------------------- Stage A: cache -----------------------------
 def cache(args):
     import librosa
     from transformers import WhisperFeatureExtractor, WhisperModel
 
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    device = pick_device()
     fe = WhisperFeatureExtractor.from_pretrained(MODEL)
     model = WhisperModel.from_pretrained(MODEL).to(device).eval()
     encoder = model.encoder
@@ -42,20 +51,27 @@ def cache(args):
     lab2id = {l: i for i, l in enumerate(labels)}
 
     X, y, splits = [], [], []
+    rows = df.to_dict("records")
     with torch.no_grad():
-        for _, r in tqdm(df.iterrows(), total=len(df), desc="embedding"):
-            try:
-                wav, _ = librosa.load(r["filepath"], sr=SR, mono=True)
-            except Exception as e:
-                print("skip", r["filepath"], e)
+        for i in tqdm(range(0, len(rows), args.batch), desc="embedding"):
+            chunk = rows[i:i + args.batch]
+            wavs, kept = [], []
+            for r in chunk:
+                try:
+                    wavs.append(librosa.load(r["filepath"], sr=SR, mono=True)[0])
+                    kept.append(r)
+                except Exception as e:
+                    print("skip", r["filepath"], e)
+            if not wavs:
                 continue
-            feats = fe(wav, sampling_rate=SR, return_tensors="pt").input_features.to(device)
             # Whisper expects 30s log-mel; FE pads/truncates automatically.
-            out = encoder(feats).last_hidden_state      # (1, T, 768)
-            vec = out.mean(dim=1).squeeze(0).cpu().numpy()
-            X.append(vec)
-            y.append(lab2id[r["district"]])
-            splits.append(r["split"])
+            feats = fe(wavs, sampling_rate=SR, return_tensors="pt").input_features.to(device)
+            out = encoder(feats).last_hidden_state      # (B, T, 768)
+            vecs = out.mean(dim=1).cpu().numpy()
+            for r, v in zip(kept, vecs):
+                X.append(v)
+                y.append(lab2id[r["district"]])
+                splits.append(r["split"])
 
     np.savez_compressed(args.out,
                         X=np.stack(X), y=np.array(y),
@@ -82,7 +98,7 @@ def train(args):
 
     d = np.load(args.emb, allow_pickle=True)
     X, y, splits, labels = d["X"], d["y"], d["splits"], list(d["labels"])
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    device = pick_device()
 
     # standardize features on train stats
     tr = splits == "train"
@@ -144,6 +160,7 @@ if __name__ == "__main__":
     c = sub.add_parser("cache")
     c.add_argument("--manifest", default="manifest_split.csv")
     c.add_argument("--out", default="embeddings.npz")
+    c.add_argument("--batch", type=int, default=16)
     c.set_defaults(func=cache)
 
     t = sub.add_parser("train")
