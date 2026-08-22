@@ -1,0 +1,16 @@
+# Platform-neutral install (works on Apple Silicon via MPS and on CUDA machines):
+#   python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
+# or with uv:
+#   uv venv --python 3.12 .venv && uv pip install -r requirements.txt
+torch
+torchaudio
+transformers>=4.40
+librosa
+soundfile
+scikit-learn
+pandas
+numpy
+tqdm
+matplotlib
+seaborn
+audiomentations   # Phase 3 augmentation

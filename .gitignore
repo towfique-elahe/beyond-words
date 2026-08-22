@@ -6,6 +6,8 @@ manifest_split.csv
 features.csv
 # Cached encoder embeddings: python baseline_whisper.py cache
 *.npz
+# Run logs
+*.log
 
 # Raw / standardized audio dataset (see README: not distributed)
 *.wav
