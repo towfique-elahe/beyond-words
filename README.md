@@ -129,6 +129,32 @@ t-SNE of the frozen Whisper-small embeddings, colored by dialect:
   <img src="reports/figures/tsne_embeddings.png" alt="t-SNE of Whisper-small embeddings" width="70%" />
 </p>
 
+## Fine-tuned results (Phase 2, XLS-R-300M end-to-end)
+
+**Test macro-F1: 0.952** (n = 1,329; 20 epochs, fp16, Kaggle T4; seed 42; same split as the baseline) — **+3.5 points over the frozen-embedding baseline**, with every district improving or holding. The largest gains land exactly on the baseline's weakest classes: Noakhali +6.1, Chattogram +4.4, Dhaka +5.9, Barishal +5.6.
+
+| District | Baseline F1 | Fine-tuned F1 |
+|---|---|---|
+| Khulna | 0.986 | 0.986 |
+| Sylhet | 0.951 | 0.982 |
+| Rajshahi | 0.947 | 0.980 |
+| Formal | 0.970 | 0.973 |
+| Dhaka | 0.913 | 0.972 |
+| Barishal | 0.871 | 0.927 |
+| Chattogram | 0.880 | 0.924 |
+| Mymensingh | 0.890 | 0.912 |
+| Noakhali | 0.848 | 0.910 |
+| **macro** | **0.917** | **0.952** |
+
+The Barishal ↔ Noakhali confusion shrinks (31 → 15 errors) but remains the dominant error mode; Sylhet becomes near-perfect (137/137 recall). An 8-epoch run scored only 0.865 (still climbing); the 20-epoch validation curve plateaus at ~0.95 from epoch 11 onward, so longer training offers little further gain.
+
+<p align="center">
+  <img src="reports/figures/confusion_matrix_xlsr.png" alt="XLS-R confusion matrix" width="49%" />
+  <img src="reports/figures/per_class_f1_comparison.png" alt="Per-class F1 comparison" width="49%" />
+</p>
+
+Run artifacts (metrics, test predictions) live in [`reports/phase2/`](reports/phase2/); the checkpoint (1.2 GB) is not tracked in git.
+
 ## Known limitations (disclosed by design)
 
 - **Possible source/channel leakage for regional classes.** Formal-class filenames contain recoverable YouTube video IDs, enabling a source-disjoint split. The 8 regional classes have only sequential filenames with no recoverable speaker/source metadata, so their split is clip-level. The same speaker or recording source may therefore appear in both train and test, and **reported scores for regional classes should be read as an upper bound.** Near-perfect scores for individual classes (e.g., Khulna) may partly reflect recording-channel signatures rather than accent alone.
@@ -141,7 +167,7 @@ Planned mitigations: speaker clustering (ECAPA embeddings) to build pseudo-speak
 
 - [x] Phase 0 — data hygiene, manifest, leakage-aware splitting
 - [x] Phase 1 — cached Whisper-small embedding baseline
-- [ ] Phase 2 — fine-tune `facebook/wav2vec2-xls-r-300m` end-to-end (fp16, Kaggle/Colab T4)
+- [x] Phase 2 — fine-tune `facebook/wav2vec2-xls-r-300m` end-to-end (fp16, Kaggle T4) — **0.952 test macro-F1**
 - [ ] Phase 3 — ablation table (v1 features vs. frozen embeddings vs. fine-tuned), augmentation study, speaker-clustered strict split, data-efficiency curve
 - [ ] Phase 4 — thesis write-up, reproducible release, inference demo
 
@@ -163,7 +189,9 @@ Phases 0–1 were developed on a single **NVIDIA GTX 1660 Ti (6 GB)** and later 
 ├── notebooks/             # analysis notebooks (EDA, figures)
 │   ├── beyond-words.ipynb
 │   └── kaggle_xlsr_finetune.ipynb
-├── reports/figures/       # baseline result figures
+├── reports/
+│   ├── figures/           # result figures (baseline + fine-tuned)
+│   └── phase2/            # XLS-R run metrics + test predictions
 ├── docs/                  # thesis notes (leakage caveat, etc.)
 ├── LICENSE                # MIT
 └── README.md
