@@ -1,0 +1,19 @@
+{
+  "model": "facebook/wav2vec2-xls-r-300m",
+  "seed": 42,
+  "epochs": 20,
+  "best_epoch": 19,
+  "val_macroF1": 0.9603176532924262,
+  "test_macroF1": 0.9517879556385412,
+  "per_class_F1": {
+    "Barishal": 0.9271137026239067,
+    "Chattogram": 0.9237668161434978,
+    "Dhaka": 0.9724770642201835,
+    "Formal": 0.9730848861283644,
+    "Khulna": 0.986046511627907,
+    "Mymensingh": 0.9121621621621622,
+    "Noakhali": 0.9096045197740112,
+    "Rajshahi": 0.979757085020243,
+    "Sylhet": 0.982078853046595
+  }
+}
