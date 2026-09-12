@@ -1,0 +1,61 @@
+representation,split,fraction,n_train,seed,test_macroF1
+Frozen Whisper-small,clip-level,0.1,697,0,0.7897674021285623
+Frozen Whisper-small,clip-level,0.1,697,1,0.7946505131968148
+Frozen Whisper-small,clip-level,0.1,697,2,0.779595086380375
+Frozen Whisper-small,clip-level,0.25,1744,0,0.8564891075486105
+Frozen Whisper-small,clip-level,0.25,1744,1,0.8530585751032693
+Frozen Whisper-small,clip-level,0.25,1744,2,0.851042080061455
+Frozen Whisper-small,clip-level,0.5,3488,0,0.9050514269324856
+Frozen Whisper-small,clip-level,0.5,3488,1,0.8981132940813465
+Frozen Whisper-small,clip-level,0.5,3488,2,0.9040493633648689
+Frozen Whisper-small,clip-level,0.75,5232,0,0.9052500938409085
+Frozen Whisper-small,clip-level,0.75,5232,1,0.9060785328269974
+Frozen Whisper-small,clip-level,0.75,5232,2,0.912847533435294
+Frozen Whisper-small,clip-level,1.0,6977,0,0.9167427065153583
+Frozen Whisper-small,clip-level,1.0,6977,1,0.9173839863625796
+Frozen Whisper-small,clip-level,1.0,6977,2,0.9057354529926749
+Frozen Whisper-small,strict,0.1,693,0,0.6862861469801567
+Frozen Whisper-small,strict,0.1,693,1,0.7113781072862153
+Frozen Whisper-small,strict,0.1,693,2,0.6146437104691931
+Frozen Whisper-small,strict,0.25,1732,0,0.7301626586731901
+Frozen Whisper-small,strict,0.25,1732,1,0.7786795989392667
+Frozen Whisper-small,strict,0.25,1732,2,0.7431001635275297
+Frozen Whisper-small,strict,0.5,3465,0,0.7705647774473418
+Frozen Whisper-small,strict,0.5,3465,1,0.8069177684432142
+Frozen Whisper-small,strict,0.5,3465,2,0.7755000213742886
+Frozen Whisper-small,strict,0.75,5198,0,0.7838081334388185
+Frozen Whisper-small,strict,0.75,5198,1,0.7894090669514964
+Frozen Whisper-small,strict,0.75,5198,2,0.7953235815395417
+Frozen Whisper-small,strict,1.0,6931,0,0.7918543149397156
+Frozen Whisper-small,strict,1.0,6931,1,0.7944120780097763
+Frozen Whisper-small,strict,1.0,6931,2,0.7917612491493818
+v1 MFCC stats,clip-level,0.1,697,0,0.5389094912941339
+v1 MFCC stats,clip-level,0.1,697,1,0.5255346780751186
+v1 MFCC stats,clip-level,0.1,697,2,0.5001616725560412
+v1 MFCC stats,clip-level,0.25,1744,0,0.6409847080820755
+v1 MFCC stats,clip-level,0.25,1744,1,0.6144502668421707
+v1 MFCC stats,clip-level,0.25,1744,2,0.5984840159545717
+v1 MFCC stats,clip-level,0.5,3488,0,0.692057467521273
+v1 MFCC stats,clip-level,0.5,3488,1,0.6740794188349883
+v1 MFCC stats,clip-level,0.5,3488,2,0.6584950266764479
+v1 MFCC stats,clip-level,0.75,5232,0,0.7197872822622158
+v1 MFCC stats,clip-level,0.75,5232,1,0.7025843079396448
+v1 MFCC stats,clip-level,0.75,5232,2,0.6984666578541465
+v1 MFCC stats,clip-level,1.0,6977,0,0.7264905504239872
+v1 MFCC stats,clip-level,1.0,6977,1,0.7283987566624571
+v1 MFCC stats,clip-level,1.0,6977,2,0.7229861206593222
+v1 MFCC stats,strict,0.1,693,0,0.3554204964863882
+v1 MFCC stats,strict,0.1,693,1,0.3848182580604176
+v1 MFCC stats,strict,0.1,693,2,0.3737498493947743
+v1 MFCC stats,strict,0.25,1732,0,0.434230228208003
+v1 MFCC stats,strict,0.25,1732,1,0.43826698195899255
+v1 MFCC stats,strict,0.25,1732,2,0.4293343527636766
+v1 MFCC stats,strict,0.5,3465,0,0.4798903122434432
+v1 MFCC stats,strict,0.5,3465,1,0.4711856158353618
+v1 MFCC stats,strict,0.5,3465,2,0.47254871960727257
+v1 MFCC stats,strict,0.75,5198,0,0.48937445942015867
+v1 MFCC stats,strict,0.75,5198,1,0.4926976175598661
+v1 MFCC stats,strict,0.75,5198,2,0.48463327881755863
+v1 MFCC stats,strict,1.0,6931,0,0.5001250477017126
+v1 MFCC stats,strict,1.0,6931,1,0.49462216730870345
+v1 MFCC stats,strict,1.0,6931,2,0.48584537491926494
