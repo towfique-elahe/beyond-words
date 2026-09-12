@@ -64,3 +64,8 @@ desktop.ini
 
 # ---- Private supervisor/meeting docs (not distributed) ----
 docs/supervisor/
+
+# Thesis manuscript drafts (keep off the public repo until after submission)
+docs/thesis/*.docx
+docs/thesis/*.pdf
+docs/thesis/*.pages
