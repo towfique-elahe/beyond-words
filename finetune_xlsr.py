@@ -51,11 +51,27 @@ def pick_device():
 
 
 # ----------------------------- data -----------------------------
+def make_augmenter():
+    """Waveform augmentation to suppress recording-channel cues (train only).
+    scipy/librosa-backed transforms only — no ffmpeg/codec dependencies."""
+    from audiomentations import (AddGaussianSNR, BandPassFilter, Compose, Gain,
+                                 PitchShift, SevenBandParametricEQ, TimeStretch)
+    return Compose([
+        Gain(min_gain_db=-6.0, max_gain_db=6.0, p=0.5),
+        AddGaussianSNR(min_snr_db=10.0, max_snr_db=30.0, p=0.5),
+        SevenBandParametricEQ(min_gain_db=-6.0, max_gain_db=6.0, p=0.3),
+        BandPassFilter(min_center_freq=300.0, max_center_freq=3400.0, p=0.15),
+        PitchShift(min_semitones=-2.0, max_semitones=2.0, p=0.25),
+        TimeStretch(min_rate=0.9, max_rate=1.1, p=0.25),
+    ])
+
+
 class ClipDataset(Dataset):
-    def __init__(self, df, audio_root, lab2id):
+    def __init__(self, df, audio_root, lab2id, augment=None):
         self.rows = df.to_dict("records")
         self.audio_root = audio_root
         self.lab2id = lab2id
+        self.augment = augment
 
     def __len__(self):
         return len(self.rows)
@@ -67,6 +83,8 @@ class ClipDataset(Dataset):
         assert sr == SR, f"{path}: expected {SR} Hz, got {sr}"
         if wav.ndim > 1:                       # safety; clips are mono already
             wav = wav.mean(axis=1)
+        if self.augment is not None:
+            wav = self.augment(samples=wav, sample_rate=SR)
         if len(wav) >= CLIP_SAMPLES:
             wav = wav[:CLIP_SAMPLES]
         else:
@@ -111,6 +129,8 @@ def main():
     ap.add_argument("--workers", type=int, default=2)
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--limit", type=int, default=0, help="per-split cap for smoke tests")
+    ap.add_argument("--augment", action="store_true",
+                    help="waveform augmentation on the train split (audiomentations)")
     ap.add_argument("--grad-ckpt", action="store_true", help="gradient checkpointing (slower, less VRAM)")
     ap.add_argument("--no-amp", action="store_true", help="disable fp16 autocast on CUDA")
     args = ap.parse_args()
@@ -138,8 +158,11 @@ def main():
     print({k: len(v) for k, v in parts.items()})
 
     pin = device == "cuda"
+    aug = make_augmenter() if args.augment else None
     loaders = {
-        s: DataLoader(ClipDataset(p, audio_root, lab2id), batch_size=args.batch,
+        s: DataLoader(ClipDataset(p, audio_root, lab2id,
+                                  augment=(aug if s == "train" else None)),
+                      batch_size=args.batch,
                       shuffle=(s == "train"), num_workers=args.workers,
                       collate_fn=collate, pin_memory=pin, drop_last=(s == "train"))
         for s, p in parts.items()
