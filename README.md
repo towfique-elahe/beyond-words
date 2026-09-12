@@ -86,6 +86,9 @@ python build_split.py --manifest manifest_speaker.csv --out manifest_split_stric
 python baseline_whisper.py train --emb embeddings.npz --device cpu --remap-split manifest_split_strict.csv
 python baseline_mfcc.py cache --manifest manifest_split.csv --out features_v1.npz
 python data_efficiency.py
+
+# 5. Inference demo (any audio file/format; needs a trained checkpoint)
+python predict.py path/to/clip.wav
 ```
 
 ### Phase 2: fine-tune XLS-R on Kaggle (free T4)
@@ -266,6 +269,7 @@ The project runs on a zero-hardware budget. Phases 0–1 were developed on an **
 ├── build_speaker_clusters.py  # Phase 3: ECAPA pseudo-speaker clustering
 ├── baseline_mfcc.py       # Phase 3: v1-style MFCC features (ablation)
 ├── data_efficiency.py     # Phase 3: label-fraction sweep + curve
+├── predict.py             # Phase 4: inference demo (dialect + confidence)
 ├── splits/                # committed splits (relative paths, reproducibility)
 │   ├── manifest_split_rel.csv         # canonical clip-level split
 │   └── manifest_split_strict_rel.csv  # Phase 3 strict pseudo-speaker split
@@ -278,7 +282,10 @@ The project runs on a zero-hardware budget. Phases 0–1 were developed on an **
 │   ├── figures/           # result figures (baseline + fine-tuned + ablation)
 │   ├── phase2/            # XLS-R run metrics + test predictions
 │   └── phase3/            # strict-split evaluations + ablation artifacts
-├── docs/                  # thesis notes (leakage caveat, etc.)
+├── docs/                  # thesis materials
+│   ├── thesis/            #   chapter outline + methodology/results/discussion drafts
+│   ├── reproducibility.md #   exact result→command map, release checklist
+│   └── caveat.txt         #   original leakage caveat note
 ├── LICENSE                # MIT
 └── README.md
 ```
