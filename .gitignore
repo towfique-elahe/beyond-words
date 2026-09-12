@@ -2,6 +2,8 @@
 # Manifests + splits: build_manifest.py / build_split.py
 manifest.csv
 manifest_split.csv
+manifest_speaker.csv
+manifest_split_strict.csv
 # Legacy v1 hand-crafted features
 features.csv
 # Cached encoder embeddings: python baseline_whisper.py cache

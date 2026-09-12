@@ -1,0 +1,26 @@
+{
+  "experiment": "Phase 3 strict split (pseudo-speaker group-disjoint)",
+  "clustering": {
+    "model": "speechbrain/spkrec-ecapa-voxceleb",
+    "method": "agglomerative, cosine, average linkage",
+    "threshold": 0.5,
+    "calibration": "Formal class true sources, ARI 0.347"
+  },
+  "split": {
+    "train": 6931,
+    "val": 1045,
+    "test": 1327,
+    "groups": 1683,
+    "groups_crossing_splits": 0
+  },
+  "baseline_whisper_mlp": {
+    "clip_level_test_macroF1": 0.9172,
+    "strict_test_macroF1": 0.7933,
+    "delta": -0.1239
+  },
+  "xlsr_finetuned": {
+    "clip_level_test_macroF1": 0.9524,
+    "strict_test_macroF1": null,
+    "note": "requires retraining on strict train split (Kaggle)"
+  }
+}

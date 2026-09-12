@@ -96,9 +96,21 @@ class MLP(nn.Module):
 def train(args):
     from sklearn.metrics import classification_report, confusion_matrix, f1_score
 
+    torch.manual_seed(args.seed)
+    np.random.seed(args.seed)
+
     d = np.load(args.emb, allow_pickle=True)
     X, y, splits, labels = d["X"], d["y"], d["splits"], list(d["labels"])
-    device = pick_device()
+    if args.remap_split:
+        # Re-assign splits from another manifest (e.g. the strict speaker-
+        # clustered split). Embeddings were cached in manifest row order with
+        # zero skips, so rows align 1:1.
+        remap = pd.read_csv(args.remap_split)
+        assert len(remap) == len(y), (
+            f"row count mismatch: {args.remap_split} has {len(remap)} rows, "
+            f"embeddings have {len(y)}")
+        splits = remap["split"].values
+    device = args.device if args.device else (pick_device())
 
     # standardize features on train stats
     tr = splits == "train"
@@ -166,6 +178,11 @@ if __name__ == "__main__":
     t = sub.add_parser("train")
     t.add_argument("--emb", default="embeddings.npz")
     t.add_argument("--epochs", type=int, default=60)
+    t.add_argument("--seed", type=int, default=42)
+    t.add_argument("--remap-split", default="",
+                   help="manifest CSV whose 'split' column overrides the cached one")
+    t.add_argument("--device", default="",
+                   help="cpu|mps|cuda (default: auto). cpu is fully deterministic")
     t.set_defaults(func=train)
 
     args = ap.parse_args()
