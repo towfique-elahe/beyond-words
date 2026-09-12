@@ -103,7 +103,8 @@ def main():
     print("\nSplit totals:")
     print(df["split"].value_counts())
 
-    regional_unsourced = df[(df["source_id"].fillna("") == "")]
+    spk = df.get("speaker_id", pd.Series("", index=df.index)).fillna("").astype(str)
+    regional_unsourced = df[(df["source_id"].fillna("") == "") & (spk == "")]
     if len(regional_unsourced):
         print("\n[!] CAVEAT FOR THESIS: "
               f"{len(regional_unsourced)} clips (the regional classes) have no "
