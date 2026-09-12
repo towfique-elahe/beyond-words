@@ -2,7 +2,7 @@
 
 **Bangla Dialect Identification with Self-Supervised Speech Models**
 
-Classifying regional Bangla accents from short audio clips. v2 replaces the original hand-crafted-features + MLP pipeline with pretrained speech-model embeddings and (upcoming) end-to-end fine-tuning, plus a leakage-aware data pipeline.
+Classifying regional Bangla accents from short audio clips. v2 replaces the original hand-crafted-features + MLP pipeline with pretrained self-supervised speech models and a leakage-aware data pipeline. Headline results: **0.917** test macro-F1 with frozen Whisper-small embeddings, **0.952** after end-to-end XLS-R-300M fine-tuning, and — under a strict pseudo-speaker split that removes speaker/channel leakage — honest estimates of **0.793 / 0.808**.
 
 > Thesis: *A Neural Network Approach to Classifying Bangla Accentual Diversity* — framed as a Dialect Identification (DID) task.
 
@@ -21,7 +21,7 @@ Classifying regional Bangla accents from short audio clips. v2 replaces the orig
 | Noakhali | 1,213 |
 | Rajshahi | 860 |
 | Sylhet | 958 |
-| **Total** | **9,305** (~13 hours) |
+| **Total** | **9,305** (9,303 pass validation; ~13 hours) |
 
 All clips are ~5-second `.wav`, standardized to 16 kHz mono PCM-16. Audio was collected from TV shows, films, and online content, originally in mp4.
 
@@ -32,8 +32,8 @@ All clips are ~5-second `.wav`, standardized to 16 kHz mono PCM-16. Audio was co
 | | v1 | v2 |
 |---|---|---|
 | Features | Hand-crafted (MFCC etc.) in `features.csv` | Raw audio → pretrained speech-model embeddings |
-| Model | Small feed-forward NN | Whisper-small encoder + weighted MLP head (baseline); XLS-R-300M fine-tuning (planned) |
-| Splitting | Random | Stratified; **source-disjoint where source metadata exists** |
+| Model | Small feed-forward NN | Whisper-small encoder + weighted MLP head (baseline); fine-tuned XLS-R-300M |
+| Splitting | Random | Stratified + source-disjoint where metadata exists; **strict pseudo-speaker split** (ECAPA clustering) for honest evaluation |
 | Imbalance | Unhandled | Inverse-frequency class weights; macro-F1 reported |
 | Leakage awareness | None | Source IDs tracked; limitations disclosed (see below) |
 
@@ -72,12 +72,20 @@ conda activate beyond-words
 # 1. Manifest (validates + converts to 16k mono in place)
 python build_manifest.py --root "path/to/bangla_accent_voice_data" --out manifest.csv --standardize
 
-# 2. Split (85/10/15 stratified by district; grouped by source_id where available)
+# 2. Split (75/10/15 stratified by district; grouped by source_id where available)
 python build_split.py --manifest manifest.csv --out manifest_split.csv
 
 # 3. Baseline
 python baseline_whisper.py cache --manifest manifest_split.csv --out embeddings.npz
-python baseline_whisper.py train --emb embeddings.npz --epochs 60
+python baseline_whisper.py train --emb embeddings.npz --epochs 60 --device cpu
+
+# 4. Strict split + local Phase 3 evaluations
+python build_speaker_clusters.py embed   --manifest manifest_split.csv --out ecapa_embeddings.npz
+python build_speaker_clusters.py cluster --manifest manifest_split.csv --emb ecapa_embeddings.npz --out manifest_speaker.csv
+python build_split.py --manifest manifest_speaker.csv --out manifest_split_strict.csv
+python baseline_whisper.py train --emb embeddings.npz --device cpu --remap-split manifest_split_strict.csv
+python baseline_mfcc.py cache --manifest manifest_split.csv --out features_v1.npz
+python data_efficiency.py
 ```
 
 ### Phase 2: fine-tune XLS-R on Kaggle (free T4)
@@ -91,12 +99,16 @@ Kaggle T4 (16 GB, 30 GPU-h/week) covers it in one ~2 h session. The run uses the
    a `dataset-metadata.json` is expected in the audio root; edit the `id` to your
    Kaggle username, then:
    ```bash
-   pip install kaggle          # + put your API token in ~/.kaggle/kaggle.json
+   pip install kaggle          # auth: kaggle.json, or an access token in ~/.kaggle/access_token
    kaggle datasets create -p path/to/bangla_accent_voice_data --dir-mode zip
    ```
    (Kaggle datasets are private by default; or use the website's *Create Dataset* UI.)
 2. **Run the notebook:** upload [`notebooks/kaggle_xlsr_finetune.ipynb`](notebooks/kaggle_xlsr_finetune.ipynb)
    to Kaggle, attach the dataset, set accelerator to GPU T4 and Internet ON, *Save & Run All*.
+   (Or push it headlessly: `kaggle kernels push --accelerator NvidiaTeslaT4` with a
+   `kernel-metadata.json` — forcing the T4 matters, as Kaggle's default GPU assignment
+   can hand out a P100 that current PyTorch builds no longer support.) The notebook's
+   `MANIFEST` / `EXTRA_ARGS` variables select the strict split and `--augment`.
 3. **Collect outputs** from the notebook's Output tab: `xlsr_best.pt`,
    `metrics_xlsr.json`, `test_predictions_xlsr.csv`.
 
@@ -226,11 +238,11 @@ three models, XLS-R strict metrics/predictions, and `strict_split_results.json`.
 
 ## Known limitations (disclosed by design)
 
-- **Possible source/channel leakage for regional classes.** Formal-class filenames contain recoverable YouTube video IDs, enabling a source-disjoint split. The 8 regional classes have only sequential filenames with no recoverable speaker/source metadata, so their split is clip-level. The same speaker or recording source may therefore appear in both train and test, and **reported scores for regional classes should be read as an upper bound.** Near-perfect scores for individual classes (e.g., Khulna) may partly reflect recording-channel signatures rather than accent alone.
+- **Source/channel leakage in the canonical split — now measured.** About a third of Formal clips (559 of 1,654, 35 sources) carry recoverable YouTube video IDs and are split source-disjoint. All other clips have no recoverable speaker/source metadata, so the canonical split is clip-level for them and the same speaker or recording source may appear in both train and test. **Clip-level scores are therefore an upper bound** — quantified by the strict-split results above at 12–14 macro-F1 points for the pretrained models. Near-perfect clip-level scores for individual classes (e.g., Khulna) partly reflect recording-channel signatures.
 - **Class imbalance** (Formal 1,654 vs. Khulna 750) is mitigated with weighted loss; macro-F1 is the headline metric, not accuracy.
 - Clips are ~5 s; longer-context dialect cues are not modeled.
 
-Mitigation status: speaker clustering (ECAPA) is implemented — see the strict-split results below, which quantify the leakage at 12–14 macro-F1 points for the pretrained models. Channel-suppression augmentation was tested and *reduced* strict-split accuracy (see the negative result below); prosody-preserving augmentation remains future work.
+Mitigation status: speaker clustering (ECAPA) is implemented — the strict-split results above quantify the leakage. Channel-suppression augmentation was tested and *reduced* strict-split accuracy (negative result above); prosody-preserving augmentation remains future work.
 
 ## Roadmap
 
@@ -242,7 +254,7 @@ Mitigation status: speaker clustering (ECAPA) is implemented — see the strict-
 
 ## Hardware
 
-Phases 0–1 were developed on a single **NVIDIA GTX 1660 Ti (6 GB)** and later reproduced on an **Apple M1 (16 GB unified memory)** via PyTorch's MPS backend — the device is auto-selected (`cuda` > `mps` > `cpu`). All configurations are sized for a small-memory budget: fp32, frozen feature encoder, small batches, and one-time embedding caching. Phase 2 end-to-end fine-tuning targets a free cloud GPU (Kaggle/Colab T4, 16 GB VRAM).
+The project runs on a zero-hardware budget. Phases 0–1 were developed on an **NVIDIA GTX 1660 Ti (6 GB)** and reproduced within 0.3 macro-F1 points on an **Apple M1 (16 GB)** via PyTorch's MPS backend — the device is auto-selected (`cuda` > `mps` > `cpu`). Everything except end-to-end fine-tuning (embedding caches, MLP heads, ECAPA clustering, ablations) runs locally on the M1; the XLS-R fine-tuning runs (Phases 2–3) each used ~2.5 h of Kaggle's free T4 tier (16 GB, 30 GPU-h/week).
 
 ## Repository layout
 
@@ -254,8 +266,9 @@ Phases 0–1 were developed on a single **NVIDIA GTX 1660 Ti (6 GB)** and later 
 ├── build_speaker_clusters.py  # Phase 3: ECAPA pseudo-speaker clustering
 ├── baseline_mfcc.py       # Phase 3: v1-style MFCC features (ablation)
 ├── data_efficiency.py     # Phase 3: label-fraction sweep + curve
-├── splits/                # committed canonical split (relative paths)
-│   └── manifest_split_rel.csv
+├── splits/                # committed splits (relative paths, reproducibility)
+│   ├── manifest_split_rel.csv         # canonical clip-level split
+│   └── manifest_split_strict_rel.csv  # Phase 3 strict pseudo-speaker split
 ├── environment.yml        # conda environment (CUDA machines)
 ├── requirements.txt       # pip environment (macOS / Apple Silicon or any platform)
 ├── notebooks/             # analysis notebooks (EDA, figures)
@@ -270,12 +283,13 @@ Phases 0–1 were developed on a single **NVIDIA GTX 1660 Ti (6 GB)** and later 
 └── README.md
 ```
 
-Generated artifacts (`manifest.csv`, `manifest_split.csv`, `embeddings.npz`) and the
-audio dataset are **not** tracked in git — regenerate them with the pipeline above.
+Generated artifacts (manifests, `embeddings.npz`, `ecapa_embeddings.npz`,
+`features_v1.npz`, model checkpoints) and the audio dataset are **not** tracked in
+git — regenerate them with the pipeline above.
 
 ## Acknowledgements
 
-Built on [OpenAI Whisper](https://github.com/openai/whisper) encoders and the Hugging Face `transformers` ecosystem. Planned fine-tuning uses [XLS-R](https://huggingface.co/facebook/wav2vec2-xls-r-300m).
+Built on [OpenAI Whisper](https://github.com/openai/whisper) encoders, [XLS-R](https://huggingface.co/facebook/wav2vec2-xls-r-300m) fine-tuning via the Hugging Face `transformers` ecosystem, [SpeechBrain](https://speechbrain.github.io/)'s ECAPA-TDNN for speaker clustering, and [audiomentations](https://github.com/iver56/audiomentations) for the augmentation study.
 
 ## License
 
