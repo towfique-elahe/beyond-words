@@ -45,6 +45,9 @@ build_split.py     →  manifest_split.csv    # train/val/test (group-aware wher
 baseline_whisper.py cache  →  embeddings.npz  # Whisper-small encoder, mean-pooled, cached once
 baseline_whisper.py train                     # weighted MLP head + evaluation
 finetune_xlsr.py           →  xlsr_best.pt    # Phase 2: end-to-end XLS-R-300M (Kaggle T4)
+build_speaker_clusters.py  →  manifest_speaker.csv       # Phase 3: ECAPA pseudo-speakers
+build_split.py --manifest manifest_speaker.csv           #   → strict group-disjoint split
+baseline_mfcc.py cache     →  features_v1.npz # Phase 3: v1-style MFCC ablation row
 ```
 
 ### Setup
@@ -155,20 +158,62 @@ The Barishal ↔ Noakhali confusion shrinks (31 → 15 errors) but remains the d
 
 Run artifacts (metrics, test predictions) live in [`reports/phase2/`](reports/phase2/); the checkpoint (1.2 GB) is not tracked in git.
 
+## Strict-split results (Phase 3: how much was leakage?)
+
+The clip-level scores above are disclosed as an **upper bound** because regional
+classes lack speaker metadata. Phase 3 measures the gap. `build_speaker_clusters.py`
+embeds every clip with ECAPA-TDNN and clusters per district (agglomerative, cosine);
+the distance threshold is **calibrated on the Formal class**, whose true YouTube
+source IDs are known (0.50 maximizes adjusted Rand index against them). The
+resulting 1,683 pseudo-speaker groups are verified never to cross splits, giving a
+strict group-disjoint split ([`splits/manifest_split_strict_rel.csv`](splits/manifest_split_strict_rel.csv)).
+All three representations were then re-evaluated under the identical protocol
+(same MLP/weighted loss/seed; XLS-R retrained from scratch on the strict train set):
+
+| Representation | Clip-level split | Strict split | Δ |
+|---|---|---|---|
+| v1 MFCC stats + MLP (`baseline_mfcc.py`) | 0.728 | 0.480 | −24.8 |
+| Frozen Whisper-small + MLP | 0.917 | 0.793 | −12.4 |
+| Fine-tuned XLS-R-300M | 0.952 | 0.808 | −14.4 |
+
+<p align="center">
+  <img src="reports/figures/ablation_representation_split.png" alt="Ablation: representation x split" width="70%" />
+</p>
+
+Findings:
+
+- **Roughly 12–14 points of the headline scores are attributable to speaker/channel
+  overlap**, now measured rather than speculated. Strict-split numbers are the
+  honest estimates; clip-level numbers remain comparable to prior work.
+- **Self-supervised representations are more leakage-robust than hand-crafted
+  features**: MFCCs lose 24.8 points under the strict split — half their apparent
+  skill was channel signature — versus 12–14 for the pretrained models.
+- **Fine-tuning still helps under the strict split** (+1.5 over the frozen
+  baseline), but most of its clip-level advantage (+3.5) came from exploiting
+  recording-channel cues.
+- Formal, whose split was source-disjoint from the start, moves least among the
+  well-populated classes — evidence the drop measures leakage, not model failure.
+- Caveats: pseudo-speakers are approximate (calibration ARI 0.347), and some strict
+  test cells are dominated by single large clusters (e.g. Barishal), making
+  per-class strict numbers noisier than the macro average.
+
+Artifacts in [`reports/phase3/`](reports/phase3/): strict-split evaluations for all
+three models, XLS-R strict metrics/predictions, and `strict_split_results.json`.
+
 ## Known limitations (disclosed by design)
 
 - **Possible source/channel leakage for regional classes.** Formal-class filenames contain recoverable YouTube video IDs, enabling a source-disjoint split. The 8 regional classes have only sequential filenames with no recoverable speaker/source metadata, so their split is clip-level. The same speaker or recording source may therefore appear in both train and test, and **reported scores for regional classes should be read as an upper bound.** Near-perfect scores for individual classes (e.g., Khulna) may partly reflect recording-channel signatures rather than accent alone.
 - **Class imbalance** (Formal 1,654 vs. Khulna 750) is mitigated with weighted loss; macro-F1 is the headline metric, not accuracy.
 - Clips are ~5 s; longer-context dialect cues are not modeled.
 
-Planned mitigations: speaker clustering (ECAPA embeddings) to build pseudo-speaker groups for a stricter split, and augmentation (noise, reverb, speed/pitch, codec round-trip) to suppress channel cues.
+Mitigation status: speaker clustering (ECAPA) is implemented — see the strict-split results below, which quantify the leakage at 12–14 macro-F1 points for the pretrained models. Augmentation (noise, reverb, speed/pitch, codec round-trip) to suppress channel cues remains planned.
 
 ## Roadmap
 
 - [x] Phase 0 — data hygiene, manifest, leakage-aware splitting
 - [x] Phase 1 — cached Whisper-small embedding baseline
 - [x] Phase 2 — fine-tune `facebook/wav2vec2-xls-r-300m` end-to-end (fp16, Kaggle T4) — **0.952 test macro-F1**
-- [ ] Phase 3 — ablation table (v1 features vs. frozen embeddings vs. fine-tuned), augmentation study, speaker-clustered strict split, data-efficiency curve
+- [x] Phase 3 — speaker-clustered strict split (**0.793 / 0.808** honest estimates) + ablation table; still open: augmentation study, data-efficiency curve
 - [ ] Phase 4 — thesis write-up, reproducible release, inference demo
 
 ## Hardware
@@ -182,6 +227,8 @@ Phases 0–1 were developed on a single **NVIDIA GTX 1660 Ti (6 GB)** and later 
 ├── build_split.py         # Phase 0: leakage-aware train/val/test split
 ├── baseline_whisper.py    # Phase 1: cache embeddings, train + evaluate head
 ├── finetune_xlsr.py       # Phase 2: end-to-end XLS-R-300M fine-tuning
+├── build_speaker_clusters.py  # Phase 3: ECAPA pseudo-speaker clustering
+├── baseline_mfcc.py       # Phase 3: v1-style MFCC features (ablation)
 ├── splits/                # committed canonical split (relative paths)
 │   └── manifest_split_rel.csv
 ├── environment.yml        # conda environment (CUDA machines)
@@ -190,8 +237,9 @@ Phases 0–1 were developed on a single **NVIDIA GTX 1660 Ti (6 GB)** and later 
 │   ├── beyond-words.ipynb
 │   └── kaggle_xlsr_finetune.ipynb
 ├── reports/
-│   ├── figures/           # result figures (baseline + fine-tuned)
-│   └── phase2/            # XLS-R run metrics + test predictions
+│   ├── figures/           # result figures (baseline + fine-tuned + ablation)
+│   ├── phase2/            # XLS-R run metrics + test predictions
+│   └── phase3/            # strict-split evaluations + ablation artifacts
 ├── docs/                  # thesis notes (leakage caveat, etc.)
 ├── LICENSE                # MIT
 └── README.md
