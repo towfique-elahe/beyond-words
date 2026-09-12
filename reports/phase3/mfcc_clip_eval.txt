@@ -1,0 +1,39 @@
+ep  0  loss 2.202  val_macroF1 0.167
+ep 10  loss 1.804  val_macroF1 0.371
+ep 20  loss 1.387  val_macroF1 0.521
+ep 30  loss 1.060  val_macroF1 0.601
+ep 40  loss 0.853  val_macroF1 0.659
+ep 50  loss 0.690  val_macroF1 0.690
+ep 59  loss 0.582  val_macroF1 0.717
+
+==== TEST ====
+macro-F1: 0.7275
+              precision    recall  f1-score   support
+
+    Barishal      0.711     0.603     0.653       179
+  Chattogram      0.617     0.579     0.597       114
+       Dhaka      0.605     0.716     0.655       109
+      Formal      0.796     0.746     0.770       236
+      Khulna      0.845     0.916     0.879       107
+  Mymensingh      0.667     0.636     0.651       151
+    Noakhali      0.692     0.684     0.688       174
+    Rajshahi      0.746     0.820     0.781       122
+      Sylhet      0.825     0.927     0.873       137
+
+    accuracy                          0.728      1329
+   macro avg      0.723     0.736     0.727      1329
+weighted avg      0.727     0.728     0.726      1329
+
+Confusion matrix (rows=true, cols=pred):
+            Barishal  Chattogram  Dhaka  ...  Noakhali  Rajshahi  Sylhet
+Barishal         108           9     15  ...        23         3       9
+Chattogram        10          66      3  ...         1         4       4
+Dhaka              3           2     78  ...         5         1       2
+Formal            12          16      8  ...         3         3       8
+Khulna             0           1      0  ...         0         7       0
+Mymensingh         6          10      6  ...        15         9       1
+Noakhali          13           2     12  ...       119         5       1
+Rajshahi           0           0      7  ...         6       100       2
+Sylhet             0           1      0  ...         0         2     127
+
+[9 rows x 9 columns]

@@ -20,7 +20,14 @@
   },
   "xlsr_finetuned": {
     "clip_level_test_macroF1": 0.9524,
-    "strict_test_macroF1": null,
-    "note": "requires retraining on strict train split (Kaggle)"
+    "strict_test_macroF1": 0.8084,
+    "delta": -0.144,
+    "note": "retrained from scratch on strict train split, 20 epochs, Kaggle T4, seed 42"
+  },
+  "mfcc_v1_mlp": {
+    "clip_level_test_macroF1": 0.7275,
+    "strict_test_macroF1": 0.4795,
+    "delta": -0.248,
+    "features": "40 MFCC + delta + delta2, mean/std pooled (240-d)"
   }
 }
