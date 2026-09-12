@@ -175,6 +175,7 @@ All three representations were then re-evaluated under the identical protocol
 | v1 MFCC stats + MLP (`baseline_mfcc.py`) | 0.728 | 0.480 | −24.8 |
 | Frozen Whisper-small + MLP | 0.917 | 0.793 | −12.4 |
 | Fine-tuned XLS-R-300M | 0.952 | 0.808 | −14.4 |
+| Fine-tuned XLS-R-300M + train-time augmentation | — | 0.748 | — |
 
 <p align="center">
   <img src="reports/figures/ablation_representation_split.png" alt="Ablation: representation x split" width="70%" />
@@ -193,9 +194,32 @@ Findings:
   recording-channel cues.
 - Formal, whose split was source-disjoint from the start, moves least among the
   well-populated classes — evidence the drop measures leakage, not model failure.
+- **Augmentation is a negative result.** Training with a channel-suppression
+  chain (gain, additive noise, 7-band EQ, telephone band-pass, pitch ±2 st,
+  tempo 0.9–1.1; `finetune_xlsr.py --augment`) *lowered* strict macro-F1 from
+  0.808 to 0.748. The likely mechanism is that pitch and tempo perturbations
+  destroy dialect-bearing prosodic cues — for DID, unlike ASR, prosody is signal,
+  not nuisance. A milder, prosody-preserving chain is future work.
 - Caveats: pseudo-speakers are approximate (calibration ARI 0.347), and some strict
   test cells are dominated by single large clusters (e.g. Barishal), making
   per-class strict numbers noisier than the macro average.
+
+### Data efficiency
+
+`data_efficiency.py` retrains the identical MLP head on stratified fractions of
+the train split (3 seeds per point, min–max bands):
+
+<p align="center">
+  <img src="reports/figures/data_efficiency.png" alt="Data-efficiency curves" width="70%" />
+</p>
+
+- **Frozen Whisper embeddings with 10 % of the labels (0.79 clip-level / 0.67
+  strict) outperform MFCCs with 100 % (0.73 / 0.49)** — pretraining is worth more
+  than a tenfold increase in labeled data here.
+- Curves flatten beyond ~50 % of the data: the ~13 h corpus is adequately sized
+  for the frozen-embedding approach.
+- The representation gap widens under the strict split at every fraction — the
+  leakage-robustness advantage of self-supervised features holds across scales.
 
 Artifacts in [`reports/phase3/`](reports/phase3/): strict-split evaluations for all
 three models, XLS-R strict metrics/predictions, and `strict_split_results.json`.
@@ -206,14 +230,14 @@ three models, XLS-R strict metrics/predictions, and `strict_split_results.json`.
 - **Class imbalance** (Formal 1,654 vs. Khulna 750) is mitigated with weighted loss; macro-F1 is the headline metric, not accuracy.
 - Clips are ~5 s; longer-context dialect cues are not modeled.
 
-Mitigation status: speaker clustering (ECAPA) is implemented — see the strict-split results below, which quantify the leakage at 12–14 macro-F1 points for the pretrained models. Augmentation (noise, reverb, speed/pitch, codec round-trip) to suppress channel cues remains planned.
+Mitigation status: speaker clustering (ECAPA) is implemented — see the strict-split results below, which quantify the leakage at 12–14 macro-F1 points for the pretrained models. Channel-suppression augmentation was tested and *reduced* strict-split accuracy (see the negative result below); prosody-preserving augmentation remains future work.
 
 ## Roadmap
 
 - [x] Phase 0 — data hygiene, manifest, leakage-aware splitting
 - [x] Phase 1 — cached Whisper-small embedding baseline
 - [x] Phase 2 — fine-tune `facebook/wav2vec2-xls-r-300m` end-to-end (fp16, Kaggle T4) — **0.952 test macro-F1**
-- [x] Phase 3 — speaker-clustered strict split (**0.793 / 0.808** honest estimates) + ablation table; still open: augmentation study, data-efficiency curve
+- [x] Phase 3 — speaker-clustered strict split (**0.793 / 0.808** honest estimates), ablation table, augmentation study (negative result), data-efficiency curve
 - [ ] Phase 4 — thesis write-up, reproducible release, inference demo
 
 ## Hardware
@@ -229,6 +253,7 @@ Phases 0–1 were developed on a single **NVIDIA GTX 1660 Ti (6 GB)** and later 
 ├── finetune_xlsr.py       # Phase 2: end-to-end XLS-R-300M fine-tuning
 ├── build_speaker_clusters.py  # Phase 3: ECAPA pseudo-speaker clustering
 ├── baseline_mfcc.py       # Phase 3: v1-style MFCC features (ablation)
+├── data_efficiency.py     # Phase 3: label-fraction sweep + curve
 ├── splits/                # committed canonical split (relative paths)
 │   └── manifest_split_rel.csv
 ├── environment.yml        # conda environment (CUDA machines)

@@ -29,5 +29,11 @@
     "strict_test_macroF1": 0.4795,
     "delta": -0.248,
     "features": "40 MFCC + delta + delta2, mean/std pooled (240-d)"
+  },
+  "xlsr_finetuned_augmented": {
+    "strict_test_macroF1": 0.7482,
+    "vs_no_augment": -0.0602,
+    "augmentation": "gain, gaussian SNR 10-30dB, 7-band EQ, band-pass 300-3400Hz, pitch \u00b12st, tempo 0.9-1.1 (train only)",
+    "finding": "NEGATIVE result: augmentation hurt strict-split DID. Pitch/tempo transforms likely destroy dialect-bearing prosodic cues; 20-epoch budget may also be insufficient under augmentation (val still lower throughout)."
   }
 }
