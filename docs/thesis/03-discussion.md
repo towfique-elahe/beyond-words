@@ -15,10 +15,11 @@ representations, ~25 for hand-crafted features. Three implications:
 2. **The honest headline for this corpus is 0.808** (fine-tuned XLS-R, strict).
    That remains a strong 9-way result (~9× chance) on genuinely unseen
    pseudo-speakers.
-3. Class-level inflation is uneven: Khulna's near-perfect clip-level score
-   (0.986) survives the strict split for the baseline (0.887–0.986 range across
-   models) less dramatically than Barishal's collapse (0.871 → 0.603), suggesting
-   Barishal's clip-level score leaned most on recording-channel signatures.
+3. Class-level inflation is uneven, but per-class strict numbers must be read
+   with care: Barishal's strict test set is a single 251-clip pseudo-speaker
+   cluster, so its collapse (0.871 → 0.603 baseline) measures generalization to
+   one speaker/source rather than to the class. Macro-level conclusions are the
+   robust ones.
 
 ## 6.2 Errors follow dialect geography
 
@@ -32,8 +33,10 @@ clip-level split).
 
 ## 6.3 Why fine-tuning's advantage shrinks under strict evaluation
 
-Fine-tuned XLS-R gains +3.5 points at clip level but only +1.5 under the strict
-split, and its strict drop (−14.4) slightly exceeds the frozen baseline's (−12.4).
+Fine-tuned XLS-R gains +3.5 points at clip level (significant: group-bootstrap
+CI +1.8 to +5.3) but only +1.5 under the strict split — a gap that is **not**
+statistically significant (CI −2.0 to +7.5) — and its strict drop (−14.4)
+slightly exceeds the frozen baseline's (−12.4).
 End-to-end adaptation gives the model freedom to exploit *whatever* discriminates
 training classes — including channel signatures correlated with class in the
 training data. A frozen general-purpose representation cannot specialize this way.
@@ -72,8 +75,19 @@ until shown otherwise. Testing that reduced chain is left as future work.
   intonation phrases).
 - **Single-domain corpus** (broadcast/online media); generalization to
   conversational or telephone speech is untested.
-- The Formal class is one register from 35 sources; its stability across
-  protocols partly reflects that narrowness.
+- **Model family is confounded with adaptation regime**: the frozen model is
+  Whisper-small and the fine-tuned one is XLS-R-300M, so "frozen vs fine-tuned"
+  and "Whisper vs XLS-R" are not separated. Frozen XLS-R embeddings (cheap,
+  local) would disentangle them.
+- **Single-seed fine-tuning**: XLS-R results are one seed each; bootstrap CIs
+  cover test-set sampling noise, not training-seed variance.
+- **Whisper pooling includes padding**: Whisper's encoder always sees 30 s of
+  (padded) input, and the baseline mean-pools all 1,500 frames, of which only
+  ~250 cover the 5 s of speech. The padding contribution is constant across
+  clips and the features are standardized, but pooling only the speech frames is
+  the cleaner design.
+- **Found-data authenticity**: clips from films and dramas may include actors
+  performing a dialect rather than native speakers.
 
 ## 6.6 Future work
 

@@ -17,9 +17,10 @@ makes it the calibration anchor for the strict split (§4.3).
 
 `build_manifest.py` scans the corpus, validates and standardizes every file to
 16 kHz mono PCM-16, and extracts recoverable source identifiers from filenames.
-Of 9,305 raw clips, 9,303 pass validation (~13.1 h). Only the Formal class carries
-recoverable provenance: 559 of its 1,654 clips encode YouTube video IDs (35 unique
-sources). The eight regional classes have sequential filenames with no speaker or
+All 9,303 `.wav` clips pass validation (~13.1 h); two duplicate `.ogg` files in the
+Formal folder are not used. Clips are nominally 5 s (median 5.0 s), but 1,067 fall
+outside 4.5–5.5 s (range 1.1–8.0 s). Only the Formal class carries recoverable
+provenance: 557 of its 1,652 clips encode YouTube video IDs (35 unique sources). The eight regional classes have sequential filenames with no speaker or
 source metadata — the root of the leakage problem this thesis quantifies.
 
 ## 4.3 Splitting protocols

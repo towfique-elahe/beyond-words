@@ -29,9 +29,9 @@ Companion drafts: [01-methodology.md](01-methodology.md), [02-results.md](02-res
 
 ## 3. Dataset
 - Source: TV, film, online media; ~5 s clips; 16 kHz mono PCM-16
-- 9,305 raw / 9,303 validated clips, ~13.1 h; class table (750–1,654 per class)
+- 9,303 usable clips (~13.1 h; 2 duplicate .ogg files excluded); 750–1,652 per class
 - The "Formal" design choice: a register, not a region — argued explicitly
-- Metadata reality: 559/1,654 Formal clips have recoverable YouTube source IDs
+- Metadata reality: 557/1,652 Formal clips have recoverable YouTube source IDs
   (35 sources); regional classes have none → the central leakage problem
 - Artifacts: `build_manifest.py`, class table in README
 

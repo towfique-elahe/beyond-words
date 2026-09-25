@@ -18,7 +18,7 @@ All numbers are test macro-F1 unless stated; artifacts in `reports/`.
 | Chattogram | | 0.880 | 0.924 |
 | Mymensingh | | 0.890 | 0.912 |
 | Noakhali | | 0.848 | 0.910 |
-| **macro** | **0.728** | **0.917** | **0.952** |
+| **macro** | **0.727** | **0.917** | **0.952** |
 
 *(Per-class MFCC numbers: `reports/phase3/mfcc_clip_eval.txt`.)*
 
@@ -42,7 +42,7 @@ The six-cell ablation (representation × split), plus the augmentation variant:
 
 | Representation | Clip-level | Strict | Δ (points) |
 |---|---|---|---|
-| v1 MFCC stats + MLP | 0.728 | 0.480 | −24.8 |
+| v1 MFCC stats + MLP | 0.727 | 0.480 | −24.8 |
 | Frozen Whisper-small + MLP | 0.917 | 0.793 | −12.4 |
 | Fine-tuned XLS-R-300M | 0.952 | 0.808 | −14.4 |
 | XLS-R-300M + channel augmentation | — | 0.748 | — |
@@ -53,16 +53,34 @@ Key results:
 1. **Leakage is measured at 12–14 macro-F1 points** for the pretrained models
    (24.8 for MFCC). Strict numbers (0.793 / 0.808) are the honest estimates;
    clip-level numbers remain reported for comparability with prior work.
-2. **Formal barely moves** (0.970 → 0.929 baseline): its split was source-disjoint
-   under both protocols, so its stability isolates the protocol change as the
-   cause of the regional drops.
-3. **Fine-tuning still wins under strict evaluation** (+1.5 over frozen), but most
-   of its clip-level margin (+3.5) came from channel exploitation — its strict
-   drop (−14.4) slightly exceeds the frozen baseline's (−12.4).
+2. **Under strict evaluation, fine-tuned and frozen are statistically tied.**
+   XLS-R's +1.5 lead over frozen Whisper has a speaker-group bootstrap 95 % CI of
+   −2.0 to +7.5; its clip-level +3.5 lead (CI +1.8 to +5.3) is significant. Most
+   of the fine-tuning margin therefore came from channel exploitation — its
+   strict drop (−14.4) slightly exceeds the frozen baseline's (−12.4).
+3. Only the 557 sourced Formal clips were source-disjoint under *both*
+   protocols; Formal's other 1,095 clips moved from clip-level to pseudo-speaker
+   grouping like the regional classes, so Formal is **not** a clean control.
 4. Per-class strict numbers are noisier than the macro average: some test cells
    are dominated by a single large pseudo-speaker cluster (Barishal's strict test
    set is essentially one 251-clip cluster; its strict F1 of 0.60 baseline / 0.51
    XLS-R should be read with that caveat).
+
+### Statistical uncertainty (`bootstrap_ci.py`, B = 2000)
+
+| Model | Clip-level (95 % CI, group bootstrap) | Strict (95 % CI, group bootstrap) |
+|---|---|---|
+| MFCC + MLP | 0.727 (0.676–0.753) | 0.480 (0.368–0.552) |
+| Frozen Whisper + MLP | 0.917 (0.894–0.932) | 0.793 (0.688–0.808) |
+| Fine-tuned XLS-R | 0.952 (0.935–0.963) | 0.808 (0.717–0.838) |
+| XLS-R + augmentation | — | 0.748 (0.649–0.792) |
+
+Groups are pseudo-speakers or YouTube sources (565 in the clip-level test set,
+230 in the strict one). Clip-level bootstrap intervals are narrower but understate
+the variance, because clips from one speaker are correlated. Significant under the
+group bootstrap: every MFCC-vs-SSL gap, XLS-R vs Whisper at clip level, and the
+augmentation drop (−6.0, CI −9.4 to −0.9). Not significant: XLS-R vs Whisper under
+the strict split.
 
 ## 5.3 Data efficiency
 

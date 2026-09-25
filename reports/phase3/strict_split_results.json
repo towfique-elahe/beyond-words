@@ -19,9 +19,9 @@
     "delta": -0.1239
   },
   "xlsr_finetuned": {
-    "clip_level_test_macroF1": 0.9524,
+    "clip_level_test_macroF1": 0.9518,
     "strict_test_macroF1": 0.8084,
-    "delta": -0.144,
+    "delta": -0.1434,
     "note": "retrained from scratch on strict train split, 20 epochs, Kaggle T4, seed 42"
   },
   "mfcc_v1_mlp": {
@@ -35,5 +35,6 @@
     "vs_no_augment": -0.0602,
     "augmentation": "gain, gaussian SNR 10-30dB, 7-band EQ, band-pass 300-3400Hz, pitch \u00b12st, tempo 0.9-1.1 (train only)",
     "finding": "NEGATIVE result: augmentation hurt strict-split DID. Pitch/tempo transforms likely destroy dialect-bearing prosodic cues; 20-epoch budget may also be insufficient under augmentation (val still lower throughout)."
-  }
+  },
+  "bootstrap": "see bootstrap_ci.json: strict XLS-R vs Whisper gap +1.5 is NOT significant (group CI -2.0..+7.5)"
 }
