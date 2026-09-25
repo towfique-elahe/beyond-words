@@ -15,15 +15,15 @@ Classifying regional Bangla accents from short audio clips. v2 replaces the orig
 | Barishal | 1,257 |
 | Chattogram | 797 |
 | Dhaka | 763 |
-| Formal (standard register) | 1,654 |
+| Formal (standard register) | 1,652 |
 | Khulna | 750 |
 | Mymensingh | 1,053 |
 | Noakhali | 1,213 |
 | Rajshahi | 860 |
 | Sylhet | 958 |
-| **Total** | **9,305** (9,303 pass validation; ~13 hours) |
+| **Total** | **9,303** (~13.1 hours; 2 duplicate `.ogg` files in Formal are excluded) |
 
-All clips are ~5-second `.wav`, standardized to 16 kHz mono PCM-16. Audio was collected from TV shows, films, and online content, originally in mp4.
+Clips are `.wav`, standardized to 16 kHz mono PCM-16, and nominally 5 s long (median 5.0 s; 1,067 fall outside 4.5–5.5 s, range 1.1–8.0 s). Audio was collected from TV shows, films, and online content, originally in mp4.
 
 **Note on "Formal":** Formal is a *speech register* (standard/prescribed Bangla), not a regional category. Treating it as a ninth class is a deliberate design choice, discussed in the thesis.
 
@@ -86,6 +86,7 @@ python build_split.py --manifest manifest_speaker.csv --out manifest_split_stric
 python baseline_whisper.py train --emb embeddings.npz --device cpu --remap-split manifest_split_strict.csv
 python baseline_mfcc.py cache --manifest manifest_split.csv --out features_v1.npz
 python data_efficiency.py
+python bootstrap_ci.py
 
 # 5. Inference demo (any audio file/format; needs a trained checkpoint)
 python predict.py path/to/clip.wav
@@ -187,7 +188,7 @@ All three representations were then re-evaluated under the identical protocol
 
 | Representation | Clip-level split | Strict split | Δ |
 |---|---|---|---|
-| v1 MFCC stats + MLP (`baseline_mfcc.py`) | 0.728 | 0.480 | −24.8 |
+| v1 MFCC stats + MLP (`baseline_mfcc.py`) | 0.727 | 0.480 | −24.8 |
 | Frozen Whisper-small + MLP | 0.917 | 0.793 | −12.4 |
 | Fine-tuned XLS-R-300M | 0.952 | 0.808 | −14.4 |
 | Fine-tuned XLS-R-300M + train-time augmentation | — | 0.748 | — |
@@ -204,11 +205,16 @@ Findings:
 - **Self-supervised representations are more leakage-robust than hand-crafted
   features**: MFCCs lose 24.8 points under the strict split — half their apparent
   skill was channel signature — versus 12–14 for the pretrained models.
-- **Fine-tuning still helps under the strict split** (+1.5 over the frozen
-  baseline), but most of its clip-level advantage (+3.5) came from exploiting
+- **Under the strict split, fine-tuned XLS-R and frozen Whisper are statistically
+  indistinguishable**: XLS-R's +1.5-point lead has a speaker-group bootstrap 95 %
+  CI of −2.0 to +7.5 (`bootstrap_ci.py`). Its clip-level lead (+3.5, CI +1.8 to
+  +5.3) is significant, so most of that advantage came from exploiting
   recording-channel cues.
-- Formal, whose split was source-disjoint from the start, moves least among the
-  well-populated classes — evidence the drop measures leakage, not model failure.
+- **Uncertainty is large under the strict split.** Only 230 pseudo-speaker groups
+  make up the strict test set, and Barishal's is a *single* 251-clip cluster, so
+  group-bootstrap 95 % CIs span ~12 points (Whisper 0.688–0.808, XLS-R
+  0.717–0.838). The MFCC-vs-SSL gaps and the augmentation drop remain significant
+  under this stricter test; the XLS-R-vs-Whisper gap does not.
 - **Augmentation is a negative result.** Training with a channel-suppression
   chain (gain, additive noise, 7-band EQ, telephone band-pass, pitch ±2 st,
   tempo 0.9–1.1; `finetune_xlsr.py --augment`) *lowered* strict macro-F1 from
@@ -237,12 +243,13 @@ the train split (3 seeds per point, min–max bands):
   leakage-robustness advantage of self-supervised features holds across scales.
 
 Artifacts in [`reports/phase3/`](reports/phase3/): strict-split evaluations for all
-three models, XLS-R strict metrics/predictions, and `strict_split_results.json`.
+three models, XLS-R strict metrics/predictions, `strict_split_results.json`, and
+`bootstrap_ci.json` (clip- and speaker-group bootstrap CIs for every score and gap).
 
 ## Known limitations (disclosed by design)
 
-- **Source/channel leakage in the canonical split — now measured.** About a third of Formal clips (559 of 1,654, 35 sources) carry recoverable YouTube video IDs and are split source-disjoint. All other clips have no recoverable speaker/source metadata, so the canonical split is clip-level for them and the same speaker or recording source may appear in both train and test. **Clip-level scores are therefore an upper bound** — quantified by the strict-split results above at 12–14 macro-F1 points for the pretrained models. Near-perfect clip-level scores for individual classes (e.g., Khulna) partly reflect recording-channel signatures.
-- **Class imbalance** (Formal 1,654 vs. Khulna 750) is mitigated with weighted loss; macro-F1 is the headline metric, not accuracy.
+- **Source/channel leakage in the canonical split — now measured.** About a third of Formal clips (557 of 1,652, 35 sources) carry recoverable YouTube video IDs and are split source-disjoint. All other clips have no recoverable speaker/source metadata, so the canonical split is clip-level for them and the same speaker or recording source may appear in both train and test. **Clip-level scores are therefore an upper bound** — quantified by the strict-split results above at 12–14 macro-F1 points for the pretrained models. Near-perfect clip-level scores for individual classes (e.g., Khulna) partly reflect recording-channel signatures.
+- **Class imbalance** (Formal 1,652 vs. Khulna 750) is mitigated with weighted loss; macro-F1 is the headline metric, not accuracy.
 - Clips are ~5 s; longer-context dialect cues are not modeled.
 
 Mitigation status: speaker clustering (ECAPA) is implemented — the strict-split results above quantify the leakage. Channel-suppression augmentation was tested and *reduced* strict-split accuracy (negative result above); prosody-preserving augmentation remains future work.
@@ -269,6 +276,7 @@ The project runs on a zero-hardware budget. Phases 0–1 were developed on an **
 ├── build_speaker_clusters.py  # Phase 3: ECAPA pseudo-speaker clustering
 ├── baseline_mfcc.py       # Phase 3: v1-style MFCC features (ablation)
 ├── data_efficiency.py     # Phase 3: label-fraction sweep + curve
+├── bootstrap_ci.py        # Phase 3: bootstrap CIs (clip + speaker-group) for scores and gaps
 ├── predict.py             # Phase 4: inference demo (dialect + confidence)
 ├── splits/                # committed splits (relative paths, reproducibility)
 │   ├── manifest_split_rel.csv         # canonical clip-level split

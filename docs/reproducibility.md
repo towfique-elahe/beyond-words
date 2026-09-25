@@ -32,12 +32,13 @@ pseudo-speakers; the committed strict split is the canonical one used everywhere
 |---|---|
 | Whisper clip-level **0.917** | `baseline_whisper.py cache` then `baseline_whisper.py train --device cpu` |
 | Whisper strict **0.793** | `baseline_whisper.py train --device cpu --remap-split manifest_split_strict.csv` |
-| MFCC clip-level **0.728** | `baseline_mfcc.py cache` then `baseline_whisper.py train --emb features_v1.npz --device cpu` |
+| MFCC clip-level **0.727** | `baseline_mfcc.py cache` then `baseline_whisper.py train --emb features_v1.npz --device cpu` |
 | MFCC strict **0.480** | same + `--remap-split manifest_split_strict.csv` |
 | XLS-R clip-level **0.952** | `finetune_xlsr.py --manifest splits/manifest_split_rel.csv` (T4, 20 ep) |
 | XLS-R strict **0.808** | `finetune_xlsr.py --manifest splits/manifest_split_strict_rel.csv` (T4, 20 ep) |
 | XLS-R strict + augment **0.748** | same + `--augment` |
 | Data-efficiency table/figure | `data_efficiency.py` (3 seeds × 5 fractions × 2 reps × 2 splits) |
+| Bootstrap 95 % CIs (all scores + gaps) | `bootstrap_ci.py` → `reports/phase3/bootstrap_ci.json` |
 
 All fine-tuning defaults are in `finetune_xlsr.py` argparse (batch 8 × accum 2,
 enc lr 2e-5 / head lr 1e-4, 10 % warmup, fp16, frozen conv encoder, clip 1.0).
