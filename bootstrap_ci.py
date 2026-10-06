@@ -15,6 +15,10 @@ recipe of baseline_whisper.py; XLS-R predictions come from the Kaggle runs.
 
 Usage:
     python bootstrap_ci.py --out reports/phase3/bootstrap_ci.json
+
+Phase 5 lexical / fusion predictions are added with --extra:
+    python bootstrap_ci.py --out reports/phase5/bootstrap_ci.json \
+        --extra "strict:TF-IDF=reports/phase5/test_predictions_<run>__tfidf.csv"
 """
 
 import argparse
@@ -107,6 +111,9 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--B", type=int, default=2000)
     ap.add_argument("--out", default="reports/phase3/bootstrap_ci.json")
+    ap.add_argument("--extra", action="append", default=[], metavar="SPLIT:NAME=CSV",
+                    help="extra test-prediction CSV (relpath,pred), e.g. "
+                         "strict:TF-IDF=reports/phase5/test_predictions_x__tfidf.csv")
     args = ap.parse_args()
     rng = np.random.RandomState(0)
 
@@ -122,6 +129,10 @@ def main():
         "strict": {"XLS-R": "reports/phase3/test_predictions_xlsr_strict.csv",
                    "XLS-R+aug": "reports/phase3/test_predictions_xlsr_augment.csv"},
     }
+    for spec in args.extra:                            # Phase 5 lexical / fusion runs
+        split_name, rest = spec.split(":", 1)
+        model, path = rest.split("=", 1)
+        xlsr[split_name][model] = path
     report = {"B": args.B, "note": "95% percentile intervals; group = pseudo-speaker or YouTube source"}
     for name, splits in [("clip-level", spk["split"].values), ("strict", strict["split"].values)]:
         te = splits == "test"
