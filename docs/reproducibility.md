@@ -40,6 +40,32 @@ pseudo-speakers; the committed strict split is the canonical one used everywhere
 | Data-efficiency table/figure | `data_efficiency.py` (3 seeds × 5 fractions × 2 reps × 2 splits) |
 | Bootstrap 95 % CIs (all scores + gaps) | `bootstrap_ci.py` → `reports/phase3/bootstrap_ci.json` |
 
+### Phase 5 (lexical route)
+
+External text inputs (not committed; `data/` is gitignored): OOD-Speech
+`train.csv` (Kaggle competition `bengaliai-speech`, rules must be accepted on the
+account), Ben-10 `train/*/train.csv` + `valid/valid.csv` (HF `bengaliAI/Ben-10`,
+CC0), Vashantor CSVs (Mendeley `bj5jgk878b` v2, CC BY 4.0).
+
+| Result | Command |
+|---|---|
+| Transcripts, 9,303 clips × 5 ASR front-ends | `notebooks/kaggle_transcribe.ipynb` (T4; wraps `transcribe.py`; ~43 / 45 / 82 / 15 / 7 min for Tugstugi-Ben10 / Tugstugi / Whisper-large-v3 / wav2vec2 / Hishab) → `transcripts/<tag>.csv` |
+| Formal vocabulary (156,643 types) | `build_lexicon.py formal --source data/ood_speech/train.csv` → `lexicons/formal_vocab.txt` (count ≥ 3 applied at load time) |
+| External regional lexicon | `build_lexicon.py external --ben10 data/ben10/train.csv --vashantor data/vashantor/Vashantor_CSV_Format` |
+| In-domain lexicon per front-end × split | `build_lexicon.py indomain --transcripts transcripts/<tag>.csv --manifest splits/<split>.csv --out lexicons/indomain_<tag>_<strict|clip>.json` (min-count 3, ≥ 2 pseudo-speakers) |
+| XLS-R val/test probabilities for fusion | `predict.py --checkpoint checkpoints/xlsr_strict_best.pt --manifest splits/manifest_split_strict_rel.csv --audio-root <root> --dump-probs reports/phase5/xlsr_probs_strict.csv` (and `xlsr_best.pt` / `manifest_split_rel.csv` → `xlsr_probs_clip.csv`); argmax reproduces the saved predictions (strict 100 %, clip-level 1,328/1,329) |
+| Word match / TF-IDF / fusion, e.g. Ben-10 strict **0.360 / 0.633 / 0.856** | `lexical_did.py --transcripts transcripts/tugstugi_ben10.csv --manifest splits/manifest_split_strict_rel.csv --lexicon lexicons/indomain_tugstugi_ben10_strict.json --xlsr-probs reports/phase5/xlsr_probs_strict.csv` → `reports/phase5/metrics_*.json`, `test_predictions_*.csv` |
+| Front-end OOV diagnostics | `asr_diagnostics.py transcripts/<tag>.csv --min-count 3 --out reports/phase5/diagnostics_<tag>.json` |
+| Summary table | `summarize_phase5.py` → `reports/phase5/summary.csv` |
+| Bootstrap CIs incl. lexical runs | `bootstrap_ci.py --out reports/phase5/bootstrap_ci.json --extra "strict:Fusion/tugstugi_ben10=reports/phase5/test_predictions_tugstugi_ben10__indomain_tugstugi_ben10_strict__fusion.csv" ...` |
+| WER / CER / dialect-word recall on Ben-10 valid | `notebooks/kaggle_ben10_eval.ipynb` (T4) → `transcripts/ben10_valid/<tag>.csv`, then `ben10_eval.py transcripts/ben10_valid/*.csv` |
+
+Decoding is greedy everywhere (Whisper `num_beams=1`, `max_new_tokens=128`,
+language/task forced to Bangla transcription; CTC argmax without a language
+model). Thresholds tuned on val only: `tau` (Formal cut-off) for word matching,
+`C` for TF-IDF, `alpha` for fusion. T4 fp16 and M1 fp32 Whisper transcripts agree
+on 93.6 % of pilot clips; the committed numbers use the T4 transcripts.
+
 All fine-tuning defaults are in `finetune_xlsr.py` argparse (batch 8 × accum 2,
 enc lr 2e-5 / head lr 1e-4, 10 % warmup, fp16, frozen conv encoder, clip 1.0).
 The Kaggle notebook `notebooks/kaggle_xlsr_finetune.ipynb` wraps the two GPU rows
@@ -57,7 +83,9 @@ The Kaggle notebook `notebooks/kaggle_xlsr_finetune.ipynb` wraps the two GPU row
 
 | Artifact | Where | Tracked? |
 |---|---|---|
-| Metrics, predictions, eval reports | `reports/phase2/`, `reports/phase3/` | yes |
+| Metrics, predictions, eval reports | `reports/phase2/`, `reports/phase3/`, `reports/phase5/` | yes |
+| ASR transcripts, lexicons | `transcripts/`, `lexicons/` | small CSV/JSON — recommended to track (transcripts are derived from non-distributed audio but contain no audio) |
+| External text corpora (OOD-Speech, Ben-10, Vashantor) | `data/` | no — download per the licences above |
 | Figures | `reports/figures/` | yes |
 | Split files | `splits/` | yes |
 | Embedding/feature caches (`*.npz`) | repo root | no — regenerate |

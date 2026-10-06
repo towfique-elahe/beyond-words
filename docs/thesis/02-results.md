@@ -110,3 +110,108 @@ epoch 17/20, val 0.702 vs. 0.757 unaugmented — so this is not selection noise)
 Interpretation is taken up in the Discussion: pitch and tempo perturbations,
 standard in ASR augmentation, plausibly destroy dialect-bearing prosodic cues.
 Artifacts: `reports/phase3/metrics_xlsr_augment.json`.
+
+## 5.5 The lexical route: words versus sound
+
+Artifacts: `reports/phase5/` (`summary.csv`, `metrics_*.json`,
+`test_predictions_*.csv`, `diagnostics_*.json`, `ben10_valid_eval.json`,
+`bootstrap_ci.json`).
+
+### 5.5.1 How much dialect survives transcription?
+
+Ben-10 valid (1,666 human-transcribed clips; 21,119 reference tokens outside
+the formal vocabulary):
+
+| Front-end | WER | CER | Dialect-word recall | Formal-word recall |
+|---|---|---|---|---|
+| Tugstugi, fine-tuned on Ben-10 | **0.707** | **0.471** | **0.192** | **0.455** |
+| Tugstugi (standard Bangla) | 0.775 | 0.532 | 0.034 | 0.369 |
+| Hishab FastConformer | 0.792 | 0.517 | 0.012 | 0.405 |
+| wav2vec2 XLS-R Bengali (SCB stand-in) | 0.942 | 0.669 | 0.012 | 0.085 |
+| Whisper-large-v3 | 0.960 | 0.808 | 0.016 | 0.061 |
+
+The WER ordering and magnitudes match the Ben-10 paper's Table 3 (0.70 for the
+Ben-10 model on the private test set; 0.81 / 0.87 / 1.13 for Tugstugi / Hishab /
+Whisper-large-v3). Even the best front-end reproduces fewer than one dialect
+word in five (per district: Sylhet 0.24 … Rangpur 0.13); the standard-Bangla
+models reproduce 1–3 %. The paper's hand-counted recall (0.16–0.53 vs
+0.01–0.09 for the same two Tugstugi models) is confirmed at full scale and
+automatically.
+
+On the thesis clips (no references), the share of transcript tokens outside
+the formal vocabulary, Formal class vs mean over the eight regional classes:
+Ben-10 model 0.08 / 0.25; Tugstugi 0.05 / 0.13; Hishab 0.04 / 0.09;
+wav2vec2 0.27 / 0.51; Whisper-large-v3 0.45 / 0.53. Only the Ben-10 model
+separates regional from Formal speech by a wide margin with recognisable
+dialect forms (মুই, আঁই, আঁর, হামার, কিতা, টেহা); the two high-OOV models are
+high for the wrong reason — misrecognition, and for Whisper-large-v3
+repetition loops in 12.3 % of transcripts (a word repeated five or more times
+in a row) plus 2–5 % empty outputs per class.
+
+### 5.5.2 Classification from transcripts
+
+Test macro-F1 by front-end (in-domain lexicon; XLS-R on the same split: 0.808
+strict, 0.952 clip-level):
+
+| Front-end | Word match, strict | TF-IDF, strict | Fusion, strict | TF-IDF, clip | Fusion, clip |
+|---|---|---|---|---|---|
+| Tugstugi (Ben-10) | 0.360 (44 % of clips matched) | **0.633** | **0.856** | **0.728** | **0.967** |
+| Tugstugi | 0.060 | 0.456 | 0.836 | 0.595 | 0.965 |
+| Hishab FastConformer | 0.049 | 0.445 | 0.820 | 0.553 | 0.962 |
+| wav2vec2 XLS-R Bengali | 0.077 | 0.424 | 0.825 | 0.536 | 0.960 |
+| Whisper-large-v3 | 0.156 | 0.388 | 0.800 | 0.490 | 0.954 |
+
+1. **Word matching is weak** even with the best front-end: 0.360 strict /
+   0.399 clip-level. Fewer than half of the test clips contain any lexicon
+   word, so the rest default to Formal. Relaxing the lexicon thresholds
+   (min-count 1, any speaker count; chosen on val) raises coverage to 59 % and
+   macro-F1 to 0.419 — still far below every pretrained acoustic model. The
+   clean external lexicon (Ben-10 + Vashantor; 6 of 9 classes) scores 0.418 on
+   its own classes with 51 % coverage. With the standard-Bangla front-ends,
+   matching collapses (coverage 2–5 %): there are no regional words left to
+   match.
+2. **The learned text classifier roughly doubles the matching score** (0.633
+   strict with the Ben-10 model), placing words alone between MFCC (0.480) and
+   frozen Whisper (0.793). Front-end quality orders the TF-IDF results exactly
+   as dialect-word recall does.
+3. **Fusion improves on XLS-R with four of five front-ends.** With the Ben-10
+   model: strict 0.808 → 0.856 (α = 0.25, i.e. the text carries three quarters
+   of the log-probability weight after tuning on val); clip-level 0.952 → 0.967
+   (α = 0.30).
+
+### 5.5.3 Statistical uncertainty (`bootstrap_ci.py --extra …`, B = 2000)
+
+| Model (Ben-10 front-end) | Clip-level (95 % CI, group) | Strict (95 % CI, group) |
+|---|---|---|
+| Word match | 0.399 (0.359–0.421) | 0.360 (0.284–0.380) |
+| TF-IDF | 0.728 (0.684–0.748) | 0.633 (0.538–0.642) |
+| Fusion XLS-R + TF-IDF | 0.967 (0.952–0.976) | 0.856 (0.754–0.875) |
+| Fine-tuned XLS-R (reference) | 0.952 (0.935–0.963) | 0.808 (0.717–0.838) |
+
+Gaps against XLS-R (fusion − XLS-R): clip-level +1.5 points, group CI +0.9 to
++2.4, P(gap ≤ 0) = 0.000 — significant; strict +4.8 points, group CI −0.3 to
++6.8, P(gap ≤ 0) = 0.043 — borderline. For the other front-ends, clip-level
+fusion gains are significant except Whisper-large-v3 (+0.2, CI −0.7 to +1.1);
+no other strict gain is significant, and Whisper-large-v3's fusion is 0.8
+points *below* XLS-R on the strict split.
+
+### 5.5.4 Where the text helps (strict split, Ben-10 front-end, per-class F1)
+
+| Class | Word match | TF-IDF | XLS-R | Fusion | Δ fusion − XLS-R |
+|---|---|---|---|---|---|
+| Barishal | 0.268 | 0.544 | 0.508 | 0.720 | **+21.2** |
+| Sylhet | 0.600 | 0.750 | 0.750 | 0.832 | +8.2 |
+| Chattogram | 0.392 | 0.617 | 0.820 | 0.878 | +5.8 |
+| Formal | 0.448 | 0.805 | 0.785 | 0.835 | +5.0 |
+| Noakhali | 0.500 | 0.707 | 0.862 | 0.898 | +3.5 |
+| Mymensingh | 0.395 | 0.694 | 0.904 | 0.928 | +2.4 |
+| Rajshahi | 0.175 | 0.550 | 0.842 | 0.857 | +1.5 |
+| Dhaka | 0.158 | 0.470 | 0.848 | 0.853 | +0.5 |
+| Khulna | 0.305 | 0.557 | 0.957 | 0.904 | −5.3 |
+
+The gain concentrates on the classes the acoustic model finds hardest under
+the strict split (Barishal — the single-cluster test cell — and Sylhet) and
+on the classes with the most distinctive, best-transcribed vocabulary
+(Sylhet's match F1 of 0.60 is the only strong matching result). Khulna, the
+acoustic model's best class, is the one class fusion hurts. Formal is the only
+class on which TF-IDF alone beats XLS-R: the register is lexically marked.

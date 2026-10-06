@@ -97,4 +97,84 @@ PyTorch MPS). Fine-tuning ran on Kaggle's free T4 tier (16 GB VRAM), ~2.5 h per
 run. The pipeline survived a mid-project hardware migration (GTX 1660 Ti → M1)
 with the baseline reproducing within 0.3 macro-F1 points — the split files, seeds,
 and one-command pipeline stages are the mechanism. Total GPU consumption for every
-result in this thesis: under 10 hours of free-tier compute.
+result in this thesis: under 10 hours of free-tier compute for the acoustic route
+and about 3.5 further T4 hours for the lexical route's transcription runs.
+
+## 4.7 The lexical route
+
+Models (a)–(c) never observe *what* is said: Whisper consumes log-mel frames,
+XLS-R the raw waveform. The lexical route asks how much dialect identity is
+recoverable from the words alone, and whether it adds to the acoustics. It
+reuses the splits, the macro-F1 protocol and the group bootstrap of §4.3–4.4
+unchanged, so every number is directly comparable to (a)–(c).
+
+**(i) Transcription** (`transcribe.py`). The corpus has no transcripts, so text
+is produced by off-the-shelf Bangla ASR, used as released (no fine-tuning).
+The front-ends follow the Ben-10 ASR benchmark (Dipto et al., IJCNLP-AACL
+2025) as far as public checkpoints allow: Whisper-large-v3 (zero-shot);
+`bengaliAI/tugstugi_bengaliai-asr_whisper-medium`, the Bengali.AI 2023
+competition winner, trained on standard colloquial Bangla; the same model
+fine-tuned by Bengali.AI on Ben-10 dialect speech
+(`…-regional-asr_whisper-medium`); Hishab's FastConformer
+(`hishab/hishab_bn_fastconformer`, NeMo, ~18k h of mostly news speech); and
+`arijitx/wav2vec2-xls-r-300m-bengali` as a documented stand-in for the paper's
+"Wav2Vec2 (SCB)", whose checkpoint is not public. Google's paid API and the
+paper's Ben-10-tuned wav2vec2 (no checkpoint) are omitted. Decoding is greedy
+throughout (Whisper: language and task forced to Bangla transcription, no prompt,
+≤ 128 new tokens; CTC: argmax, no language model). Fine-tuned Whisper
+checkpoints ship without a language-token table, so the base model's
+generation config is substituted; this is the standard remedy and changes no
+weights. Transcription of all 9,303 clips ran on a Kaggle T4 (43 / 45 / 82 / 15
+/ 7 min for the five front-ends); a 450-clip pilot on the M1 agreed with the
+T4 output on 93.6 % of clips.
+
+**(ii) Normalisation and the standard-Bangla vocabulary** (`text_utils.py`,
+`build_lexicon.py formal`). All text — transcripts, reference corpora, word
+lists — passes one tokeniser: Unicode NFC, Bangla-letter tokens only (digits,
+punctuation and Latin text dropped), word-level normalisation with
+`bnunicodenormalizer`, zero-width joiners stripped. The *formal vocabulary* is
+the word inventory of OOD-Speech's training transcripts (Rakib et al., 2023;
+963,636 standard-Bangla sentences; 8.19 M tokens, 156,643 types), restricted to
+types occurring ≥ 3 times (88,262) to exclude typos. A transcript word outside
+this vocabulary is a *candidate regional word*. The same out-of-vocabulary
+(OOV) construction is used by the Ben-10 paper to characterise its districts.
+
+**(iii) Regional lexicons** (`build_lexicon.py external|indomain`). A lexicon
+maps each region to {word → p(region | word)}, where p is the word's
+size-normalised rate in that region divided by its summed rate over all
+regions in the source (add-0.5 smoothing), so a word shared by several
+dialects counts less. Two sources: the *external* lexicon from human-written
+dialect text independent of the thesis audio — Ben-10 train transcripts
+(district-labelled, CC0) and the regional side of the Vashantor parallel
+corpus (a word also present on the pair's standard side is not regional) —
+which covers Barishal, Chattogram, Sylhet, Noakhali and Mymensingh by exact
+district-name match only; and the *in-domain* lexicon from the ASR transcripts
+of the **train split only** (verified programmatically: no val/test clip
+contributes), keeping a word if it occurs ≥ 3 times in ≥ 2 pseudo-speakers of
+that class, which suppresses ASR noise and programme-specific words. In-domain
+lexicons are built separately per front-end and per split protocol.
+
+**(iv) Classifiers** (`lexical_did.py`). *Word matching*: each clip receives a
+per-region *match percentage* — the weighted share of its tokens found in that
+region's lexicon — and its share of non-formal tokens. A clip below a
+non-formal-share threshold τ (tuned on val) or matching no lexicon is called
+Formal; otherwise the best-matching region wins. No training; the per-word
+evidence is shown by `predict.py --explain`. *TF-IDF + logistic regression*
+over the normalised transcript (word 1–2-grams and character 2–5-grams,
+sublinear TF, balanced class weights; C ∈ {0.3, 1, 3, 10, 30} chosen on val):
+the learned text baseline, which uses formal words too. *Late fusion*:
+α·log p_XLS-R + (1−α)·log p_TF-IDF with α ∈ [0, 1] in steps of 0.05 chosen on
+val; XLS-R probabilities come from the Phase 2/3 checkpoints on the same 5 s
+windows (`predict.py --dump-probs`; the argmax reproduces the saved test
+predictions exactly on the strict split and on 1,328 of 1,329 clip-level
+clips, the one difference being M1-vs-T4 arithmetic).
+
+**(v) ASR reference evaluation** (`ben10_eval.py`). The thesis audio has no
+reference text, so ASR quality is measured on Ben-10's public validation set
+(1,666 clips, 10 districts, dialect transcribed as spoken). Besides corpus WER
+and CER on normalised tokens, *dialect-word recall* is the share of reference
+tokens outside the formal vocabulary that the hypothesis reproduces exactly —
+the full-set, automated counterpart of the Ben-10 paper's hand-counted
+"dialect recall" over ~50 words per district. Per-front-end OOV rates on the
+thesis clips (`asr_diagnostics.py`) need no references and are reported
+alongside.

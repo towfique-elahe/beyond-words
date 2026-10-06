@@ -79,8 +79,10 @@ the rest are canonical and safely citable.
   https://link.springer.com/chapter/10.1007/978-981-15-7394-1_46
 - ⚑ **"Bangla Dialect Classification Across 11 Regions Using Machine Learning
   and Transformer-Based Models" (IEEE, 2025).** Text-based dialect
-  classification (BanglaDial; BanglaBERT ~88.7 %) — contrast: this thesis is
-  audio-only.  https://ieeexplore.ieee.org/document/11429342/
+  classification (BanglaDial; BanglaBERT ~88.7 %) on *human-written* dialect
+  text — the precedent for the lexical route, and the contrast case: Phase 5
+  shows what happens when the text has to come from ASR instead (§2.6).
+  https://ieeexplore.ieee.org/document/11429342/
 - ⚑ **Bangla Regional Dialects Speech Dataset (Mendeley Data).** 5-region
   speech dataset; compare scale/coverage with this thesis's 9-class ~13 h corpus.
   https://data.mendeley.com/datasets/777wsgjgtm/1
@@ -125,6 +127,60 @@ the rest are canonical and safely citable.
   augmentation-for-speech citation; note it operates on features, whereas this
   thesis's chain operates on waveforms.
 
+## 2.6 Bangla ASR and dialect speech resources (the lexical route)
+
+- ⚑ **Dipto et al., 2025 — "Are ASR foundation models generalized enough to
+  capture features of regional dialects for low-resource languages?"
+  (IJCNLP-AACL 2025 short, pp. 178–188; arXiv 2510.23252).** Introduces
+  **Ben-10** (78 h, 16,690 clips, 394 speakers, 10 districts, dialect
+  transcribed as spoken) and benchmarks seven ASR systems on it by WER/CER:
+  Whisper-large-v3 1.13, Google ASR 1.03, Hishab Conformer 0.87, Wav2Vec2
+  (SCB) 0.89, Tugstugi 0.81, and the two Ben-10-fine-tuned variants 0.83 /
+  **0.70**. Its §5 hand-counts "dialect recall" on ~50 words per district
+  (0.01–0.09 zero-shot vs 0.16–0.53 after Ben-10 fine-tuning) and calls the
+  full-scale version "beyond the scope of this paper" — Phase 5's automated
+  dialect-word recall on the full validation set is that version. **It is an
+  ASR benchmark, not a dialect-identification paper**: no classifier, no
+  accuracy or F1 — its models are this thesis's transcription front-ends, not a
+  DID baseline. Code: github.com/BengaliAI/reg-speech-aacl (includes per-district
+  TF-IDF word lists). Dataset: HF `bengaliAI/Ben-10` (CC0; test set private).
+  https://aclanthology.org/2025.ijcnlp-short.17/
+- ⚑ **Rakib et al., 2023 — "OOD-Speech: A Large Bengali Speech Recognition
+  Dataset for Out-of-Distribution Benchmarking" (Interspeech 2023; arXiv
+  2305.09688).** 1,178 h of crowd-read standard Bangla from 22,645 speakers,
+  plus a 23 h test set from 17 out-of-distribution domains. Its training
+  transcripts (Kaggle competition `bengaliai-speech`) are Phase 5's
+  standard-Bangla vocabulary; the Ben-10 paper defines district OOV rates
+  against the same corpus.  https://arxiv.org/abs/2305.09688
+- ⚑ **Bengali.AI Speech Recognition competition, 2023 (Kaggle).** The
+  first-place "Tugstugi" solution — a Whisper-medium fine-tune on OOD-Speech,
+  released as `bengaliAI/tugstugi_bengaliai-asr_whisper-medium` — and its
+  Ben-10 fine-tune `…-regional-asr_whisper-medium` are two of the five
+  front-ends. Cite the competition and the model cards.
+- ⚑ **Nandi et al., 2023 — Hishab Bangla FastConformer** (`hishab/hishab_bn_fastconformer`,
+  NeMo, CC-BY-NC-4.0; ~18k h MegaBNSpeech, mostly news). The industrial
+  standard-Bangla front-end; in Phase 5 it has the lowest out-of-vocabulary
+  rate of all five on regional clips — i.e. it standardises the dialect most.
+- ⚑ **Radford et al., 2023 — Whisper (ICML).** Already cited for the Phase 1
+  encoder; in Phase 5 `openai/whisper-large-v3` is the zero-shot front-end and
+  the worst on dialect speech (WER 0.96 on Ben-10 valid, repetition loops in
+  12 % of thesis clips) — the generalisation question in Dipto et al.'s title.
+- ⚑ **Faria et al., 2023 — "Vashantor: A Large-scale Multilingual Benchmark
+  Dataset for Automated Translation of Bangla Regional Dialects to Bangla
+  Language" (arXiv 2311.11142).** 32,500 sentence pairs, dialect ↔ standard
+  Bangla (plus Banglish and English) for Chittagong, Noakhali, Sylhet,
+  Barishal and Mymensingh; CC BY 4.0 (Mendeley `bj5jgk878b`). The parallel
+  structure lets a regional word be defined as "present on the dialect side,
+  absent on the standard side" — the external lexicon's second source.
+  https://arxiv.org/abs/2311.11142
+- **RegSpeech12 (arXiv 2510.24096)** — same group as Ben-10, 12 dialects
+  (adds Comilla and Noakhali), ~100 h; and **BanglaDialecto (arXiv 2411.10879)**
+  — Noakhali speech → dialect text → standard translation. Mention as the
+  resources that would extend external lexicons to more of this corpus's
+  classes; not used.
+- **Software:** `bnunicodenormalizer` (Bangla Unicode normalisation), `jiwer`
+  (WER/CER), NVIDIA NeMo, Hugging Face Transformers.
+
 ---
 
 ## How to use this list
@@ -137,5 +193,10 @@ the rest are canonical and safely citable.
   as a finding in itself.
 - The probing paper (2306.06524) plus Ko et al. (2015) together carry the
   discussion of the augmentation negative result.
+- §2.6 sets up the lexical route: BanglaDial shows text-based DID works on
+  human-written dialect text; Dipto et al. show ASR does not produce such text
+  for standard-trained models; Phase 5 connects the two. Be explicit that the
+  Ben-10 paper's WER numbers are not comparable to DID accuracy and that its
+  models are used as front-ends, not as competing DID systems.
 - Remember to also cite software: PyTorch, Hugging Face Transformers,
   SpeechBrain, librosa, scikit-learn, audiomentations.
