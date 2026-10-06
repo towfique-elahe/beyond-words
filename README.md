@@ -48,6 +48,9 @@ finetune_xlsr.py           →  xlsr_best.pt    # Phase 2: end-to-end XLS-R-300M
 build_speaker_clusters.py  →  manifest_speaker.csv       # Phase 3: ECAPA pseudo-speakers
 build_split.py --manifest manifest_speaker.csv           #   → strict group-disjoint split
 baseline_mfcc.py cache     →  features_v1.npz # Phase 3: v1-style MFCC ablation row
+transcribe.py              →  transcripts/<asr>.csv   # Phase 5: off-the-shelf Bangla ASR per clip (Kaggle T4)
+build_lexicon.py formal|external|indomain →  lexicons/  # Phase 5: standard vocab + regional word lists
+lexical_did.py             →  reports/phase5/ # Phase 5: word matching, TF-IDF, fusion with XLS-R
 ```
 
 ### Setup
@@ -246,6 +249,89 @@ Artifacts in [`reports/phase3/`](reports/phase3/): strict-split evaluations for 
 three models, XLS-R strict metrics/predictions, `strict_split_results.json`, and
 `bootstrap_ci.json` (clip- and speaker-group bootstrap CIs for every score and gap).
 
+## Lexical route (Phase 5: is the dialect in the words or in the sound?)
+
+Phases 1–3 never look at *what* is said: the models consume log-mel frames or
+the raw waveform. Phase 5 adds a text route. Every clip is transcribed with
+off-the-shelf Bangla ASR (no fine-tuning), words outside a standard-Bangla
+vocabulary are treated as candidate regional words, and three classifiers run
+on the transcripts under the same splits and the same macro-F1 protocol:
+
+- **Word matching** — per-region *match percentage*: the weighted share of a
+  clip's words found in that region's lexicon (`build_lexicon.py indomain`,
+  built from train-split transcripts only; `external` from Ben-10 + Vashantor
+  human text). Interpretable, no training.
+- **TF-IDF + logistic regression** on the transcripts (word 1–2 grams, char 2–5 grams).
+- **Late fusion** of the TF-IDF probabilities with XLS-R (`alpha` tuned on val).
+
+The standard-Bangla vocabulary is OOD-Speech `train.csv` (156k word types; words
+with count ≥ 3 are used). Transcripts come from five front-ends, chosen to
+follow the Ben-10 ASR benchmark (IJCNLP-AACL 2025): `bengaliAI/tugstugi_bengaliai-regional-asr_whisper-medium`
+(fine-tuned on Ben-10 dialect speech), `bengaliAI/tugstugi_bengaliai-asr_whisper-medium`,
+`openai/whisper-large-v3`, `hishab/hishab_bn_fastconformer`, and
+`arijitx/wav2vec2-xls-r-300m-bengali` as a stand-in for the paper's unreleased
+"Wav2Vec2 (SCB)". Google ASR (paid) and the paper's Ben-10 wav2vec2 (no public
+checkpoint) are not run.
+
+Test macro-F1 (`reports/phase5/summary.csv`; XLS-R on the same split: 0.952 clip-level, 0.808 strict):
+
+| ASR front-end | OOV share: Formal / regional | Word match (strict) | TF-IDF (strict) | Fusion (strict) | TF-IDF (clip) | Fusion (clip) |
+|---|---|---|---|---|---|---|
+| Tugstugi (Ben-10) | 0.08 / 0.25 | 0.360 (44 % of clips matched) | **0.633** | **0.856** | **0.728** | **0.967** |
+| Tugstugi | 0.05 / 0.13 | 0.060 | 0.456 | 0.836 | 0.595 | 0.965 |
+| Hishab FastConformer | 0.04 / 0.09 | 0.049 | 0.445 | 0.820 | 0.553 | 0.962 |
+| wav2vec2 XLS-R Bengali | 0.27 / 0.51 | 0.077 | 0.424 | 0.825 | 0.536 | 0.960 |
+| Whisper-large-v3 | 0.45 / 0.53 | 0.156 | 0.388 | 0.800 | 0.490 | 0.954 |
+
+What this says:
+
+- **Standard-Bangla ASR erases the dialect.** Hishab and base Tugstugi output
+  as few out-of-vocabulary words on regional clips as on Formal ones; only the
+  Ben-10-tuned model keeps dialect forms (মুই, আঁই, হামার, কিতা …), and it is the
+  only front-end on which word matching works at all. Whisper-large-v3 and the
+  wav2vec2 model have *high* OOV shares for the wrong reason — misrecognitions
+  and repetition loops (12 % of large-v3 transcripts repeat a word 5+ times).
+- **Matching regional words alone is weak** (0.36 strict): fewer than half the
+  5-second test clips contain any word from the lexicon. Using all words and
+  character patterns (TF-IDF) nearly doubles the score — the formal-word filter
+  throws away evidence such as dialect verb endings.
+- **Text and sound are complementary, modestly.** Fusion improves on XLS-R
+  with four of the five front-ends (Whisper-large-v3 is the exception on the
+  strict split). With the Ben-10 model the gain is +4.8 points strict (95 %
+  speaker-group CI −0.3 to +6.8 — borderline, 4 % probability of no gain) and
+  +1.5 clip-level (CI +0.9 to +2.4). No other front-end's strict gain is
+  significant; clip-level gains are significant for all but Whisper-large-v3.
+- **The lexical route alone sits between MFCC and frozen Whisper** (0.63 strict
+  vs 0.48 / 0.79): the words carry real dialect information, but less than the
+  acoustics on clips this short.
+
+**ASR quality against human references** (Ben-10 valid, 1,666 clips, 10 districts;
+`ben10_eval.py`, greedy decoding, punctuation ignored). *Dialect recall* is the
+share of reference words outside the standard vocabulary (21,119 tokens) that
+the hypothesis reproduces exactly — an automated, full-set version of the
+Ben-10 paper's hand-counted measure:
+
+| Front-end | WER | CER | Dialect-word recall | Formal-word recall |
+|---|---|---|---|---|
+| Tugstugi (Ben-10) | **0.707** | **0.471** | **0.192** | **0.455** |
+| Tugstugi | 0.775 | 0.532 | 0.034 | 0.369 |
+| Hishab FastConformer | 0.792 | 0.517 | 0.012 | 0.405 |
+| wav2vec2 XLS-R Bengali | 0.942 | 0.669 | 0.012 | 0.085 |
+| Whisper-large-v3 | 0.960 | 0.808 | 0.016 | 0.061 |
+
+The WER ordering and magnitudes match the paper's Table 3 (0.70 for the Ben-10
+model on its private test set). Even the best front-end recovers fewer than one
+in five dialect words (best district Sylhet 0.24, worst Rangpur 0.13), which
+bounds what any word-matching approach can see.
+
+`python predict.py --explain clip.wav` adds the transcript, the words outside
+standard Bangla and the per-region match percentages to the acoustic top-k.
+Artifacts in [`reports/phase5/`](reports/phase5/): per-front-end diagnostics
+(`diagnostics_*.json`), per-run metrics and test predictions, `bootstrap_ci.json`,
+`summary.csv`. Transcripts (`transcripts/`) and lexicons (`lexicons/`) are
+regenerated with the pipeline above; ASR quality against human references is
+measured on Ben-10 valid with `ben10_eval.py`.
+
 ## Known limitations (disclosed by design)
 
 - **Source/channel leakage in the canonical split — now measured.** About a third of Formal clips (557 of 1,652, 35 sources) carry recoverable YouTube video IDs and are split source-disjoint. All other clips have no recoverable speaker/source metadata, so the canonical split is clip-level for them and the same speaker or recording source may appear in both train and test. **Clip-level scores are therefore an upper bound** — quantified by the strict-split results above at 12–14 macro-F1 points for the pretrained models. Near-perfect clip-level scores for individual classes (e.g., Khulna) partly reflect recording-channel signatures.
@@ -260,7 +346,8 @@ Mitigation status: speaker clustering (ECAPA) is implemented — the strict-spli
 - [x] Phase 1 — cached Whisper-small embedding baseline
 - [x] Phase 2 — fine-tune `facebook/wav2vec2-xls-r-300m` end-to-end (fp16, Kaggle T4) — **0.952 test macro-F1**
 - [x] Phase 3 — speaker-clustered strict split (**0.793 / 0.808** honest estimates), ablation table, augmentation study (negative result), data-efficiency curve
-- [ ] Phase 4 — thesis write-up, reproducible release, inference demo
+- [x] Phase 4 — thesis write-up drafts, reproducible release, inference demo (`predict.py`)
+- [x] Phase 5 — lexical route: ASR transcripts, regional-word matching, TF-IDF, fusion (**0.856** strict with XLS-R + text); five ASR front-ends compared
 
 ## Hardware
 
@@ -277,7 +364,14 @@ The project runs on a zero-hardware budget. Phases 0–1 were developed on an **
 ├── baseline_mfcc.py       # Phase 3: v1-style MFCC features (ablation)
 ├── data_efficiency.py     # Phase 3: label-fraction sweep + curve
 ├── bootstrap_ci.py        # Phase 3: bootstrap CIs (clip + speaker-group) for scores and gaps
-├── predict.py             # Phase 4: inference demo (dialect + confidence)
+├── predict.py             # Phase 4: inference demo (dialect + confidence; --explain shows the words)
+├── transcribe.py          # Phase 5: off-the-shelf Bangla ASR over the manifest (whisper / ctc / nemo)
+├── text_utils.py          # Phase 5: shared Bangla normaliser + tokeniser
+├── build_lexicon.py       # Phase 5: formal vocabulary, external + in-domain regional lexicons
+├── lexical_did.py         # Phase 5: word matching, TF-IDF, late fusion with XLS-R
+├── asr_diagnostics.py     # Phase 5: per-front-end OOV / empty-rate table (no references needed)
+├── ben10_eval.py          # Phase 5: WER/CER + dialect-word recall on Ben-10 valid
+├── summarize_phase5.py    # Phase 5: one table over front-ends x splits
 ├── splits/                # committed splits (relative paths, reproducibility)
 │   ├── manifest_split_rel.csv         # canonical clip-level split
 │   └── manifest_split_strict_rel.csv  # Phase 3 strict pseudo-speaker split
@@ -285,11 +379,14 @@ The project runs on a zero-hardware budget. Phases 0–1 were developed on an **
 ├── requirements.txt       # pip environment (macOS / Apple Silicon or any platform)
 ├── notebooks/             # analysis notebooks (EDA, figures)
 │   ├── beyond-words.ipynb
-│   └── kaggle_xlsr_finetune.ipynb
+│   ├── kaggle_xlsr_finetune.ipynb
+│   ├── kaggle_transcribe.ipynb        # Phase 5: all clips x all ASR front-ends (T4)
+│   └── kaggle_ben10_eval.ipynb        # Phase 5: front-ends on Ben-10 valid audio
 ├── reports/
 │   ├── figures/           # result figures (baseline + fine-tuned + ablation)
 │   ├── phase2/            # XLS-R run metrics + test predictions
-│   └── phase3/            # strict-split evaluations + ablation artifacts
+│   ├── phase3/            # strict-split evaluations + ablation artifacts
+│   └── phase5/            # lexical-route metrics, predictions, diagnostics, summary
 ├── docs/                  # thesis materials
 │   ├── thesis/            #   chapter outline + methodology/results/discussion drafts
 │   ├── reproducibility.md #   exact result→command map, release checklist
