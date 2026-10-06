@@ -1,0 +1,93 @@
+{
+  "formal": "lexicons/formal_vocab.txt",
+  "min_count": 3,
+  "fronts": {
+    "tugstugi_ben10": {
+      "table": [
+        {
+          "district": "Barishal",
+          "clips": 1257,
+          "empty": 0.0,
+          "tok_per_clip": 12.881463802704852,
+          "oov": 0.21146245059288538,
+          "clips_with_oov": 0.9045346062052506
+        },
+        {
+          "district": "Chattogram",
+          "clips": 797,
+          "empty": 0.0012547051442910915,
+          "tok_per_clip": 12.649937264742785,
+          "oov": 0.32186074191628644,
+          "clips_with_oov": 0.9347553324968633
+        },
+        {
+          "district": "Dhaka",
+          "clips": 763,
+          "empty": 0.0,
+          "tok_per_clip": 13.003931847968545,
+          "oov": 0.2297923805684338,
+          "clips_with_oov": 0.9292267365661862
+        },
+        {
+          "district": "Formal",
+          "clips": 1652,
+          "empty": 0.0,
+          "tok_per_clip": 13.221549636803875,
+          "oov": 0.08414980313158135,
+          "clips_with_oov": 0.6234866828087167
+        },
+        {
+          "district": "Khulna",
+          "clips": 750,
+          "empty": 0.0,
+          "tok_per_clip": 13.282666666666668,
+          "oov": 0.1845011041959446,
+          "clips_with_oov": 0.88
+        },
+        {
+          "district": "Mymensingh",
+          "clips": 1053,
+          "empty": 0.0,
+          "tok_per_clip": 12.665716999050332,
+          "oov": 0.25860388393191874,
+          "clips_with_oov": 0.9173789173789174
+        },
+        {
+          "district": "Noakhali",
+          "clips": 1213,
+          "empty": 0.0,
+          "tok_per_clip": 12.463314097279472,
+          "oov": 0.274242624685805,
+          "clips_with_oov": 0.9414674361088211
+        },
+        {
+          "district": "Rajshahi",
+          "clips": 860,
+          "empty": 0.0,
+          "tok_per_clip": 13.847674418604651,
+          "oov": 0.18381056343941557,
+          "clips_with_oov": 0.8860465116279069
+        },
+        {
+          "district": "Sylhet",
+          "clips": 958,
+          "empty": 0.0,
+          "tok_per_clip": 12.495824634655532,
+          "oov": 0.33982123465040515,
+          "clips_with_oov": 0.9676409185803758
+        }
+      ],
+      "top_oov": {
+        "Barishal": [],
+        "Chattogram": [],
+        "Dhaka": [],
+        "Formal": [],
+        "Khulna": [],
+        "Mymensingh": [],
+        "Noakhali": [],
+        "Rajshahi": [],
+        "Sylhet": []
+      }
+    }
+  }
+}

@@ -71,3 +71,6 @@ docs/thesis/*.pdf
 docs/thesis/*.pages
 # Private meeting-prep docs (same policy as docs/supervisor/)
 docs/nlp-expert-meeting/
+
+# Phase 5: standard-Bangla vocabulary derived from OOD-Speech (licence unconfirmed; regenerate with build_lexicon.py formal)
+lexicons/formal_vocab*.txt

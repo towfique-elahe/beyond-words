@@ -1,0 +1,50 @@
+{
+  "transcripts": "transcripts/tugstugi_ben10.csv",
+  "manifest": "splits/manifest_split_rel.csv",
+  "lexicon": "lexicons/external.json",
+  "n_clips": 9303,
+  "results": {
+    "match": {
+      "val_macro_f1": 0.4033,
+      "val_acc": 0.4711,
+      "test_macro_f1": 0.4139,
+      "test_acc": 0.4773,
+      "test_f1_per_class": {
+        "Barishal": 0.3551,
+        "Chattogram": 0.5232,
+        "Formal": 0.6066,
+        "Mymensingh": 0.1047,
+        "Noakhali": 0.3376,
+        "Sylhet": 0.5562
+      },
+      "tau": 0.1,
+      "coverage_test": 0.5049,
+      "classes": [
+        "Barishal",
+        "Chattogram",
+        "Formal",
+        "Mymensingh",
+        "Noakhali",
+        "Sylhet"
+      ]
+    },
+    "tfidf": {
+      "val_macro_f1": 0.7602,
+      "val_acc": 0.7713,
+      "test_macro_f1": 0.7281,
+      "test_acc": 0.7389,
+      "test_f1_per_class": {
+        "Barishal": 0.6648,
+        "Chattogram": 0.7354,
+        "Dhaka": 0.6126,
+        "Formal": 0.8595,
+        "Khulna": 0.7064,
+        "Mymensingh": 0.6735,
+        "Noakhali": 0.7458,
+        "Rajshahi": 0.7328,
+        "Sylhet": 0.8222
+      },
+      "C": 3
+    }
+  }
+}
