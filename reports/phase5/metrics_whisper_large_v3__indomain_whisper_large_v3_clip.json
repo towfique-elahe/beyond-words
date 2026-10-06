@@ -1,0 +1,91 @@
+{
+  "transcripts": "transcripts/whisper_large_v3.csv",
+  "manifest": "splits/manifest_split_rel.csv",
+  "lexicon": "lexicons/indomain_whisper_large_v3_clip.json",
+  "n_clips": 9303,
+  "results": {
+    "match": {
+      "val_macro_f1": 0.2005,
+      "val_acc": 0.2538,
+      "test_macro_f1": 0.211,
+      "test_acc": 0.2491,
+      "test_f1_per_class": {
+        "Barishal": 0.1393,
+        "Chattogram": 0.1522,
+        "Dhaka": 0.1053,
+        "Formal": 0.312,
+        "Khulna": 0.1761,
+        "Mymensingh": 0.199,
+        "Noakhali": 0.3183,
+        "Rajshahi": 0.2762,
+        "Sylhet": 0.221
+      },
+      "tau": 0.0,
+      "coverage_test": 0.3672,
+      "classes": [
+        "Barishal",
+        "Chattogram",
+        "Dhaka",
+        "Formal",
+        "Khulna",
+        "Mymensingh",
+        "Noakhali",
+        "Rajshahi",
+        "Sylhet"
+      ]
+    },
+    "tfidf": {
+      "val_macro_f1": 0.4813,
+      "val_acc": 0.4965,
+      "test_macro_f1": 0.4897,
+      "test_acc": 0.5071,
+      "test_f1_per_class": {
+        "Barishal": 0.4083,
+        "Chattogram": 0.3931,
+        "Dhaka": 0.3981,
+        "Formal": 0.6949,
+        "Khulna": 0.4225,
+        "Mymensingh": 0.4911,
+        "Noakhali": 0.5464,
+        "Rajshahi": 0.5415,
+        "Sylhet": 0.5116
+      },
+      "C": 1
+    },
+    "fusion": {
+      "val_macro_f1": 0.9648,
+      "val_acc": 0.9649,
+      "test_macro_f1": 0.9538,
+      "test_acc": 0.9526,
+      "test_f1_per_class": {
+        "Barishal": 0.9244,
+        "Chattogram": 0.9375,
+        "Dhaka": 0.968,
+        "Formal": 0.9769,
+        "Khulna": 0.986,
+        "Mymensingh": 0.9231,
+        "Noakhali": 0.9244,
+        "Rajshahi": 0.9793,
+        "Sylhet": 0.9645
+      },
+      "alpha": 0.2
+    },
+    "xlsr": {
+      "val_macro_f1": 0.9603,
+      "val_acc": 0.9599,
+      "test_macro_f1": 0.9508,
+      "test_acc": 0.9496,
+      "test_f1_per_class": {
+        "Barishal": 0.9271,
+        "Chattogram": 0.9238,
+        "Dhaka": 0.9725,
+        "Formal": 0.9731,
+        "Khulna": 0.9815,
+        "Mymensingh": 0.9122,
+        "Noakhali": 0.9096,
+        "Rajshahi": 0.9756,
+        "Sylhet": 0.9821
+      }
+    }
+  }
+}

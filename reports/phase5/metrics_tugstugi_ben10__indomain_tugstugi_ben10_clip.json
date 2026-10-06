@@ -1,0 +1,91 @@
+{
+  "transcripts": "transcripts/tugstugi_ben10.csv",
+  "manifest": "splits/manifest_split_rel.csv",
+  "lexicon": "lexicons/indomain_tugstugi_ben10_clip.json",
+  "n_clips": 9303,
+  "results": {
+    "match": {
+      "val_macro_f1": 0.4054,
+      "val_acc": 0.4393,
+      "test_macro_f1": 0.3991,
+      "test_acc": 0.4327,
+      "test_f1_per_class": {
+        "Barishal": 0.2672,
+        "Chattogram": 0.4746,
+        "Dhaka": 0.2781,
+        "Formal": 0.4585,
+        "Khulna": 0.327,
+        "Mymensingh": 0.3394,
+        "Noakhali": 0.5515,
+        "Rajshahi": 0.2727,
+        "Sylhet": 0.6227
+      },
+      "tau": 0.0,
+      "coverage_test": 0.4522,
+      "classes": [
+        "Barishal",
+        "Chattogram",
+        "Dhaka",
+        "Formal",
+        "Khulna",
+        "Mymensingh",
+        "Noakhali",
+        "Rajshahi",
+        "Sylhet"
+      ]
+    },
+    "tfidf": {
+      "val_macro_f1": 0.7602,
+      "val_acc": 0.7713,
+      "test_macro_f1": 0.7281,
+      "test_acc": 0.7389,
+      "test_f1_per_class": {
+        "Barishal": 0.6648,
+        "Chattogram": 0.7354,
+        "Dhaka": 0.6126,
+        "Formal": 0.8595,
+        "Khulna": 0.7064,
+        "Mymensingh": 0.6735,
+        "Noakhali": 0.7458,
+        "Rajshahi": 0.7328,
+        "Sylhet": 0.8222
+      },
+      "C": 3
+    },
+    "fusion": {
+      "val_macro_f1": 0.9747,
+      "val_acc": 0.9749,
+      "test_macro_f1": 0.9669,
+      "test_acc": 0.9654,
+      "test_f1_per_class": {
+        "Barishal": 0.9456,
+        "Chattogram": 0.9412,
+        "Dhaka": 0.9862,
+        "Formal": 0.9792,
+        "Khulna": 0.9953,
+        "Mymensingh": 0.94,
+        "Noakhali": 0.9382,
+        "Rajshahi": 0.9878,
+        "Sylhet": 0.9891
+      },
+      "alpha": 0.3
+    },
+    "xlsr": {
+      "val_macro_f1": 0.9603,
+      "val_acc": 0.9599,
+      "test_macro_f1": 0.9508,
+      "test_acc": 0.9496,
+      "test_f1_per_class": {
+        "Barishal": 0.9271,
+        "Chattogram": 0.9238,
+        "Dhaka": 0.9725,
+        "Formal": 0.9731,
+        "Khulna": 0.9815,
+        "Mymensingh": 0.9122,
+        "Noakhali": 0.9096,
+        "Rajshahi": 0.9756,
+        "Sylhet": 0.9821
+      }
+    }
+  }
+}
