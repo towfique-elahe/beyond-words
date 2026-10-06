@@ -14,3 +14,8 @@ tqdm
 matplotlib
 seaborn
 audiomentations   # Phase 3 augmentation
+speechbrain       # Phase 3 strict split (ECAPA pseudo-speaker clustering)
+bnunicodenormalizer   # Phase 5 lexical route: Bangla word normalisation
+jiwer             # Phase 5 WER/CER on Ben-10 valid
+# Phase 5 Hishab front-end only (install on Kaggle, not needed locally):
+#   pip install "nemo_toolkit[asr]"
