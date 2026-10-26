@@ -2,7 +2,7 @@
 
 **Bangla Dialect Identification with Self-Supervised Speech Models**
 
-Classifying regional Bangla accents from short audio clips. v2 replaces the original hand-crafted-features + MLP pipeline with pretrained self-supervised speech models and a leakage-aware data pipeline. Headline results: **0.917** test macro-F1 with frozen Whisper-small embeddings, **0.952** after end-to-end XLS-R-300M fine-tuning, and — under a strict pseudo-speaker split that removes speaker/channel leakage — honest estimates of **0.793 / 0.808**.
+Classifying regional Bangla accents from short audio clips. v2 replaces the original hand-crafted-features + MLP pipeline with pretrained speech models and a leakage-aware data pipeline. Headline results: **0.917** test macro-F1 with frozen Whisper-small embeddings, **0.952** after end-to-end XLS-R-300M fine-tuning and **0.984** with fine-tuned Whisper-medium; under a strict pseudo-speaker split that removes speaker/channel leakage, honest estimates of **0.793 / 0.808 / 0.919**.
 
 > Thesis: *A Neural Network Approach to Classifying Bangla Accentual Diversity* — framed as a Dialect Identification (DID) task.
 
@@ -45,6 +45,7 @@ build_split.py     →  manifest_split.csv    # train/val/test (group-aware wher
 baseline_whisper.py cache  →  embeddings.npz  # Whisper-small encoder, mean-pooled, cached once
 baseline_whisper.py train                     # weighted MLP head + evaluation
 finetune_xlsr.py           →  xlsr_best.pt    # Phase 2: end-to-end XLS-R-300M (Kaggle T4)
+finetune_xlsr.py --model <id> --tag <tag>     # Phase 6: Whisper-medium / Tugstugi / Hishab encoders
 build_speaker_clusters.py  →  manifest_speaker.csv       # Phase 3: ECAPA pseudo-speakers
 build_split.py --manifest manifest_speaker.csv           #   → strict group-disjoint split
 baseline_mfcc.py cache     →  features_v1.npz # Phase 3: v1-style MFCC ablation row
@@ -249,6 +250,51 @@ Artifacts in [`reports/phase3/`](reports/phase3/): strict-split evaluations for 
 three models, XLS-R strict metrics/predictions, `strict_split_results.json`, and
 `bootstrap_ci.json` (clip- and speaker-group bootstrap CIs for every score and gap).
 
+## More encoders (Phase 6: which pretrained model, frozen or fine-tuned?)
+
+Phases 1–3 compared one hand-crafted, one frozen and one fine-tuned
+representation, which confounded the training regime with the encoder. Phase 6
+runs the XLS-R recipe (`finetune_xlsr.py --model ... --family ...`) on four
+more encoders and adds frozen rows for two of them, so the same checkpoint
+appears both frozen and fine-tuned. Whisper encoders are trained on 5 s inputs
+by keeping the first 250 rows of their positional table (`WhisperForAudioClassification`,
+decoder dropped); Hishab's NeMo FastConformer gets a masked-mean-pool head.
+
+Test macro-F1 with 95 % speaker-group bootstrap CIs (`reports/phase6/summary.csv`, `bootstrap_ci.json`):
+
+| Model | Pretraining | Clip-level | Strict | Drop |
+|---|---|---|---|---|
+| MFCC statistics + MLP | — | 0.727 (0.676–0.753) | 0.480 (0.368–0.552) | 24.8 |
+| Whisper-small, frozen + MLP | multilingual | 0.917 (0.894–0.932) | 0.793 (0.688–0.808) | 12.4 |
+| Whisper-medium, frozen + MLP | multilingual | *pending* | *pending* | |
+| Tugstugi (Ben-10), frozen + MLP | Bangla | 0.936 (0.916–0.949) | 0.857 (0.725–0.870) | 7.9 |
+| XLS-R-300M, fine-tuned | multilingual | 0.952 (0.935–0.963) | 0.808 (0.717–0.838) | 14.4 |
+| Whisper-medium, fine-tuned | multilingual | **0.984** (0.975–0.991) | 0.919 (0.808–0.931) | 6.5 |
+| Tugstugi, fine-tuned | Bangla | 0.981 (0.972–0.988) | 0.908 (0.802–0.919) | 7.3 |
+| Tugstugi (Ben-10), fine-tuned | Bangla | 0.980 (0.970–0.987) | **0.921** (0.785–0.932) | 6.0 |
+| Hishab FastConformer, fine-tuned | Bangla | 0.901 (0.877–0.916) | 0.746 (0.613–0.773) | 15.5 |
+
+<p align="center">
+  <img src="reports/figures/phase6_models_split.png" alt="Every acoustic model under both splits" width="80%" />
+</p>
+
+- **New honest headline: 0.92.** Fine-tuned Whisper-medium beats XLS-R by 11.1
+  points under the strict split (group CI +1.5 to +16.8) and by 3.3 at clip
+  level (CI +2.2 to +4.7). Barishal, XLS-R's worst class (0.51), reaches 0.88–0.93.
+- **Fine-tuning helps on the same checkpoint**: Tugstugi (Ben-10) frozen 0.857 →
+  fine-tuned 0.921 strict (CI +3.6 to +10.4). The earlier "frozen Whisper-small ≈
+  fine-tuned XLS-R under the strict split" finding was an encoder effect, not a
+  regime effect.
+- **Bangla-specific pretraining adds nothing measurable**: Whisper-medium, Tugstugi
+  and Tugstugi (Ben-10) are within 1.3 points of each other with every CI
+  straddling zero.
+- **The leakage drop halves** for the Whisper-medium family (6–7 points vs 12–14),
+  and is largest for Hishab's CTC-trained FastConformer (15.5), the weakest
+  pretrained model (0.746 strict; 115M parameters, best epoch 18/20).
+- Each Whisper-medium run took 64–76 min on a T4 (12 epochs); the eight runs
+  used ~9 GPU-hours. Fusion in Phase 5 below is still with XLS-R; fusion with
+  Whisper-medium has not been run.
+
 ## Lexical route (Phase 5: is the dialect in the words or in the sound?)
 
 Phases 1–3 never look at *what* is said: the models consume log-mel frames or
@@ -313,16 +359,18 @@ Ben-10 paper's hand-counted measure:
 
 | Front-end | WER | CER | Dialect-word recall | Formal-word recall |
 |---|---|---|---|---|
-| Tugstugi (Ben-10) | **0.707** | **0.471** | **0.192** | **0.455** |
-| Tugstugi | 0.775 | 0.532 | 0.034 | 0.369 |
+| Tugstugi (Ben-10) | **0.645** | **0.333** | **0.266** | **0.620** |
+| Tugstugi | 0.752 | 0.484 | 0.040 | 0.416 |
 | Hishab FastConformer | 0.792 | 0.517 | 0.012 | 0.405 |
 | wav2vec2 XLS-R Bengali | 0.942 | 0.669 | 0.012 | 0.085 |
-| Whisper-large-v3 | 0.960 | 0.808 | 0.016 | 0.061 |
+| Whisper-large-v3 | 0.978 | 0.660 | 0.040 | 0.147 |
 
-The WER ordering and magnitudes match the paper's Table 3 (0.70 for the Ben-10
-model on its private test set). Even the best front-end recovers fewer than one
-in five dialect words (best district Sylhet 0.24, worst Rangpur 0.13), which
-bounds what any word-matching approach can see.
+The WER ordering matches the paper's Table 3 (0.70 / 0.81 / 0.87 / 1.13 for the
+Ben-10 model / Tugstugi / Hishab / Whisper-large-v3 on its private test set).
+Even the best front-end recovers only about one dialect word in four (best
+district Sylhet 0.36, worst Kishoreganj 0.17), which bounds what any
+word-matching approach can see. Whisper models decode with a 440-token cap on
+this 30 s audio (128 on the 5 s thesis clips).
 
 `python predict.py --explain clip.wav` adds the transcript, the words outside
 standard Bangla and the per-region match percentages to the acoustic top-k.
@@ -348,6 +396,7 @@ Mitigation status: speaker clustering (ECAPA) is implemented — the strict-spli
 - [x] Phase 3 — speaker-clustered strict split (**0.793 / 0.808** honest estimates), ablation table, augmentation study (negative result), data-efficiency curve
 - [x] Phase 4 — thesis write-up drafts, reproducible release, inference demo (`predict.py`)
 - [x] Phase 5 — lexical route: ASR transcripts, regional-word matching, TF-IDF, fusion (**0.856** strict with XLS-R + text); five ASR front-ends compared
+- [x] Phase 6 — fine-tuned Whisper-medium, Tugstugi ×2 and Hishab FastConformer as classifiers, plus frozen rows (**0.919 / 0.921** strict; Bangla pretraining adds nothing measurable)
 
 ## Hardware
 
@@ -359,7 +408,7 @@ The project runs on a zero-hardware budget. Phases 0–1 were developed on an **
 ├── build_manifest.py      # Phase 0: scan + validate + standardize audio
 ├── build_split.py         # Phase 0: leakage-aware train/val/test split
 ├── baseline_whisper.py    # Phase 1: cache embeddings, train + evaluate head
-├── finetune_xlsr.py       # Phase 2: end-to-end XLS-R-300M fine-tuning
+├── finetune_xlsr.py       # Phase 2/6: end-to-end fine-tuning (wav2vec2 / whisper / nemo families)
 ├── build_speaker_clusters.py  # Phase 3: ECAPA pseudo-speaker clustering
 ├── baseline_mfcc.py       # Phase 3: v1-style MFCC features (ablation)
 ├── data_efficiency.py     # Phase 3: label-fraction sweep + curve
@@ -372,6 +421,9 @@ The project runs on a zero-hardware budget. Phases 0–1 were developed on an **
 ├── asr_diagnostics.py     # Phase 5: per-front-end OOV / empty-rate table (no references needed)
 ├── ben10_eval.py          # Phase 5: WER/CER + dialect-word recall on Ben-10 valid
 ├── summarize_phase5.py    # Phase 5: one table over front-ends x splits
+├── summarize_phase6.py    # Phase 6: every acoustic model x split
+├── make_phase5_figures.py # Phase 5 figures
+├── make_phase6_figures.py # Phase 6 figure
 ├── splits/                # committed splits (relative paths, reproducibility)
 │   ├── manifest_split_rel.csv         # canonical clip-level split
 │   └── manifest_split_strict_rel.csv  # Phase 3 strict pseudo-speaker split
@@ -381,12 +433,14 @@ The project runs on a zero-hardware budget. Phases 0–1 were developed on an **
 │   ├── beyond-words.ipynb
 │   ├── kaggle_xlsr_finetune.ipynb
 │   ├── kaggle_transcribe.ipynb        # Phase 5: all clips x all ASR front-ends (T4)
+│   ├── kaggle_finetune_encoders.ipynb # Phase 6: one encoder x one split per kernel (T4)
 │   └── kaggle_ben10_eval.ipynb        # Phase 5: front-ends on Ben-10 valid audio
 ├── reports/
 │   ├── figures/           # result figures (baseline + fine-tuned + ablation)
 │   ├── phase2/            # XLS-R run metrics + test predictions
 │   ├── phase3/            # strict-split evaluations + ablation artifacts
-│   └── phase5/            # lexical-route metrics, predictions, diagnostics, summary
+│   ├── phase5/            # lexical-route metrics, predictions, diagnostics, summary
+│   └── phase6/            # per-model metrics + predictions (clip/, strict/), summary, bootstrap CIs
 ├── docs/                  # thesis materials
 │   ├── thesis/            #   chapter outline + methodology/results/discussion drafts
 │   ├── reproducibility.md #   exact result→command map, release checklist
