@@ -93,7 +93,7 @@ def whisper_backend(args, device):
     def run(wavs, paths):
         feats = processor(wavs, sampling_rate=SR, return_tensors="pt").input_features
         ids = model.generate(feats.to(device, dtype), language="bn", task="transcribe",
-                             num_beams=1, max_new_tokens=128)
+                             num_beams=1, max_new_tokens=args.max_new_tokens)
         return processor.batch_decode(ids, skip_special_tokens=True)
 
     return run
@@ -154,6 +154,8 @@ def main():
     ap.add_argument("--audio-root", default="", help="prepended to manifest relpath")
     ap.add_argument("--out-dir", default="transcripts")
     ap.add_argument("--batch", type=int, default=8)
+    ap.add_argument("--max-new-tokens", type=int, default=128,
+                    help="Whisper decoding cap; 128 suits 5 s clips, use 440 for 30 s audio")
     ap.add_argument("--per-class", type=int, default=0, help="pilot: N clips per district")
     ap.add_argument("--limit", type=int, default=0, help="smoke test: first N rows")
     ap.add_argument("--seed", type=int, default=42)
