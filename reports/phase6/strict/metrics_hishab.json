@@ -1,0 +1,20 @@
+{
+  "model": "hishab/hishab_bn_fastconformer",
+  "family": "nemo",
+  "seed": 42,
+  "epochs": 20,
+  "best_epoch": 18,
+  "val_macroF1": 0.6831330056548178,
+  "test_macroF1": 0.7463714932907405,
+  "per_class_F1": {
+    "Barishal": 0.3878116343490305,
+    "Chattogram": 0.7685185185185185,
+    "Dhaka": 0.7864077669902912,
+    "Formal": 0.8216216216216217,
+    "Khulna": 0.9054054054054054,
+    "Mymensingh": 0.7796610169491526,
+    "Noakhali": 0.7584269662921348,
+    "Rajshahi": 0.6783216783216783,
+    "Sylhet": 0.8311688311688312
+  }
+}
