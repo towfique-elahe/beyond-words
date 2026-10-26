@@ -20,29 +20,7 @@ combined by late fusion.
 
 \begin{figure}[ht]
   \centering
-  \begin{tikzpicture}[
-      node distance=5mm and 6mm,
-      box/.style={draw, rounded corners=2pt, align=center, font=\small,
-                  minimum height=11mm, text width=27mm, fill=white},
-      data/.style={box, fill=black!6, text width=16mm},
-      arr/.style={-{Latex[length=2mm]}, thick}]
-    \node[data] (audio) {5\,s audio clip};
-    \node[box, above right=2mm and 8mm of audio] (enc) {MFCC, Whisper\\or XLS-R};
-    \node[box, right=of enc] (aclf) {classifier\\head};
-    \node[box, below right=2mm and 8mm of audio] (asr) {Bangla ASR\\$\rightarrow$ transcript};
-    \node[box, right=of asr] (lclf) {word matching\\or TF-IDF + LR};
-    \node[box, text width=14mm] (fuse) at ($(aclf.east)!0.5!(lclf.east) + (15mm,0)$) {late\\fusion};
-    \node[data, right=6mm of fuse, text width=19mm] (out) {dialect\\(9 classes)};
-    \draw[arr] (audio.north) |- (enc.west);
-    \draw[arr] (enc) -- (aclf);
-    \draw[arr] (audio.south) |- (asr.west);
-    \draw[arr] (asr) -- (lclf);
-    \draw[arr] (aclf.east) -| (fuse.north);
-    \draw[arr] (lclf.east) -| (fuse.south);
-    \draw[arr] (fuse) -- (out);
-    \node[font=\footnotesize\itshape, anchor=south, yshift=0.5mm] at ($(enc.north)!0.5!(aclf.north)$) {acoustic route: the sound};
-    \node[font=\footnotesize\itshape, anchor=north, yshift=-0.5mm] at ($(asr.south)!0.5!(lclf.south)$) {lexical route: the words};
-  \end{tikzpicture}
+  \includegraphics{pipeline}  % source: figures/src/pipeline.tex
   \caption{The two routes to dialect identity. The acoustic route sees only the
   signal; the lexical route sees only the words recovered by speech recognition.
   Each produces class probabilities, which late fusion combines

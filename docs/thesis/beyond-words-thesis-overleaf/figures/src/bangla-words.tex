@@ -1,0 +1,24 @@
+% Bangla words used in the text, one PDF page per word, so that main.tex can be
+% compiled with pdfLaTeX (fast on Overleaf). Regenerate only if you add or change
+% a word: compile THIS file with XeLaTeX, then copy bangla-words.pdf to figures/.
+% Every page has the same height (11.5pt) and depth (4.5pt), set by the rule,
+% so \bn{...} in main.tex can place each word on the text baseline.
+% Page order must match the \defbn list in main.tex.
+\documentclass[multi=bnword,border=0pt]{standalone}
+\usepackage{fontspec}
+\newfontfamily\bengalifont[Path=../../fonts/, Script=Bengali,
+  UprightFont=NotoSerifBengali-Regular.ttf]{NotoSerifBengali}
+\newcommand{\w}[1]{\begin{bnword}\fontsize{11.04pt}{13pt}\selectfont
+  \bengalifont\rule[-4.5pt]{0pt}{16pt}#1\end{bnword}}
+\begin{document}
+\w{মুই}            % 1  mui
+\w{আমি}            % 2  ami
+\w{কিতা}           % 3  kita
+\w{কী}             % 4  ki
+\w{আঁই}            % 5  ai
+\w{আঁর}            % 6  ar
+\w{হামার}          % 7  hamar
+\w{টেহা}           % 8  teha
+\w{বিয়া দিয়া দাও}  % 9  biya
+\w{বিয়ে দিয়ে দাও}  % 10 biye
+\end{document}

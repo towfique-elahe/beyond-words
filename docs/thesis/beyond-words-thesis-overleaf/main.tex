@@ -1,6 +1,6 @@
 % =====================================================================
 %  Beyond Words: Bangla Dialect Identification from Sound and Words
-%  Compiler: XeLaTeX  (Overleaf: Menu -> Compiler -> XeLaTeX)
+%  Compiler: pdfLaTeX  (Overleaf's default; the fastest to compile)
 %  Bibliography: BibTeX (natbib, author-year)
 % =====================================================================
 \documentclass[12pt,a4paper,oneside]{report}
@@ -9,20 +9,19 @@
 \newcommand{\thesistitle}{A Neural Network Approach to Classifying Bangla Accentual Diversity}
 \newcommand{\thesissubtitle}{Dialect Identification from Sound and from Words}
 \newcommand{\thesisauthor}{Towfique Elahe}
-\newcommand{\studentid}{[Student ID]}                       % TODO
-\newcommand{\thesisdegree}{[Degree, e.g.\ Master of Science in Data Science]} % TODO
-\newcommand{\thesisdepartment}{[Department]}                % TODO
-\newcommand{\thesisuniversity}{[University]}                % TODO
-\newcommand{\thesissupervisor}{[Supervisor name and title]} % TODO
-\newcommand{\thesisdate}{[Month Year]}                      % TODO
+\newcommand{\studentid}{183001112}
+\newcommand{\thesisauthortwo}{Injamamul Hoque Sikder}
+\newcommand{\studentidtwo}{183003012}
+\newcommand{\thesisdegree}{Bachelor of Science in Computer Science and Engineering}
+\newcommand{\thesisdepartment}{Department of Computer Science and Engineering}
+\newcommand{\thesisuniversity}{East Delta University}
+\newcommand{\thesissupervisor}{Ashrafur Rahman Chowdhury, Lecturer}
+\newcommand{\thesisdate}{November 2026}
 
-% ---------- Fonts (XeLaTeX) -------------------------------------------
-\usepackage{fontspec}
-\newfontfamily\bengalifont[
-  Path=fonts/, Script=Bengali, Scale=0.92,
-  UprightFont=NotoSerifBengali-Regular.ttf,
-  BoldFont=NotoSerifBengali-Bold.ttf]{NotoSerifBengali}
-\newcommand{\bn}[1]{{\bengalifont #1}}   % Bangla-script text
+% ---------- Fonts (pdfLaTeX) ------------------------------------------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
 
 % ---------- Layout ----------------------------------------------------
 \usepackage[a4paper,margin=2.5cm,bindingoffset=0.5cm]{geometry}
@@ -52,16 +51,12 @@
 \usepackage{enumitem}
 \setlist{itemsep=2pt,topsep=4pt}
 \usepackage{float}
-\usepackage{tikz}
-\usetikzlibrary{positioning,arrows.meta,calc}
 \usepackage[round,authoryear]{natbib}
 \bibliographystyle{plainnat}
 \usepackage[obeyspaces,spaces]{xurl}
 \urlstyle{same}
 \usepackage[hidelinks,bookmarksnumbered]{hyperref}
 \usepackage[nameinlink,capitalise,noabbrev]{cleveref}
-\usepackage[acronym,nonumberlist,nomain]{glossaries}
-\makenoidxglossaries
 
 % ---------- Helpers ---------------------------------------------------
 \newcommand{\fscore}[1]{#1}                       % keeps numbers greppable
@@ -69,9 +64,19 @@
 \newcolumntype{L}{>{\raggedright\arraybackslash}X}
 \newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
 
-\input{frontmatter/abbreviations}
+% Bangla words are pre-rendered (figures/src/bangla-words.tex, compiled with
+% XeLaTeX) so this document compiles with pdfLaTeX. Usage: \bn{slug}{বাংলা};
+% the second argument only keeps the word readable in the source.
+\makeatletter
+\newcommand{\defbn}[2]{\@namedef{bn@#1}{#2}}
+\defbn{mui}{1}\defbn{ami}{2}\defbn{kita}{3}\defbn{ki}{4}\defbn{ai}{5}
+\defbn{ar}{6}\defbn{hamar}{7}\defbn{teha}{8}\defbn{biya}{9}\defbn{biye}{10}
+\newcommand{\bn}[2]{\raisebox{-4.5pt}{%
+  \edef\bn@page{\@nameuse{bn@#1}}%
+  \includegraphics[page=\bn@page]{bangla-words}}}
+\makeatother
 
-% Compile one chapter at a time on Overleaf's free plan if it times out:
+% If Overleaf still times out, compile one chapter at a time:
 % \includeonly{chapters/05-results}
 
 \begin{document}
@@ -86,7 +91,7 @@
 \tableofcontents
 \listoffigures
 \listoftables
-\printnoidxglossary[type=\acronymtype,title={List of Abbreviations}]
+\input{frontmatter/abbreviations}
 
 % ---------- Main matter -----------------------------------------------
 \cleardoublepage
