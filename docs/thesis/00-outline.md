@@ -27,7 +27,10 @@ combined result. The title "Beyond Words" is read literally.
   4. Ablation across representations × split protocols + data-efficiency analysis
   5. A negative result on channel-suppression augmentation, with a prosody-based
      explanation specific to DID
-  6. **The lexical route**: five off-the-shelf Bangla ASR front-ends compared by how
+  6. **Eight acoustic models under both protocols** (Phase 6): fine-tuned
+     Whisper-medium / Tugstugi / Tugstugi (Ben-10) / Hishab plus frozen rows;
+     0.92 strict, drop halves, Bangla pretraining adds nothing measurable.
+  7. **The lexical route**: five off-the-shelf Bangla ASR front-ends compared by how
      much dialect they preserve (automated dialect-word recall on Ben-10, 1,666
      human-transcribed clips), regional-word matching with an interpretable
      per-region match percentage, a TF-IDF text classifier, and acoustic+lexical
@@ -68,7 +71,11 @@ combined result. The title "Beyond Words" is read literally.
 - 5.2 Strict-split results: the 6-cell ablation table; leakage quantified
 - 5.3 Data efficiency: 10 % of labels with SSL beats 100 % with MFCC
 - 5.4 Augmentation study: negative result (0.808 → 0.748)
-- 5.5 The lexical route: ASR front-ends on Ben-10 valid (WER, dialect-word recall);
+- 5.5 Fine-tuning more encoders (Phase 6): all eight acoustic models x both
+  splits with CIs; Whisper-medium family 0.92 strict, leakage drop halves,
+  Bangla pretraining adds nothing, Hishab weakest; frozen vs fine-tuned on one
+  checkpoint (Tugstugi Ben-10: 0.857 → 0.921)
+- 5.6 The lexical route: ASR front-ends on Ben-10 valid (WER, dialect-word recall);
   OOV diagnostics on the thesis clips; word matching (0.36) / TF-IDF (0.63) /
   fusion (0.856) under the strict split, with group-bootstrap CIs
 - Figures: reports/figures/*.png (confusion matrices, per-class comparison, t-SNE,
@@ -78,7 +85,10 @@ combined result. The title "Beyond Words" is read literally.
 - What the strict split reveals (leakage decomposition; which classes were inflated)
 - Errors follow dialect geography (Barishal↔Noakhali; Mymensingh transitional)
 - Why augmentation failed: prosody is signal in DID
-- Words or sound? The ASR ceiling (≤ 19 % of dialect words survive transcription),
+- Frozen or fine-tuned, and which encoder? (Phase 6 resolves the model-family
+  confound: fine-tuning helps on the same checkpoint; XLS-R was the channel
+  exploiter; honest headline becomes 0.92)
+- Words or sound? The ASR ceiling (≤ 27 % of dialect words survive transcription),
   why the formal-word filter underperforms a plain text classifier, where the
   routes are complementary (Barishal, Sylhet) and where they are not (Khulna)
 - Limitations: pseudo-speaker approximation (ARI 0.347), lumpy strict test cells,

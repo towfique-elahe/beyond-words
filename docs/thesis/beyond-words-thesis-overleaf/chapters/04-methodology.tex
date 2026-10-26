@@ -79,7 +79,10 @@ clip-level splitting to pseudo-speaker grouping like the regional classes.
 \label{sec:method-acoustic}
 
 All acoustic models share one protocol: inverse-frequency class-weighted
-cross-entropy, model selection by validation macro-F1, and seed 42.
+cross-entropy, model selection by validation macro-F1, and seed 42. Models
+(a)--(c) are the original comparison; (d) and (e) were added after a
+supervisor review, to place Bangla-pretrained encoders beside the multilingual
+ones and to fine-tune Whisper as XLS-R was fine-tuned.
 
 \paragraph{(a) MFCC statistics + MLP} (\path{baseline_mfcc.py}). Forty
 MFCCs with their first and second differences are mean- and standard-deviation
@@ -105,6 +108,38 @@ accumulation 2 (effective batch 16), fp16 mixed precision, gradient clipping at
 utterance. An 8-epoch pilot (macro-F1 0.865, still rising at the last epoch)
 showed that the schedule needed lengthening; at 20 epochs validation plateaus
 from about epoch 11 (\cref{fig:training-curve}).
+
+\paragraph{(d) Fine-tuned Whisper-medium encoders} (\path{finetune_xlsr.py --model ...}).
+The same recipe as (c), applied to the encoder of three Whisper-medium
+checkpoints: \hf{openai/whisper-medium} (multilingual), and the two Bangla
+speech-recognition models of \cref{tab:asr-fronts} that share its architecture,
+\emph{Tugstugi} (fine-tuned on standard Bangla by Bengali.AI) and \emph{Tugstugi
+(Ben-10)} (further fine-tuned on dialect speech). Each is loaded as an
+encoder-only classifier: the seq2seq checkpoint's decoder is dropped, and a
+projector, mean-pooling over time and a linear classifier are added, mirroring
+the XLS-R head (\texttt{WhisperForAudioClassification} in Transformers). Whisper's
+encoder is built for 30\,s of input; to train on 5\,s clips at a sixth of the
+cost, only the first 250 rows of its (frozen) positional table are kept, which
+corresponds to 500 log-mel frames, and the two convolutional input layers are
+frozen as XLS-R's feature encoder is. All 24 Transformer layers (302M
+parameters) and the head are trained with the hyperparameters of (c), for 12
+epochs rather than 20 because XLS-R's validation curve had plateaued by epoch
+11 and the larger encoder converges faster; a run takes about 70 minutes on a
+T4. Raw amplitude is fed to Whisper's own log-mel front end; the per-utterance
+normalisation of (c) is not applied.
+
+\paragraph{(e) Fine-tuned FastConformer} (\path{finetune_xlsr.py --family nemo}).
+Hishab's Bangla FastConformer (\hf{hishab/hishab_bn_fastconformer}, NVIDIA NeMo)
+is the Bangla-pretrained counterpart of (d) from a different architecture. Its
+mel front end and Conformer encoder are taken from the released ASR model, the
+encoder output is mean-pooled over the unpadded frames and a linear classifier
+is added. The encoder and head are trained with the hyperparameters of (c) for
+20 epochs; the encoder is much smaller than Whisper-medium's.
+
+\paragraph{Frozen rows for (d)} (\path{baseline_whisper.py cache --model ...}).
+To separate the effect of fine-tuning from that of the encoder, the frozen
+recipe of (b) is also run on the Whisper-medium and Tugstugi (Ben-10)
+encoders, so that the same checkpoint appears both frozen and fine-tuned.
 
 \paragraph{Augmentation variant} (\path{finetune_xlsr.py --augment}). A
 train-only waveform augmentation chain aimed at recording-channel signatures:
@@ -174,7 +209,9 @@ Ben-10-fine-tuned wav2vec~2.0, which has no public checkpoint, are omitted.
 \end{table}
 
 Decoding is greedy throughout. For the Whisper models, the language and task
-are fixed to Bangla transcription with no prompt and at most 128 new tokens; the
+are fixed to Bangla transcription with no prompt and a cap of 128 new tokens on
+the 5\,s thesis clips (median output 53 tokens; 0.2\,\% of clips reach 120) and
+440 on Ben-10's up-to-30\,s clips; the
 two Tugstugi checkpoints ship without a language-token table, so the generation
 configuration of the base \hf{openai/whisper-medium} is substituted, which
 changes no weights. The wav2vec~2.0 model is decoded by CTC argmax
@@ -281,8 +318,9 @@ outside $V$ per class is reported for each front-end.
 
 Development and all experiments except fine-tuning and transcription ran on an
 Apple M1 laptop (16\,GB, PyTorch MPS backend). Fine-tuning ran on Kaggle's free
-T4 GPU tier, about 2.5 hours per run, and transcription took about 3.5 further
-T4 hours. The pipeline survived a mid-project hardware change (GTX 1660 Ti to
+T4 GPU tier: about 2.5 hours per XLS-R run, 55--75 minutes per Phase 6 run
+(about 9 hours for the eight), and about 4.5 hours in all for the lexical
+route's transcription. The pipeline survived a mid-project hardware change (GTX 1660 Ti to
 M1) with the frozen-embedding baseline reproducing within 0.3 macro-F1 points.
 The code uses PyTorch \citep{paszke2019pytorch}, Hugging Face Transformers
 \citep{wolf2020transformers}, SpeechBrain \citep{ravanelli2021speechbrain},

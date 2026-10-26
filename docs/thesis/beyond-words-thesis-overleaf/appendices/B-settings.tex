@@ -35,7 +35,7 @@
     Clustering & agglomerative, cosine distance, average linkage, threshold 0.50 (ARI 0.347 on Formal sources) \\
     \midrule
     \multicolumn{2}{@{}l}{\textit{Lexical route}} \\
-    Decoding & greedy; Whisper: language and task fixed to Bangla transcription, $\le$128 new tokens; CTC: arg\,max, no language model \\
+    Decoding & greedy; Whisper: language and task fixed to Bangla transcription, $\le$128 new tokens (5\,s clips) or $\le$440 (Ben-10 valid); CTC: arg\,max, no language model \\
     Standard vocabulary & OOD-Speech training sentences, word types with count $\ge 3$ (88,262) \\
     In-domain lexicon & training split only; count $\ge 3$ in $\ge 2$ pseudo-speakers; add-$\tfrac12$ smoothing \\
     Word matching & Formal threshold $\tau$ tuned on validation, grid 0.00--0.50 in steps of 0.02 \\

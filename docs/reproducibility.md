@@ -58,13 +58,27 @@ CC0), Vashantor CSVs (Mendeley `bj5jgk878b` v2, CC BY 4.0).
 | Front-end OOV diagnostics | `asr_diagnostics.py transcripts/<tag>.csv --min-count 3 --out reports/phase5/diagnostics_<tag>.json` |
 | Summary table | `summarize_phase5.py` → `reports/phase5/summary.csv` |
 | Bootstrap CIs incl. lexical runs | `bootstrap_ci.py --out reports/phase5/bootstrap_ci.json --extra "strict:Fusion/tugstugi_ben10=reports/phase5/test_predictions_tugstugi_ben10__indomain_tugstugi_ben10_strict__fusion.csv" ...` |
-| WER / CER / dialect-word recall on Ben-10 valid | `notebooks/kaggle_ben10_eval.ipynb` (T4) → `transcripts/ben10_valid/<tag>.csv`, then `ben10_eval.py transcripts/ben10_valid/*.csv` |
+| WER / CER / dialect-word recall on Ben-10 valid | `notebooks/kaggle_ben10_eval.ipynb` (T4; Whisper front-ends with `--max-new-tokens 440`, since Ben-10 clips run to 30 s) → `transcripts/ben10_valid/<tag>.csv`, then `ben10_eval.py transcripts/ben10_valid/*.csv`. The 128-token transcripts of the first run are kept in `transcripts/ben10_valid/capped128/` |
 
-Decoding is greedy everywhere (Whisper `num_beams=1`, `max_new_tokens=128`,
+Decoding is greedy everywhere (Whisper `num_beams=1`, `max_new_tokens=128` on the 5 s clips and 440 on Ben-10 valid,
 language/task forced to Bangla transcription; CTC argmax without a language
 model). Thresholds tuned on val only: `tau` (Formal cut-off) for word matching,
 `C` for TF-IDF, `alpha` for fusion. T4 fp16 and M1 fp32 Whisper transcripts agree
 on 93.6 % of pilot clips; the committed numbers use the T4 transcripts.
+
+### Phase 6 (more encoders as dialect classifiers)
+
+| Result | Command |
+|---|---|
+| Fine-tuned Whisper-medium / Tugstugi / Tugstugi (Ben-10), per split | `notebooks/kaggle_finetune_encoders.ipynb` (T4; wraps `finetune_xlsr.py --model <id> --tag <tag> --epochs 12`; ~70 min per run) → `reports/phase6/{clip,strict}/metrics_<tag>.json`, `test_predictions_<tag>.csv` |
+| Fine-tuned Hishab FastConformer, per split | same notebook with `FAMILY='nemo'`, 20 epochs (installs `nemo_toolkit[asr]`) |
+| Frozen Whisper-medium / Tugstugi (Ben-10) + MLP | `baseline_whisper.py cache --model <id> --out embeddings_<tag>.npz`, then `baseline_whisper.py train --emb embeddings_<tag>.npz --device cpu --out-dir reports/phase6/clip --tag frozen_<tag>` (strict: add `--remap-split manifest_split_strict.csv --out-dir reports/phase6/strict`) |
+| MFCC and frozen Whisper-small rows in the same format | `baseline_whisper.py train ... --out-dir reports/phase6/<split> --tag {mfcc,frozen_whisper_small}` (identical numbers to Phases 1/3) |
+| Summary table and figure | `summarize_phase6.py` → `reports/phase6/summary.csv`; `make_phase6_figures.py` → `reports/figures/phase6_models_split.pdf` |
+| Bootstrap CIs incl. Phase 6 models | `bootstrap_ci.py --out reports/phase6/bootstrap_ci.json --extra "strict:Whisper-medium FT=reports/phase6/strict/test_predictions_whisper_medium.csv" ...` |
+
+The XLS-R path of `finetune_xlsr.py` (default `--model`, `--tag xlsr`) is
+unchanged by Phase 6: same data normalisation, model class and checkpoint format.
 
 All fine-tuning defaults are in `finetune_xlsr.py` argparse (batch 8 × accum 2,
 enc lr 2e-5 / head lr 1e-4, 10 % warmup, fp16, frozen conv encoder, clip 1.0).

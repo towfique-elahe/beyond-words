@@ -111,32 +111,73 @@ Interpretation is taken up in the Discussion: pitch and tempo perturbations,
 standard in ASR augmentation, plausibly destroy dialect-bearing prosodic cues.
 Artifacts: `reports/phase3/metrics_xlsr_augment.json`.
 
-## 5.5 The lexical route: words versus sound
+## 5.5 Fine-tuning more encoders (Phase 6)
+
+Artifacts: `reports/phase6/` (`summary.csv`, `summary_per_class.csv`,
+`bootstrap_ci.json`, `{clip,strict}/metrics_*.json`, `test_predictions_*.csv`);
+figure `phase6_models_split.pdf`. Recipe of §4.4(c) on four more encoders
+(12 epochs for the Whisper-medium family, 20 for Hishab; 64–76 / 54–60 min per
+run on a T4, ~9 GPU-hours in all) plus frozen rows for two of them.
+
+| Model | Pretraining | Clip-level (95 % group CI) | Strict (95 % group CI) | Drop |
+|---|---|---|---|---|
+| MFCC statistics + MLP | — | 0.727 (0.676–0.753) | 0.480 (0.368–0.552) | 24.8 |
+| Whisper-small, frozen + MLP | multilingual | 0.917 (0.894–0.932) | 0.793 (0.688–0.808) | 12.4 |
+| Whisper-medium, frozen + MLP | multilingual | *pending* | *pending* | |
+| Tugstugi (Ben-10), frozen + MLP | Bangla | 0.936 (0.916–0.949) | 0.857 (0.725–0.870) | 7.9 |
+| XLS-R-300M, fine-tuned | multilingual | 0.952 (0.935–0.963) | 0.808 (0.717–0.838) | 14.4 |
+| Whisper-medium, fine-tuned | multilingual | **0.984** (0.975–0.991) | 0.919 (0.808–0.931) | 6.5 |
+| Tugstugi, fine-tuned | Bangla | 0.981 (0.972–0.988) | 0.908 (0.802–0.919) | 7.3 |
+| Tugstugi (Ben-10), fine-tuned | Bangla | 0.980 (0.970–0.987) | **0.921** (0.785–0.932) | 6.0 |
+| Hishab FastConformer, fine-tuned | Bangla | 0.901 (0.877–0.916) | 0.746 (0.613–0.773) | 15.5 |
+
+1. **New honest headline 0.92.** Whisper-medium vs XLS-R strict: +11.1 (group CI
+   +1.5 to +16.8, P(≤0) = 0.005); Tugstugi +10.0 (+0.7 to +14.4); Tugstugi
+   (Ben-10) +11.2 (−0.6 to +16.3, P = 0.04, widened by the single-cluster
+   Barishal cell). Clip-level gains +2.9 to +3.3, all significant.
+2. **The three Whisper-medium checkpoints are indistinguishable**: pairwise
+   strict gaps −0.2 / +1.1 / +1.3, every CI straddling zero.
+3. **Fine-tuning helps on the same checkpoint**: Tugstugi (Ben-10) 0.857 → 0.921
+   strict (+6.4, CI +3.6 to +10.4), 0.936 → 0.980 clip (+4.4, CI +3.3 to +6.4).
+   The Phase 3 "frozen ≈ fine-tuned under strict" finding was an encoder effect.
+4. **Leakage drop halves** for the Whisper-medium family (6.0–7.3 vs 12.4 / 14.4);
+   the frozen Tugstugi row drops 7.9, so the robustness belongs to the encoder.
+5. **Hishab FastConformer is the weakest pretrained model** (0.746 strict, 6.2
+   below XLS-R, CI −14.7 to −0.2; 115M params, 18 × 512, CTC, news; best epoch
+   18/20; drop 15.5).
+
+Per-class strict (XLS-R → Whisper-medium / Tugstugi (Ben-10)): Barishal 0.508 →
+0.882 / 0.927; Sylhet 0.750 → 0.937 / 0.947; Khulna 0.957 → 0.971 / 0.924. Val
+macro-F1 stays below test for all models under strict (0.76–0.80 vs 0.91–0.92).
+Fusion in §5.6 remains with XLS-R; fusion with Whisper-medium untested.
+
+## 5.6 The lexical route: words versus sound
 
 Artifacts: `reports/phase5/` (`summary.csv`, `metrics_*.json`,
 `test_predictions_*.csv`, `diagnostics_*.json`, `ben10_valid_eval.json`,
 `bootstrap_ci.json`).
 
-### 5.5.1 How much dialect survives transcription?
+### 5.6.1 How much dialect survives transcription?
 
 Ben-10 valid (1,666 human-transcribed clips; 21,119 reference tokens outside
 the formal vocabulary):
 
 | Front-end | WER | CER | Dialect-word recall | Formal-word recall |
 |---|---|---|---|---|
-| Tugstugi, fine-tuned on Ben-10 | **0.707** | **0.471** | **0.192** | **0.455** |
-| Tugstugi (standard Bangla) | 0.775 | 0.532 | 0.034 | 0.369 |
+| Tugstugi, fine-tuned on Ben-10 | **0.645** | **0.333** | **0.266** | **0.620** |
+| Tugstugi (standard Bangla) | 0.752 | 0.484 | 0.040 | 0.416 |
 | Hishab FastConformer | 0.792 | 0.517 | 0.012 | 0.405 |
 | wav2vec2 XLS-R Bengali (SCB stand-in) | 0.942 | 0.669 | 0.012 | 0.085 |
-| Whisper-large-v3 | 0.960 | 0.808 | 0.016 | 0.061 |
+| Whisper-large-v3 | 0.978 | 0.660 | 0.040 | 0.147 |
 
-The WER ordering and magnitudes match the Ben-10 paper's Table 3 (0.70 for the
-Ben-10 model on the private test set; 0.81 / 0.87 / 1.13 for Tugstugi / Hishab /
-Whisper-large-v3). Even the best front-end reproduces fewer than one dialect
-word in five (per district: Sylhet 0.24 … Rangpur 0.13); the standard-Bangla
-models reproduce 1–3 %. The paper's hand-counted recall (0.16–0.53 vs
-0.01–0.09 for the same two Tugstugi models) is confirmed at full scale and
-automatically.
+The WER ordering matches the Ben-10 paper's Table 3 (0.70 for the Ben-10 model
+on the private test set; 0.81 / 0.87 / 1.13 for Tugstugi / Hishab /
+Whisper-large-v3); our validation-set values run a little lower for the Whisper
+models. Even the best front-end reproduces only about one dialect word in four
+(per district: Sylhet 0.36 … Kishoreganj 0.17); the standard-Bangla models
+reproduce 1–4 %. The paper's hand-counted recall (0.16–0.53 vs 0.01–0.09 for
+the same two Tugstugi models) is confirmed at full scale and automatically
+(per district 0.17–0.36 vs 0.01–0.14).
 
 On the thesis clips (no references), the share of transcript tokens outside
 the formal vocabulary, Formal class vs mean over the eight regional classes:
@@ -148,7 +189,7 @@ high for the wrong reason — misrecognition, and for Whisper-large-v3
 repetition loops in 12.3 % of transcripts (a word repeated five or more times
 in a row) plus 2–5 % empty outputs per class.
 
-### 5.5.2 Classification from transcripts
+### 5.6.2 Classification from transcripts
 
 Test macro-F1 by front-end (in-domain lexicon; XLS-R on the same split: 0.808
 strict, 0.952 clip-level):
@@ -180,7 +221,7 @@ strict, 0.952 clip-level):
    of the log-probability weight after tuning on val); clip-level 0.952 → 0.967
    (α = 0.30).
 
-### 5.5.3 Statistical uncertainty (`bootstrap_ci.py --extra …`, B = 2000)
+### 5.6.3 Statistical uncertainty (`bootstrap_ci.py --extra …`, B = 2000)
 
 | Model (Ben-10 front-end) | Clip-level (95 % CI, group) | Strict (95 % CI, group) |
 |---|---|---|
@@ -196,7 +237,7 @@ fusion gains are significant except Whisper-large-v3 (+0.2, CI −0.7 to +1.1);
 no other strict gain is significant, and Whisper-large-v3's fusion is 0.8
 points *below* XLS-R on the strict split.
 
-### 5.5.4 Where the text helps (strict split, Ben-10 front-end, per-class F1)
+### 5.6.4 Where the text helps (strict split, Ben-10 front-end, per-class F1)
 
 | Class | Word match | TF-IDF | XLS-R | Fusion | Δ fusion − XLS-R |
 |---|---|---|---|---|---|

@@ -83,6 +83,22 @@ Gaussian noise at 10–30 dB SNR (p=.5), 7-band parametric EQ ±6 dB (p=.3),
 telephone-style band-pass 300–3400 Hz (p=.15), pitch shift ±2 semitones (p=.25),
 time stretch 0.9–1.1 (p=.25).
 
+**(d) Fine-tuned Whisper-medium encoders** (`finetune_xlsr.py --model ...`,
+Phase 6): the recipe of (c) applied to the encoders of `openai/whisper-medium`,
+Tugstugi and Tugstugi (Ben-10) via `WhisperForAudioClassification` (decoder
+dropped; projector + mean-pool + classifier). Positional table cut to 250 rows
+(5 s = 500 mel frames) so training costs a sixth of 30 s inputs; conv1/conv2
+frozen; 302M trainable parameters; 12 epochs (~70 min per run on a T4); raw
+amplitude in, no per-utterance normalisation.
+
+**(e) Fine-tuned FastConformer** (`finetune_xlsr.py --family nemo`, Phase 6):
+`hishab/hishab_bn_fastconformer` (NeMo) preprocessor + Conformer encoder,
+masked mean-pool, linear head; recipe of (c), 20 epochs; Kaggle only.
+
+**Frozen rows for (d)** (`baseline_whisper.py cache --model ...`): the frozen
+recipe of (b) on the Whisper-medium and Tugstugi (Ben-10) encoders, so the same
+checkpoint appears frozen and fine-tuned.
+
 ## 4.5 Data-efficiency protocol
 
 `data_efficiency.py` retrains the identical MLP head on stratified fractions
@@ -121,7 +137,8 @@ fine-tuned by Bengali.AI on Ben-10 dialect speech
 "Wav2Vec2 (SCB)", whose checkpoint is not public. Google's paid API and the
 paper's Ben-10-tuned wav2vec2 (no checkpoint) are omitted. Decoding is greedy
 throughout (Whisper: language and task forced to Bangla transcription, no prompt,
-≤ 128 new tokens; CTC: argmax, no language model). Fine-tuned Whisper
+≤ 128 new tokens on the 5 s thesis clips and ≤ 440 on Ben-10 valid's up-to-30 s
+clips; CTC: argmax, no language model). Fine-tuned Whisper
 checkpoints ship without a language-token table, so the base model's
 generation config is substituted; this is the standard remedy and changes no
 weights. Transcription of all 9,303 clips ran on a Kaggle T4 (43 / 45 / 82 / 15

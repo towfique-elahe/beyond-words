@@ -107,6 +107,12 @@ them?
   \item A negative result: channel-suppression augmentation lowers
         strict-split accuracy, which the thesis attributes to prosody being
         dialect signal rather than nuisance (\cref{sec:res-augment,sec:disc-augment}).
+  \item A comparison of eight acoustic models under both protocols, adding
+        fine-tuned Whisper-medium, two Bangla-adapted Whisper-medium
+        checkpoints (Tugstugi) and a Bangla FastConformer (Hishab) to the
+        original three. Fine-tuned Whisper-medium raises the honest headline
+        to 0.92 with half the leakage drop of XLS-R; Bangla-specific
+        pretraining adds nothing measurable (\cref{sec:res-encoders,sec:disc-finetune}).
   \item The lexical route: five off-the-shelf Bangla speech recognisers compared
         by how much dialect they preserve, using an automated dialect-word
         recall over 1,666 human-transcribed clips; regional-word matching with
@@ -115,9 +121,10 @@ them?
         0.808 to 0.856 (\cref{sec:res-lexical,sec:disc-words}).
 \end{enumerate}
 
-No speech-recognition model was trained or fine-tuned in this work. The only
-model trained end to end is the XLS-R dialect classifier; the speech
-recognisers are used exactly as their publishers released them.
+No speech-recognition model was trained or fine-tuned in this work. The models
+trained end to end are dialect classifiers built on the XLS-R, Whisper-medium,
+Tugstugi and Hishab encoders; as speech recognisers, Tugstugi and Hishab are
+used exactly as their publishers released them.
 
 \section{Thesis outline}
 

@@ -16,19 +16,22 @@ embeddings, and an end-to-end fine-tuned XLS-R-300M model reach test macro-F1 of
 from ECAPA-TDNN pseudo-speaker clusters, calibrated against the known sources of
 the Formal clips, lowers these to 0.480, 0.793 and 0.808: 12--14 macro-F1 points
 of the pretrained models' clip-level scores came from speaker and channel
-overlap. Under the strict split, fine-tuning's advantage over frozen embeddings
-is not statistically significant, channel-suppression augmentation reduces the
-score (0.808 to 0.748), and frozen Whisper embeddings trained on 10\,\% of the
-labels outperform MFCC features trained on all of them.
+overlap. Fine-tuning Whisper-medium and two Bangla-adapted versions of it
+raises the strict-split score to 0.92 with a leakage drop of only 6--7 points;
+the three are indistinguishable, so Bangla-specific pretraining adds nothing
+measurable, while a smaller Bangla FastConformer trails at 0.75.
+Channel-suppression augmentation reduces XLS-R's score (0.808 to 0.748), and
+frozen Whisper embeddings trained on 10\,\% of the labels outperform MFCC
+features trained on all of them.
 
 The \emph{lexical route} transcribes every clip with five off-the-shelf Bangla
 speech recognisers and classifies the words. Measured against human
 transcripts of dialect speech, the best recogniser---one fine-tuned on regional
-speech by its publishers---reproduces 19\,\% of dialect words; recognisers
-trained on standard Bangla reproduce 1--3\,\%, rewriting dialect into the
+speech by its publishers---reproduces 27\,\% of dialect words; recognisers
+trained on standard Bangla reproduce 1--4\,\%, rewriting dialect into the
 standard form. Matching regional word lists therefore identifies the dialect
 poorly (macro-F1 0.36 under the strict split), and a text classifier over the
-full transcript reaches 0.63. Combined with the acoustic model, however, the
+full transcript reaches 0.63. Combined with the XLS-R model, however, the
 words raise the strict-split score from 0.808 to 0.856, and the clip-level score
 from 0.952 to 0.967; the clip-level gain is significant, the strict-split gain
 borderline.

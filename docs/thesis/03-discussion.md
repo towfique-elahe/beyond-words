@@ -12,9 +12,9 @@ representations, ~25 for hand-crafted features. Three implications:
    are inflated**, and the inflation is representation-dependent — comparisons
    between papers using different features on clip-level splits partially rank
    channel exploitation, not dialect skill.
-2. **The honest headline for this corpus is 0.808** (fine-tuned XLS-R, strict).
-   That remains a strong 9-way result (~7× chance) on genuinely unseen
-   pseudo-speakers.
+2. **The honest headline for this corpus is 0.92** (fine-tuned Whisper-medium /
+   Tugstugi Ben-10, strict; Phase 6), ~8× chance on genuinely unseen
+   pseudo-speakers; XLS-R, on which the leakage analysis was built, reaches 0.808.
 3. Class-level inflation is uneven, but per-class strict numbers must be read
    with care: Barishal's strict test set is a single 251-clip pseudo-speaker
    cluster, so its collapse (0.871 → 0.603 baseline) measures generalization to
@@ -31,19 +31,23 @@ dialect continuum rather than arbitrary decision boundaries, supporting the clai
 that they learn accentual structure (and not only channel shortcuts, even on the
 clip-level split).
 
-## 6.3 Why fine-tuning's advantage shrinks under strict evaluation
+## 6.3 Frozen or fine-tuned, and which encoder? (revised after Phase 6)
 
-Fine-tuned XLS-R gains +3.5 points at clip level (significant: group-bootstrap
-CI +1.8 to +5.3) but only +1.5 under the strict split — a gap that is **not**
-statistically significant (CI −2.0 to +7.5) — and its strict drop (−14.4)
-slightly exceeds the frozen baseline's (−12.4).
-End-to-end adaptation gives the model freedom to exploit *whatever* discriminates
-training classes — including channel signatures correlated with class in the
-training data. A frozen general-purpose representation cannot specialize this way.
-The practical guidance: when leakage cannot be ruled out, frozen-embedding
-baselines are not merely cheaper — they are partially self-regularizing against
-shortcut learning, and the fine-tuning margin measured on a leaky split will
-overstate the deployable improvement.
+The Phase 3 comparison (frozen Whisper-small vs fine-tuned XLS-R: +3.5 clip,
++1.5 strict n.s., larger drop for the fine-tuned model) suggested fine-tuning
+mainly buys channel exploitation. Phase 6 shows that was an encoder effect:
+- On one checkpoint, fine-tuning helps clearly (Tugstugi Ben-10: 0.857 → 0.921
+  strict, CI +3.6 to +10.4) and *reduces* the leakage drop (7.9 → 6.0).
+- XLS-R (contrastive SSL on raw audio) is the channel exploiter (drop 14.4);
+  the transcription-pretrained Whisper-medium family drops 6–7 and reaches
+  0.92 on unseen speakers.
+- Bangla-specific pretraining adds nothing measurable (Whisper-medium ≈
+  Tugstugi ≈ Tugstugi Ben-10); architecture/size matter more (Hishab
+  FastConformer, 115M, CTC, news: 0.746 strict, drop 15.5; possibly
+  under-trained, best epoch 18/20).
+Guidance: pick an encoder pretrained to transcribe, then fine-tune; a frozen
+baseline still guards against shortcuts but is not a substitute. The honest
+headline becomes 0.92 (§6.1 point 2 updated accordingly).
 
 ## 6.4 The augmentation negative result: prosody is signal in DID
 
@@ -68,11 +72,11 @@ identity is *in the words*, and how much lies beyond them? Three findings.
 1. **Standard-Bangla ASR removes the dialect before a classifier can see it.**
    Models trained on standard colloquial Bangla (Tugstugi, Hishab) transcribe
    regional speech into standard forms — "বিয়া দিয়া দাও" becomes "বিয়ে দিয়ে
-   দাও" — and reproduce only 1–3 % of the dialect words in Ben-10's human
+   দাও" — and reproduce only 1–4 % of the dialect words in Ben-10's human
    transcripts. Their output on regional clips is barely less "formal" than on
-   Formal clips. The one front-end tuned on dialect speech reproduces 19 %,
+   Formal clips. The one front-end tuned on dialect speech reproduces 27 %,
    which is both the best available and a hard ceiling for any word-list
-   method: four of five dialect words never reach the text. This is the
+   method: nearly three of four dialect words never reach the text. This is the
    Ben-10 paper's hand-counted observation, confirmed on the full validation
    set with an automated measure, and it is the single most important fact
    about the lexical route.
@@ -127,10 +131,11 @@ trained on this corpus would raise the lexical ceiling, at the cost of the
   intonation phrases).
 - **Single-domain corpus** (broadcast/online media); generalization to
   conversational or telephone speech is untested.
-- **Model family is confounded with adaptation regime**: the frozen model is
-  Whisper-small and the fine-tuned one is XLS-R-300M, so "frozen vs fine-tuned"
-  and "Whisper vs XLS-R" are not separated. Frozen XLS-R embeddings (cheap,
-  local) would disentangle them.
+- **Phase 6 models are single runs** (one seed, one schedule); Hishab may be
+  under-trained.
+- **Fusion was built on XLS-R**: the Whisper-medium family alone (0.92) now
+  exceeds the XLS-R + text fusion (0.856); fusion with the stronger model is
+  untested.
 - **Single-seed fine-tuning**: XLS-R results are one seed each; bootstrap CIs
   cover test-set sampling noise, not training-seed variance.
 - **Whisper pooling includes padding**: Whisper's encoder always sees 30 s of
