@@ -1,7 +1,8 @@
 """
 Phase 4 - Inference demo: predict the Bangla dialect of an audio file.
 
-Uses the strict-split XLS-R checkpoint by default (the honest model). Accepts
+Uses the strict-split XLS-R checkpoint by default; any finetune_xlsr.py
+checkpoint (XLS-R, Whisper-medium, Tugstugi, Hishab) can be passed. Accepts
 any common audio format/sample rate; audio longer than 5 s is scored in 5-second
 windows whose probabilities are averaged.
 
@@ -34,15 +35,15 @@ def pick_device():
 
 
 def load_model(ckpt_path, device):
-    from transformers import Wav2Vec2ForSequenceClassification
+    """Rebuild the classifier a finetune_xlsr.py checkpoint was saved from
+    (wav2vec2 / whisper / nemo). Phase 2-3 XLS-R checkpoints predate the
+    family and model fields and default to XLS-R."""
+    from finetune_xlsr import FAMILIES
 
     ckpt = torch.load(ckpt_path, map_location="cpu", weights_only=False)
     labels = list(ckpt["labels"])
-    model = Wav2Vec2ForSequenceClassification.from_pretrained(
-        MODEL, num_labels=len(labels),
-        label2id={l: i for i, l in enumerate(labels)},
-        id2label=dict(enumerate(labels)))
-    model.load_state_dict(ckpt["state_dict"])
+    model = FAMILIES[ckpt.get("family", "wav2vec2")](ckpt.get("model", MODEL), labels, False)
+    model.load_saved(ckpt["state_dict"])
     return model.to(device).eval(), labels
 
 
@@ -55,20 +56,21 @@ def load_audio(path):
 
 
 def windows(wav):
-    """Non-overlapping 5 s windows (last one zero-padded)."""
+    """Non-overlapping raw 5 s windows (last one zero-padded); the model's own
+    transform (z-normalisation for wav2vec2, log-mel for Whisper) is applied
+    afterwards."""
     n = max(1, int(np.ceil(len(wav) / WIN)))
     for i in range(n):
         w = wav[i * WIN:(i + 1) * WIN]
         if len(w) < WIN:
             w = np.pad(w, (0, WIN - len(w)))
-        yield (w - w.mean()) / (w.std() + 1e-7)
+        yield w.astype(np.float32)
 
 
 @torch.no_grad()
 def predict(model, wav, device):
-    batch = torch.stack([torch.from_numpy(w.astype(np.float32)) for w in windows(wav)])
-    logits = model(input_values=batch.to(device)).logits
-    return torch.softmax(logits, dim=-1).mean(0).cpu().numpy()
+    batch = torch.stack([model.transform(w) for w in windows(wav)])
+    return torch.softmax(model(batch.to(device)), dim=-1).mean(0).cpu().numpy()
 
 
 @torch.no_grad()
@@ -86,10 +88,9 @@ def dump_probs(model, labels, args, device):
     root = os.path.expanduser(args.audio_root)
     probs = []
     for i in tqdm(range(0, len(df), args.batch)):
-        wavs = [next(windows(load_audio(os.path.join(root, r))))
-                for r in df["relpath"].iloc[i:i + args.batch]]
-        batch = torch.from_numpy(np.stack(wavs).astype(np.float32)).to(device)
-        probs.append(torch.softmax(model(input_values=batch).logits, dim=-1).cpu().numpy())
+        xs = [model.transform(next(windows(load_audio(os.path.join(root, r)))))
+              for r in df["relpath"].iloc[i:i + args.batch]]
+        probs.append(torch.softmax(model(torch.stack(xs).to(device)), dim=-1).cpu().numpy())
     out = pd.concat([df[["relpath", "split"]],
                      pd.DataFrame(np.concatenate(probs), columns=labels)], axis=1)
     out.to_csv(args.dump_probs, index=False)

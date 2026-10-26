@@ -134,7 +134,10 @@ def main():
     ap.add_argument("--formal", default="lexicons/formal_vocab.txt")
     ap.add_argument("--formal-min-count", type=int, default=3)
     ap.add_argument("--lexicon", required=True, help="regional lexicon JSON (build_lexicon.py)")
-    ap.add_argument("--xlsr-probs", default="", help="enables late fusion")
+    ap.add_argument("--xlsr-probs", default="", help="acoustic val/test probabilities "
+                    "(predict.py --dump-probs); enables late fusion")
+    ap.add_argument("--acoustic-tag", default="xlsr",
+                    help="results key for the acoustic model behind --xlsr-probs")
     ap.add_argument("--out-dir", default="reports/phase5")
     ap.add_argument("--name", default="", help="run name; default <transcripts>_<lexicon>")
     ap.add_argument("--allow-missing", action="store_true", help="pilot: partial transcripts")
@@ -161,15 +164,15 @@ def main():
     results["tfidf"] = {**score(df, preds["tfidf"], labels), **extra}
 
     if args.xlsr_probs:
-        preds["fusion"], preds["xlsr"], extra = run_fusion(df, p_lex, args.xlsr_probs, labels)
-        results["fusion"] = {**score(df, preds["fusion"], labels), **extra}
-        results["xlsr"] = score(df, preds["xlsr"], labels)
+        preds["fusion"], preds[args.acoustic_tag], extra = run_fusion(df, p_lex, args.xlsr_probs, labels)
+        results["fusion"] = {**score(df, preds["fusion"], labels), **extra, "acoustic": args.acoustic_tag}
+        results[args.acoustic_tag] = score(df, preds[args.acoustic_tag], labels)
 
     out = Path(args.out_dir)
     out.mkdir(parents=True, exist_ok=True)
     test = df[df["split"] == "test"]
     for clf, pred in preds.items():
-        if clf == "xlsr":
+        if clf == args.acoustic_tag:
             continue
         rows = test[test["district"].isin(lex_labels)] if clf == "match" else test
         rows.assign(true=rows["district"], pred=pred[rows.index])[

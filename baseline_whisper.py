@@ -42,8 +42,8 @@ def cache(args):
     from transformers import WhisperFeatureExtractor, WhisperModel
 
     device = pick_device()
-    fe = WhisperFeatureExtractor.from_pretrained(MODEL)
-    model = WhisperModel.from_pretrained(MODEL).to(device).eval()
+    fe = WhisperFeatureExtractor.from_pretrained(args.model)
+    model = WhisperModel.from_pretrained(args.model).to(device).eval()
     encoder = model.encoder
 
     df = pd.read_csv(args.manifest)
@@ -66,7 +66,7 @@ def cache(args):
                 continue
             # Whisper expects 30s log-mel; FE pads/truncates automatically.
             feats = fe(wavs, sampling_rate=SR, return_tensors="pt").input_features.to(device)
-            out = encoder(feats).last_hidden_state      # (B, T, 768)
+            out = encoder(feats).last_hidden_state      # (B, T, d_model)
             vecs = out.mean(dim=1).cpu().numpy()
             for r, v in zip(kept, vecs):
                 X.append(v)
@@ -164,6 +164,31 @@ def train(args):
     print(pd.DataFrame(confusion_matrix(yte_np, te_pred),
                        index=labels, columns=labels))
 
+    if args.out_dir:
+        # Phase 6: save metrics + per-clip predictions in the finetune_xlsr.py
+        # format so bootstrap_ci.py --extra and summarize_phase6.py can use them.
+        import json
+        import os
+        from pathlib import Path
+        out = Path(args.out_dir)
+        out.mkdir(parents=True, exist_ok=True)
+        man = pd.read_csv(args.manifest)
+        assert len(man) == len(y), f"{args.manifest} has {len(man)} rows, embeddings {len(y)}"
+        root = os.path.commonpath(man["filepath"].tolist())
+        rel = man["filepath"].map(lambda f: os.path.relpath(f, root)).values
+        te = splits == "test"
+        pd.DataFrame({"relpath": rel[te], "district": [labels[i] for i in yte_np],
+                      "split": "test", "true": [labels[i] for i in yte_np],
+                      "pred": [labels[i] for i in te_pred]}).to_csv(
+            out / f"test_predictions_{args.tag}.csv", index=False)
+        per_class = f1_score(yte_np, te_pred, average=None)
+        json.dump({"embeddings": args.emb, "seed": args.seed, "epochs": args.epochs,
+                   "val_macroF1": float(best_va),
+                   "test_macroF1": float(f1_score(yte_np, te_pred, average="macro")),
+                   "per_class_F1": {l: float(f) for l, f in zip(labels, per_class)}},
+                  open(out / f"metrics_{args.tag}.json", "w"), indent=2)
+        print(f"wrote metrics_{args.tag}.json, test_predictions_{args.tag}.csv -> {out}")
+
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
@@ -171,6 +196,8 @@ if __name__ == "__main__":
 
     c = sub.add_parser("cache")
     c.add_argument("--manifest", default="manifest_split.csv")
+    c.add_argument("--model", default=MODEL,
+                   help="any Whisper checkpoint (Phase 6: openai/whisper-medium, Tugstugi)")
     c.add_argument("--out", default="embeddings.npz")
     c.add_argument("--batch", type=int, default=16)
     c.set_defaults(func=cache)
@@ -183,6 +210,10 @@ if __name__ == "__main__":
                    help="manifest CSV whose 'split' column overrides the cached one")
     t.add_argument("--device", default="",
                    help="cpu|mps|cuda (default: auto). cpu is fully deterministic")
+    t.add_argument("--out-dir", default="", help="Phase 6: write metrics_{tag}.json + predictions")
+    t.add_argument("--tag", default="frozen_whisper_small")
+    t.add_argument("--manifest", default="manifest_split.csv",
+                   help="manifest the embeddings were cached from (relpaths for predictions)")
     t.set_defaults(func=train)
 
     args = ap.parse_args()
