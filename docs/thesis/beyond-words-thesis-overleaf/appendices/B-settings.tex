@@ -1,0 +1,47 @@
+\chapter{Settings Reference}
+\label{app:settings}
+
+\begin{table}[ht]
+  \centering
+  \caption{Training and evaluation settings.}
+  \label{tab:settings}
+  \small
+  \begin{tabularx}{\textwidth}{@{}lL@{}}
+    \toprule
+    Setting & Value \\
+    \midrule
+    \multicolumn{2}{@{}l}{\textit{Shared}} \\
+    Seed & 42 \\
+    Loss & cross-entropy with inverse-frequency class weights \\
+    Model selection & best validation macro-F1 \\
+    Bootstrap & $B = 2{,}000$; clip and pseudo-speaker-group resampling; 95\,\% percentile intervals \\
+    \midrule
+    \multicolumn{2}{@{}l}{\textit{MLP head (MFCC and frozen Whisper)}} \\
+    Architecture & input--256--256--9, ReLU, dropout 0.3 \\
+    Optimiser & AdamW, learning rate $10^{-3}$, weight decay $10^{-4}$ \\
+    Schedule & 60 full-batch epochs on CPU \\
+    MFCC features & 40 MFCC + $\Delta$ + $\Delta\Delta$, mean and s.d.\ pooled (240-d) \\
+    Whisper features & \hf{openai/whisper-small} encoder, mean-pooled (768-d) \\
+    \midrule
+    \multicolumn{2}{@{}l}{\textit{Fine-tuned XLS-R}} \\
+    Model & \hf{facebook/wav2vec2-xls-r-300m}, convolutional encoder frozen \\
+    Learning rates & encoder $2\times10^{-5}$, head $10^{-4}$; 10\,\% warm-up, linear decay \\
+    Batch & 8 $\times$ 2 accumulation (effective 16), fp16, gradient clip 1.0 \\
+    Epochs & 20 \\
+    Input & 5\,s waveform, padded or trimmed, per-utterance normalised \\
+    \midrule
+    \multicolumn{2}{@{}l}{\textit{Strict split}} \\
+    Speaker embeddings & \hf{speechbrain/spkrec-ecapa-voxceleb} (192-d) \\
+    Clustering & agglomerative, cosine distance, average linkage, threshold 0.50 (ARI 0.347 on Formal sources) \\
+    \midrule
+    \multicolumn{2}{@{}l}{\textit{Lexical route}} \\
+    Decoding & greedy; Whisper: language and task fixed to Bangla transcription, $\le$128 new tokens; CTC: arg\,max, no language model \\
+    Standard vocabulary & OOD-Speech training sentences, word types with count $\ge 3$ (88,262) \\
+    In-domain lexicon & training split only; count $\ge 3$ in $\ge 2$ pseudo-speakers; add-$\tfrac12$ smoothing \\
+    Word matching & Formal threshold $\tau$ tuned on validation, grid 0.00--0.50 in steps of 0.02 \\
+    TF-IDF & word 1--2-grams + character 2--5-grams, sublinear TF, min.\ document frequency 2 \\
+    Logistic regression & balanced class weights, $C \in \{0.3, 1, 3, 10, 30\}$ tuned on validation \\
+    Fusion & $\alpha \in \{0, 0.05, \dots, 1\}$ tuned on validation \\
+    \bottomrule
+  \end{tabularx}
+\end{table}

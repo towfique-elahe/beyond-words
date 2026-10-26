@@ -1,0 +1,52 @@
+\chapter{Conclusion}
+\label{ch:conclusion}
+
+This thesis set out to identify nine Bangla dialect classes from 5-second clips
+of found media, to measure how much of the apparent accuracy comes from
+recognising speakers and recording channels, and to ask whether dialect identity
+is carried by the sound or by the words. The answers to the four research
+questions are as follows.
+
+\paragraph{RQ1: accuracy of pretrained speech models.} Pretrained models far
+outperform hand-crafted features. On a conventional clip-level split, frozen
+Whisper-small embeddings reach a macro-F1 of 0.917 and fine-tuned XLS-R-300M
+0.952, against 0.727 for MFCC statistics. Frozen Whisper embeddings trained on
+10\,\% of the labels outperform MFCC features trained on all of them.
+
+\paragraph{RQ2: the effect of leakage.} A strict split built from ECAPA-TDNN
+pseudo-speaker clusters, calibrated against the known sources of the Formal
+clips, lowers the pretrained models to 0.793 and 0.808: 12--14 points of their
+clip-level scores came from speaker and channel overlap. The ranking of
+pretrained over hand-crafted features survives, but fine-tuning's advantage over
+frozen embeddings does not reach significance, and channel-suppression
+augmentation that perturbs pitch and tempo lowers the score to 0.748.
+
+\paragraph{RQ3: dialect information in the words.} Off-the-shelf Bangla speech
+recognition loses most of it. The best recogniser, fine-tuned on regional speech
+by its publishers, reproduces 19\,\% of dialect words in human transcripts;
+recognisers trained on standard Bangla reproduce 1--3\,\%, rewriting dialect
+into the standard form. Matching regional word lists therefore identifies the
+dialect poorly (0.360 under the strict split), and a text classifier over the
+full transcript reaches 0.633---between hand-crafted and pretrained acoustics.
+
+\paragraph{RQ4: complementarity.} The routes are complementary, modestly.
+Combining the text classifier with the acoustic model raises the strict-split
+score from 0.808 to 0.856 (borderline under the speaker-group bootstrap) and the
+clip-level score from 0.952 to 0.967 (significant). The gain is largest on the
+classes the acoustic model finds hardest.
+
+\medskip
+The overall conclusion is that, on clips this short, Bangla dialect identity lies
+mostly \emph{beyond the words}: in pronunciation, rhythm and intonation that
+pretrained speech models capture and that speech recognition trained on the
+standard language discards. The honest headline for this corpus is 0.808 from
+sound alone and 0.856 with words added, on speakers the models have never heard.
+Two practical lessons extend beyond Bangla: dialect and accent scores on found
+data should be reported under a speaker-disjoint protocol, because the
+clip-level numbers flatter every model and some more than others; and text-based
+dialect methods built on speech recognition are limited by how much dialect the
+recogniser preserves, which should be measured before the classifier is built.
+
+All code, split files, transcripts, word lists and per-clip predictions are
+released, and \cref{app:repro} maps every number in this thesis to the command
+that produces it.

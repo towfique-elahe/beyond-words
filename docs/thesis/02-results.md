@@ -172,8 +172,9 @@ strict, 0.952 clip-level):
    match.
 2. **The learned text classifier roughly doubles the matching score** (0.633
    strict with the Ben-10 model), placing words alone between MFCC (0.480) and
-   frozen Whisper (0.793). Front-end quality orders the TF-IDF results exactly
-   as dialect-word recall does.
+   frozen Whisper (0.793). The front-ends rank on TF-IDF exactly as they rank
+   on Ben-10 word error rate (not dialect-word recall: Whisper-large-v3
+   recalls slightly more dialect words than Hishab but scores lowest).
 3. **Fusion improves on XLS-R with four of five front-ends.** With the Ben-10
    model: strict 0.808 → 0.856 (α = 0.25, i.e. the text carries three quarters
    of the log-probability weight after tuning on val); clip-level 0.952 → 0.967

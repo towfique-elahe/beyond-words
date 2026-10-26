@@ -1,0 +1,131 @@
+\chapter{Introduction}
+\label{ch:intro}
+
+\section{Motivation}
+
+Bangla is one language with many voices. A speaker from Sylhet, one from
+Chattogram and one from Barishal each speak recognisably differently from one
+another and from the standard register heard on national news, in pronunciation,
+in rhythm and intonation, and in vocabulary. To a listener from Bangladesh these
+differences are often audible within a few seconds. For speech technology they
+matter twice: dialect is a source of error for speech recognisers trained on
+standard speech, and it is information in its own right, useful for routing
+calls, adapting recognisers, or studying language variation at scale.
+
+Automatic \emph{dialect identification} (DID) is the task of predicting a
+speaker's dialect from their speech. It sits between language identification,
+where the classes are different languages, and speaker identification, where
+the classes are individuals \citep{snyder2018xvectors}. For widely studied
+languages such as Arabic it has dedicated benchmarks \citep{ali2019mgb5}; for
+Bangla it does not. Bangla speech processing is low-resource in general
+\citep{bengaliasrsurvey2021}, and previous Bangla dialect work has relied on
+hand-crafted acoustic features or on written dialect text
+\citep{bengaliaccent2021,bangladial2025}.
+
+Two developments make the task newly tractable. Self-supervised and weakly
+supervised speech models---wav2vec~2.0, XLS-R and Whisper
+\citep{baevski2020wav2vec,babu2022xlsr,radford2023whisper}---learn general
+representations from very large amounts of multilingual audio, including Bangla,
+and transfer to new tasks with little labelled data \citep{yang2021superb}. And
+public Bangla speech resources have grown: a 1,178-hour corpus of standard
+Bangla \citep{rakib2023oodspeech} and, recently, a 78-hour corpus of regional
+speech with transcripts \citep{dipto2025ben10}.
+
+\section{Problem statement}
+
+This thesis classifies 5-second audio clips into nine classes: eight regional
+dialects (Barishal, Chattogram, Dhaka, Khulna, Mymensingh, Noakhali, Rajshahi,
+Sylhet) and the standard register, labelled \emph{Formal}. The corpus contains
+9,303 clips, about 13.1 hours, collected from television, film and online media
+(\cref{ch:dataset}).
+
+Found data of this kind brings a specific risk. The corpus has no speaker labels,
+and for most clips no record of which programme or recording they came from. A
+random split can therefore place clips of the same speaker, recorded with the
+same microphone in the same room, in both the training and the test set. A model
+can then score well by recognising the speaker or the recording channel rather
+than the dialect. This is a known failure mode of audio classification on found
+data \citep{geirhos2020shortcut,echohawk2026}, but it is usually disclosed as a
+caveat rather than measured. Measuring it is a central aim of this thesis.
+
+\section{Two routes to dialect identity}
+
+Dialect is carried by both sound and words. Some cues are acoustic: vowel
+quality, consonant realisation, pitch contour and tempo. Others are lexical:
+a Barishal speaker may say \bn{মুই} where standard Bangla has \bn{আমি} (``I''); a
+Sylhet speaker asks \bn{কিতা} where the standard form is \bn{কী} (``what'').
+The acoustic models used in most of this thesis see only the sound: they consume
+log-mel spectrogram frames (Whisper) or the raw waveform (XLS-R) and have no
+access to what was said.
+
+The thesis therefore compares two routes:
+\begin{itemize}
+  \item the \textbf{acoustic route}, which learns dialect from the audio signal
+        with hand-crafted features, frozen pretrained embeddings and an
+        end-to-end fine-tuned model; and
+  \item the \textbf{lexical route}, which transcribes each clip with
+        off-the-shelf Bangla speech recognition, separates regional words from
+        standard ones, and identifies the dialect from the words.
+\end{itemize}
+Combining the two answers the question that gives the thesis its title: how much
+of Bangla dialect identity is carried by the words, and how much lies beyond
+them?
+
+\section{Research questions}
+
+\begin{enumerate}[label=\textbf{RQ\arabic*.}, leftmargin=*]
+  \item How accurately can pretrained speech models identify nine Bangla dialect
+        classes from 5-second clips, compared with hand-crafted acoustic
+        features?
+  \item How much of that accuracy comes from speaker and recording-channel
+        overlap between training and test data, and do the conclusions survive a
+        speaker-disjoint evaluation?
+  \item How much dialect information survives off-the-shelf Bangla speech
+        recognition, and how well can the dialect be identified from the
+        resulting words alone?
+  \item Are the acoustic and lexical routes complementary?
+\end{enumerate}
+
+\section{Contributions}
+
+\begin{enumerate}
+  \item A 9-class, 13.1-hour Bangla dialect corpus pipeline with
+        validation, standardisation and leakage-aware splitting, released with
+        its exact train/validation/test splits (\cref{ch:dataset,ch:method}).
+  \item An application of self-supervised and weakly supervised multilingual
+        speech models (Whisper, XLS-R) to Bangla regional dialect
+        identification, compared with a hand-crafted baseline under one
+        evaluation protocol (\cref{sec:res-clip}).
+  \item A measurement of speaker and channel leakage. A strict split built from
+        ECAPA-TDNN pseudo-speaker clusters, with its clustering threshold
+        calibrated against the known sources of the Formal clips, turns the
+        usual ``upper bound'' disclaimer into a measured effect of 12--14
+        macro-F1 points for the pretrained models (\cref{sec:res-strict}).
+  \item An ablation of representation against split protocol, speaker-group
+        bootstrap confidence intervals for every score and gap, and a
+        data-efficiency analysis (\cref{sec:res-strict,sec:res-efficiency}).
+  \item A negative result: channel-suppression augmentation lowers
+        strict-split accuracy, which the thesis attributes to prosody being
+        dialect signal rather than nuisance (\cref{sec:res-augment,sec:disc-augment}).
+  \item The lexical route: five off-the-shelf Bangla speech recognisers compared
+        by how much dialect they preserve, using an automated dialect-word
+        recall over 1,666 human-transcribed clips; regional-word matching with
+        an interpretable per-region match percentage; a text classifier; and
+        acoustic--lexical fusion, which raises the strict-split score from
+        0.808 to 0.856 (\cref{sec:res-lexical,sec:disc-words}).
+\end{enumerate}
+
+No speech-recognition model was trained or fine-tuned in this work. The only
+model trained end to end is the XLS-R dialect classifier; the speech
+recognisers are used exactly as their publishers released them.
+
+\section{Thesis outline}
+
+\Cref{ch:background} reviews dialect identification, pretrained speech
+representations, Bangla speech resources and evaluation leakage.
+\Cref{ch:dataset} describes the corpus. \Cref{ch:method} sets out the splitting
+protocols, the acoustic models and the lexical route. \Cref{ch:results} reports
+the results, \cref{ch:discussion} interprets them and states the limitations,
+and \cref{ch:conclusion} answers the research questions.
+\Cref{app:repro,app:settings} give the commands and settings needed to
+reproduce every number.

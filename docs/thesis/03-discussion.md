@@ -13,7 +13,7 @@ representations, ~25 for hand-crafted features. Three implications:
    between papers using different features on clip-level splits partially rank
    channel exploitation, not dialect skill.
 2. **The honest headline for this corpus is 0.808** (fine-tuned XLS-R, strict).
-   That remains a strong 9-way result (~9× chance) on genuinely unseen
+   That remains a strong 9-way result (~7× chance) on genuinely unseen
    pseudo-speakers.
 3. Class-level inflation is uneven, but per-class strict numbers must be read
    with care: Barishal's strict test set is a single 251-clip pseudo-speaker

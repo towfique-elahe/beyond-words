@@ -1,0 +1,73 @@
+\chapter{Reproducibility}
+\label{app:repro}
+
+Every result maps to one command in the code repository, run at seed 42 on the
+committed split files \path{splits/manifest_split_rel.csv} (clip-level) and
+\path{splits/manifest_split_strict_rel.csv} (strict). Relative paths in the
+split files resolve against the audio root, which is not redistributed.
+
+\section{Environment}
+
+\begin{itemize}
+  \item \textbf{Local:} Python 3.12, \path{pip install -r requirements.txt}.
+        PyTorch selects CUDA, then Apple MPS, then CPU. MLP heads are trained on
+        CPU for bit-reproducibility.
+  \item \textbf{Cloud:} Kaggle T4 GPU for fine-tuning and transcription
+        (\path{kaggle kernels push --accelerator NvidiaTeslaT4}; Kaggle's
+        default P100 assignment is not supported by current PyTorch builds).
+\end{itemize}
+
+\section{Acoustic route}
+
+\begin{small}
+\noindent\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{4.2cm}L@{}}
+  \toprule
+  Result & Command \\
+  \midrule
+  Whisper clip-level 0.917 & \path{baseline_whisper.py cache}, then \path{baseline_whisper.py train --device cpu} \\
+  Whisper strict 0.793 & same, with \path{--remap-split manifest_split_strict.csv} \\
+  MFCC clip-level 0.727 & \path{baseline_mfcc.py cache}, then \path{baseline_whisper.py train --emb features_v1.npz --device cpu} \\
+  MFCC strict 0.480 & same, with \path{--remap-split manifest_split_strict.csv} \\
+  XLS-R clip-level 0.952 & \path{finetune_xlsr.py --manifest splits/manifest_split_rel.csv} (T4, 20 epochs) \\
+  XLS-R strict 0.808 & \path{finetune_xlsr.py --manifest splits/manifest_split_strict_rel.csv} (T4, 20 epochs) \\
+  XLS-R strict + augmentation 0.748 & same, with \path{--augment} \\
+  Data efficiency & \path{data_efficiency.py} \\
+  Bootstrap intervals & \path{bootstrap_ci.py} $\rightarrow$ \path{reports/phase3/bootstrap_ci.json} \\
+  \bottomrule
+\end{tabularx}
+\end{small}
+
+\section{Lexical route}
+
+External inputs (not redistributed): OOD-Speech \path{train.csv} (Kaggle
+competition \path{bengaliai-speech}), Ben-10 training and validation CSVs and
+validation audio (Hugging Face \path{bengaliAI/Ben-10}), and the Vashantor CSV
+release (Mendeley Data).
+
+\begin{small}
+\noindent\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{4.2cm}L@{}}
+  \toprule
+  Result & Command \\
+  \midrule
+  Transcripts (9,303 clips $\times$ 5 front-ends) & \path{notebooks/kaggle_transcribe.ipynb}, wrapping \path{transcribe.py} $\rightarrow$ \path{transcripts/<front-end>.csv} \\
+  Standard vocabulary & \path{build_lexicon.py formal --source data/ood_speech/train.csv} \\
+  External lexicon & \path{build_lexicon.py external --ben10 data/ben10/train.csv --vashantor data/vashantor/Vashantor_CSV_Format} \\
+  In-domain lexicons & \path{build_lexicon.py indomain --transcripts transcripts/<front-end>.csv --manifest splits/<split>.csv} \\
+  XLS-R probabilities for fusion & \path{predict.py --checkpoint checkpoints/xlsr_strict_best.pt --manifest splits/manifest_split_strict_rel.csv --dump-probs reports/phase5/xlsr_probs_strict.csv} \\
+  Word matching, TF-IDF, fusion & \path{lexical_did.py --transcripts ... --lexicon ... --xlsr-probs ...} $\rightarrow$ \path{reports/phase5/metrics_*.json} \\
+  Front-end diagnostics & \path{asr_diagnostics.py transcripts/<front-end>.csv --min-count 3} \\
+  Recognition quality on Ben-10 & \path{notebooks/kaggle_ben10_eval.ipynb}, then \path{ben10_eval.py transcripts/ben10_valid/*.csv} \\
+  Summary table and figures & \path{summarize_phase5.py}, \path{make_phase5_figures.py} \\
+  Bootstrap intervals & \path{bootstrap_ci.py --extra "strict:Fusion/...=..."} $\rightarrow$ \path{reports/phase5/bootstrap_ci.json} \\
+  \bottomrule
+\end{tabularx}
+\end{small}
+
+\section{Determinism}
+
+MLP-head results are bit-reproducible on CPU at seed 42; MPS and CUDA runs land
+within $\pm 0.005$ macro-F1. Fine-tuning on a T4 in fp16 is reproducible at the
+reported precision (cuDNN non-determinism affects the fourth decimal). Embedding
+and feature caches are deterministic given the manifest order. Greedy
+transcripts on a T4 (fp16) and on an M1 (fp32) agree on 93.6\,\% of a 450-clip
+pilot; the reported numbers use the T4 transcripts.

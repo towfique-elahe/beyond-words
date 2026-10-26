@@ -1,0 +1,100 @@
+\chapter{Dataset}
+\label{ch:dataset}
+
+\section{Source and composition}
+
+The corpus consists of short clips of Bangla speech cut from television shows,
+films and online video, originally distributed as MP4 and grouped into one
+folder per class. It contains nine classes: eight regional dialects named after
+the district or division they are associated with, and the standard register,
+labelled Formal (\cref{tab:classes}). After validation, 9,303 clips totalling
+about 13.1 hours are usable; two duplicate \path{.ogg} files in the Formal
+folder are excluded. Class sizes range from 750 (Khulna) to 1,652 (Formal).
+
+\begin{table}[ht]
+  \centering
+  \caption{Classes and clip counts, with the number of test clips under the two
+  split protocols of \cref{sec:method-splits}.}
+  \label{tab:classes}
+  \begin{tabular}{lrrr}
+    \toprule
+    Class & Clips & Test (clip-level) & Test (strict) \\
+    \midrule
+    Barishal   & 1,257 & 179 & 251 \\
+    Chattogram &   797 & 114 & 114 \\
+    Dhaka      &   763 & 109 & 103 \\
+    Formal     & 1,652 & 236 & 236 \\
+    Khulna     &   750 & 107 &  67 \\
+    Mymensingh & 1,053 & 151 & 150 \\
+    Noakhali   & 1,213 & 174 & 173 \\
+    Rajshahi   &   860 & 122 & 110 \\
+    Sylhet     &   958 & 137 & 123 \\
+    \midrule
+    Total      & 9,303 & 1,329 & 1,327 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\section{Audio properties}
+
+Every clip is standardised to 16\,kHz, mono, 16-bit PCM WAV
+(\path{build_manifest.py}). Clips are nominally five seconds long: the median
+duration is 5.0\,s and the mean 5.08\,s, but 1,067 clips fall outside
+4.5--5.5\,s, with a range of 1.1--8.0\,s; Formal clips are slightly longer
+(median 5.6\,s). Five seconds is enough for a listener to recognise many
+dialects but excludes longer-range cues such as discourse markers and phrase-level
+intonation. Because the material is broadcast and online media, recording
+conditions vary widely within and across classes, from studio news to
+outdoor drama scenes.
+
+\section{The Formal class}
+
+Formal is a speech register---the standard, prescribed Bangla of news reading
+and formal speech---rather than a region. It is kept as a ninth class
+deliberately. Distinguishing regionally marked speech from the standard register
+is of practical interest in its own right, and Formal is the only class with
+recoverable provenance, which makes it the calibration anchor for the strict
+split (\cref{sec:method-splits}). A consequence is that the class boundary is
+partly one of register: Formal speakers may come from any region, and some
+regional clips contain stretches of near-standard speech.
+
+\section{Metadata and the leakage problem}
+\label{sec:data-metadata}
+
+The corpus ships no speaker labels and almost no provenance. Regional clips have
+sequential filenames (\path{khl271.wav}, \path{shlt479.wav}) that say
+nothing about speaker or source. Only the Formal class carries recoverable
+source identifiers: 557 of its 1,652 clips embed a YouTube video identifier in
+the filename, from 35 distinct videos. For the remaining 8,746 clips---94\,\% of
+the corpus---nothing prevents clips of the same speaker, or from the same
+programme and recording channel, from appearing on both sides of a random
+train/test split. \Cref{sec:method-splits} describes how the thesis estimates
+pseudo-speaker groups to control this, and \cref{sec:res-strict} measures its
+effect.
+
+The clips were collected from films and dramas as well as from news and
+interviews, so some speakers may be actors performing a dialect rather than
+native speakers of it. This cannot be checked from the metadata and is listed
+among the limitations (\cref{sec:disc-limits}).
+
+\section{External resources for the lexical route}
+\label{sec:data-external}
+
+The lexical route (\cref{sec:method-lexical}) uses three public text and speech
+resources in addition to the corpus. None contributes training audio to any
+dialect classifier.
+
+\begin{description}
+  \item[OOD-Speech] \citep{rakib2023oodspeech}: the 963,636 training sentences
+    of standard Bangla, distributed with the 2023 Bengali.AI competition
+    \citep{bengaliai2023competition}, define the standard-Bangla vocabulary.
+  \item[Ben-10] \citep{dipto2025ben10}: the district-labelled dialect
+    transcripts of its training set (13,342 clips) contribute regional words for
+    the three districts it shares with this corpus (Barishal, Chattogram,
+    Sylhet); its public validation set (1,666 clips with audio and human
+    transcripts) is the reference for measuring speech-recognition quality.
+    Released under CC0.
+  \item[Vashantor] \citep{faria2023vashantor}: regional--standard sentence
+    pairs for Chittagong, Noakhali, Sylhet, Barishal and Mymensingh contribute
+    regional words for those five classes. Released under CC BY 4.0.
+\end{description}

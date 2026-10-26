@@ -1,0 +1,113 @@
+% =====================================================================
+%  Beyond Words: Bangla Dialect Identification from Sound and Words
+%  Compiler: XeLaTeX  (Overleaf: Menu -> Compiler -> XeLaTeX)
+%  Bibliography: BibTeX (natbib, author-year)
+% =====================================================================
+\documentclass[12pt,a4paper,oneside]{report}
+
+% ---------- Title-page details: fill these in -------------------------
+\newcommand{\thesistitle}{A Neural Network Approach to Classifying Bangla Accentual Diversity}
+\newcommand{\thesissubtitle}{Dialect Identification from Sound and from Words}
+\newcommand{\thesisauthor}{Towfique Elahe}
+\newcommand{\studentid}{[Student ID]}                       % TODO
+\newcommand{\thesisdegree}{[Degree, e.g.\ Master of Science in Data Science]} % TODO
+\newcommand{\thesisdepartment}{[Department]}                % TODO
+\newcommand{\thesisuniversity}{[University]}                % TODO
+\newcommand{\thesissupervisor}{[Supervisor name and title]} % TODO
+\newcommand{\thesisdate}{[Month Year]}                      % TODO
+
+% ---------- Fonts (XeLaTeX) -------------------------------------------
+\usepackage{fontspec}
+\newfontfamily\bengalifont[
+  Path=fonts/, Script=Bengali, Scale=0.92,
+  UprightFont=NotoSerifBengali-Regular.ttf,
+  BoldFont=NotoSerifBengali-Bold.ttf]{NotoSerifBengali}
+\newcommand{\bn}[1]{{\bengalifont #1}}   % Bangla-script text
+
+% ---------- Layout ----------------------------------------------------
+\usepackage[a4paper,margin=2.5cm,bindingoffset=0.5cm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\emergencystretch}{1.5em}
+\usepackage{titlesec}
+\titleformat{\chapter}[display]
+  {\normalfont\bfseries\Huge}{\large\MakeUppercase{\chaptertitlename}\ \thechapter}{8pt}{}
+\titlespacing*{\chapter}{0pt}{-10pt}{24pt}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\nouppercase{\leftmark}}
+\fancyhead[R]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\small\thepage}\renewcommand{\headrulewidth}{0pt}}
+\setlength{\headheight}{15pt}
+
+% ---------- Content packages ------------------------------------------
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\graphicspath{{figures/}}
+\usepackage{booktabs,tabularx,array,multirow,makecell}
+\usepackage{xcolor}
+\usepackage[font=small,labelfont=bf,skip=6pt]{caption}
+\usepackage{enumitem}
+\setlist{itemsep=2pt,topsep=4pt}
+\usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,calc}
+\usepackage[round,authoryear]{natbib}
+\bibliographystyle{plainnat}
+\usepackage[obeyspaces,spaces]{xurl}
+\urlstyle{same}
+\usepackage[hidelinks,bookmarksnumbered]{hyperref}
+\usepackage[nameinlink,capitalise,noabbrev]{cleveref}
+\usepackage[acronym,nonumberlist,nomain]{glossaries}
+\makenoidxglossaries
+
+% ---------- Helpers ---------------------------------------------------
+\newcommand{\fscore}[1]{#1}                       % keeps numbers greppable
+\newcommand{\hf}[1]{\path{#1}}                    % model / dataset identifiers
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
+
+\input{frontmatter/abbreviations}
+
+% Compile one chapter at a time on Overleaf's free plan if it times out:
+% \includeonly{chapters/05-results}
+
+\begin{document}
+
+% ---------- Front matter ----------------------------------------------
+\pagenumbering{roman}
+\input{frontmatter/titlepage}
+\input{frontmatter/declaration}
+\input{frontmatter/abstract}
+\input{frontmatter/acknowledgements}
+
+\tableofcontents
+\listoffigures
+\listoftables
+\printnoidxglossary[type=\acronymtype,title={List of Abbreviations}]
+
+% ---------- Main matter -----------------------------------------------
+\cleardoublepage
+\pagenumbering{arabic}
+\include{chapters/01-introduction}
+\include{chapters/02-background}
+\include{chapters/03-dataset}
+\include{chapters/04-methodology}
+\include{chapters/05-results}
+\include{chapters/06-discussion}
+\include{chapters/07-conclusion}
+
+% ---------- Back matter -----------------------------------------------
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{Bibliography}
+\bibliography{references}
+
+\appendix
+\include{appendices/A-reproducibility}
+\include{appendices/B-settings}
+\include{appendices/C-figures}
+
+\end{document}

@@ -1,0 +1,207 @@
+\chapter{Discussion}
+\label{ch:discussion}
+
+\section{What the strict split reveals}
+\label{sec:disc-strict}
+
+The central methodological result is that a disclaimer became a measurement.
+Most audio classification on found data either ignores speaker and channel
+leakage or mentions it qualitatively. Here the pseudo-speaker split bounds it:
+12--14 macro-F1 points for pretrained representations and about 25 for
+hand-crafted features. Three implications follow.
+
+\begin{enumerate}
+  \item \textbf{Scores reported on clip-level splits of found-data corpora are
+        inflated, and by an amount that depends on the representation.}
+        Comparing papers that use different features on clip-level splits
+        partly ranks how well each exploits the channel, not how well it
+        identifies dialect.
+  \item \textbf{The honest acoustic headline for this corpus is 0.808}
+        (fine-tuned XLS-R, strict split). That remains a strong 9-way result,
+        about seven times chance, on speakers the model has never heard.
+  \item \textbf{Per-class strict numbers must be read with care.} Barishal's
+        strict test set is a single 251-clip pseudo-speaker cluster, so its fall
+        from 0.871 to 0.603 for the frozen model measures generalisation to one
+        speaker or source rather than to the class. Conclusions at the macro
+        level are the robust ones.
+\end{enumerate}
+
+\section{Errors follow dialect geography}
+\label{sec:disc-geography}
+
+Under every model and protocol the dominant confusion is between Barishal and
+Noakhali, two southern coastal dialects with documented linguistic proximity,
+and Mymensingh, a transitional zone, spreads its errors across its neighbours.
+This is linguistically coherent behaviour: the models' mistakes recapitulate the
+dialect continuum rather than arbitrary decision boundaries, which supports the
+claim that they learn accentual structure and not only channel shortcuts, even
+on the clip-level split.
+
+\section{The shrinking advantage of fine-tuning}
+\label{sec:disc-finetune}
+
+Fine-tuned XLS-R gains 3.5 points over frozen Whisper at clip level, a
+significant difference, but only 1.5 under the strict split, which is not
+significant, and its strict-split drop ($-14.4$) is slightly larger than the
+frozen model's ($-12.4$). End-to-end adaptation lets a model exploit whatever
+separates the training classes, including channel signatures that correlate with
+class in the training data; a frozen, general-purpose representation cannot
+specialise in this way. The practical lesson is that, when leakage cannot be
+ruled out, frozen-embedding baselines are not merely cheaper: they partly
+protect against shortcut learning, and a fine-tuning margin measured on a leaky
+split overstates the improvement that would hold in deployment. The comparison
+is confounded, however: the frozen model is Whisper-small and the fine-tuned one
+XLS-R-300M, so ``frozen versus fine-tuned'' and ``Whisper versus XLS-R'' are not
+separated (\cref{sec:disc-limits}).
+
+\section{The augmentation result: prosody is signal}
+\label{sec:disc-augment}
+
+The channel-suppression chain lowered strict-split macro-F1 by six points. The
+chain included pitch shift ($\pm 2$ semitones) and time stretch (0.9--1.1),
+transforms that are standard and beneficial in speech recognition
+\citep{ko2015augmentation}, where the transcript is invariant to prosody.
+Dialect identification inverts this: pitch contour, rhythm and tempo carry
+dialect, so these transforms corrupt the evidence for the label rather than
+removing nuisance variation. Probing work showing that accent fine-tuning
+reshapes prosodic encoding in wav2vec~2.0 \citep{yang2023accent} supports this
+reading, and the validation score, depressed throughout training (0.702 against
+0.757), indicates a harder target rather than an unlucky checkpoint.
+
+The recommendation is task-specific: augmentation for dialect and accent
+identification should preserve prosody (additive noise, equalisation, band
+limiting, gain), and prosodic perturbation should be treated as harmful until
+shown otherwise. The reduced chain was not tested and is left as future work;
+without that test, the attribution to the pitch and tempo transforms remains a
+hypothesis.
+
+\section{Words or sound?}
+\label{sec:disc-words}
+
+The lexical route reads the thesis title literally: how much of Bangla dialect
+identity is in the words, and how much lies beyond them? Three findings stand
+out.
+
+\paragraph{Standard-Bangla speech recognition removes the dialect before a
+classifier can see it.} Recognisers trained on standard Bangla (Tugstugi,
+Hishab) transcribe regional speech into standard forms---\bn{বিয়া দিয়া দাও}
+(``arrange the marriage'') becomes \bn{বিয়ে দিয়ে দাও}---and reproduce only
+1--3\,\% of the dialect words in Ben-10's human transcripts. Their output on
+regional clips is barely less standard than on Formal clips. The one front-end
+fine-tuned on dialect speech reproduces 19\,\%, which is both the best available
+and a hard ceiling for any word-list method: four of five dialect words never
+reach the text. This confirms, with an automated measure over the full
+validation set, the observation that \citet{dipto2025ben10} made by hand, and it
+is the single most important fact about the lexical route.
+
+\paragraph{Filtering to regional words discards evidence.} The intuitive
+design---drop every word that standard Bangla also has and match what is left
+against regional word lists---scores 0.360 under the strict split, because
+fewer than half of the 5-second clips keep any matchable word. A TF-IDF
+classifier over all words and character n-grams reaches 0.633 on the same
+transcripts. Two mechanisms plausibly explain the gap, though this thesis did
+not isolate them: words that also exist in standard Bangla but are used at
+different rates across regions (pronouns, particles, common verbs), which the
+filter removes; and character n-grams, which generalise over rare inflected
+dialect forms such as verb endings that never reach the lexicon's frequency
+thresholds. Word matching keeps its value as an \emph{explanation}---it shows
+which words decided a clip and how strongly each belongs to each region---rather
+than as the classifier.
+
+\paragraph{Words and sound are complementary, modestly.} Fusion raises the
+honest headline from 0.808 to 0.856, a gain that is borderline under the
+speaker-group bootstrap (a 4\,\% probability of no gain), and the clip-level
+score from 0.952 to 0.967, which is significant. The gain lands where the
+acoustic model is weakest under the strict split---Barishal (+21 points) and
+Sylhet (+8), the dialect with the most distinctive and best-transcribed
+vocabulary---and is negative only for Khulna, where the acoustics are already
+near perfect. The two routes fail on different clips, which is the condition
+under which fusion helps, and this is evidence that the text carries dialect
+information of its own rather than a noisier copy of the acoustic decision.
+
+\paragraph{The answer.} For clips this short, dialect identity lies
+\emph{mostly beyond the words}. Words alone (0.633) sit between hand-crafted
+acoustics (0.480) and frozen Whisper (0.793); the acoustic route is the stronger
+single route, and the lexical route's ceiling is set by speech recognition, not
+by the classifier. Two caveats temper the comparison. The TF-IDF model may
+partly learn programme- or topic-specific vocabulary, because the strict split
+separates speakers but not content, so 0.633 is itself an upper bound on the
+dialect information in the words. And the acoustic models were trained on 13
+hours of in-domain audio, whereas the recognisers saw none of it: a
+dialect-aware recogniser trained on this corpus would raise the lexical ceiling,
+at the cost of the off-the-shelf setting that makes the comparison clean.
+
+\section{Limitations}
+\label{sec:disc-limits}
+
+\begin{itemize}
+  \item \textbf{Pseudo-speakers are approximate.} Calibration against Formal's
+        true sources reaches an ARI of 0.347, and clustering both over-merges (a
+        251-clip Barishal cluster) and over-splits (many singletons). The strict
+        split removes much, but not provably all, speaker and channel overlap;
+        true speaker labels would tighten the estimate in both directions.
+  \item \textbf{Uneven strict test cells.} Group-disjoint splitting with
+        unequal clusters concentrates some classes' test sets in a few clusters,
+        so per-class strict numbers have high variance.
+  \item \textbf{Short clips.} Five seconds excludes longer-range dialect cues
+        such as discourse markers and phrase-level intonation.
+  \item \textbf{Single domain.} The corpus is broadcast and online media;
+        generalisation to conversational or telephone speech is untested.
+  \item \textbf{Model family is confounded with adaptation regime.} The frozen
+        model is Whisper-small and the fine-tuned one XLS-R-300M. Frozen XLS-R
+        embeddings, cheap to compute locally, would separate the two factors.
+  \item \textbf{Single-seed fine-tuning.} Each XLS-R result is one seed; the
+        bootstrap intervals cover test-set sampling noise, not training-seed
+        variance.
+  \item \textbf{Whisper pooling includes padding.} Whisper's encoder always
+        processes 30\,s of input, and the baseline mean-pools all 1,500 frames,
+        of which only about 250 cover the 5\,s of speech. The padding
+        contribution is the same for every clip, but pooling only speech frames
+        would be the cleaner design.
+  \item \textbf{Authenticity of found data.} Clips from films and dramas may
+        include actors performing a dialect rather than native speakers.
+  \item \textbf{No reference transcripts for the corpus.} Recognition quality is
+        measured on Ben-10, a different corpus with longer, spontaneous clips
+        and only three districts in common; word error rate on this corpus is
+        unknown. Hand-transcribing a subset of about 20 clips per class would
+        close this gap.
+  \item \textbf{Content leakage is not controlled.} The strict split is
+        speaker-disjoint, not topic-disjoint; recurring programmes, names and
+        topics can appear on both sides and inflate the text classifier. The
+        in-domain lexicon's two-speaker rule and the external lexicon mitigate,
+        but do not remove, this risk.
+  \item \textbf{Front-end substitutions.} The benchmark's ``Wav2Vec2 (SCB)''
+        checkpoint is not public, and the wav2vec~2.0 model used instead is a
+        different model; Google's recogniser and the benchmark's Ben-10-tuned
+        wav2vec~2.0 were not run. The Ben-10-tuned recogniser was trained on ten
+        districts, of which only Barishal, Chattogram and Sylhet are classes
+        here, and Khulna, Rajshahi and Dhaka have no clean external word list.
+  \item \textbf{Validation reuse.} The XLS-R checkpoint was selected on the same
+        validation split later used to tune the fusion weight $\alpha$, so
+        XLS-R's validation probabilities are mildly optimistic and $\alpha$ may
+        lean towards the acoustic model. Test numbers are unaffected, and all
+        tuning used validation data only.
+  \item \textbf{Greedy, single decoding.} Each front-end's transcripts are one
+        greedy decode; beam search or temperature fallback might reduce
+        Whisper-large-v3's repetition loops.
+\end{itemize}
+
+\section{Future work}
+\label{sec:disc-future}
+
+\begin{itemize}
+  \item A prosody-preserving augmentation chain on the strict split, the direct
+        test of \cref{sec:disc-augment}.
+  \item True speaker annotation for a subset, to validate the pseudo-speaker
+        estimate.
+  \item Larger multilingual encoders (XLS-R-1B, MMS) within the same free-GPU
+        budget, and frozen XLS-R embeddings to remove the model-family confound.
+  \item Longer inputs, and aggregation of clip decisions to speaker or
+        recording level.
+  \item Cross-domain evaluation on conversational and telephone speech.
+  \item For the lexical route: a dialect-aware recogniser fine-tuned on this
+        corpus, since transcription rather than classification is the
+        bottleneck; a hand-transcribed subset for word error rate on this
+        corpus; a topic-disjoint split to bound content leakage; and joint
+        rather than late fusion, feeding text features into the acoustic model.
+\end{itemize}

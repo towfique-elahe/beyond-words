@@ -69,6 +69,8 @@ docs/supervisor/
 docs/thesis/*.docx
 docs/thesis/*.pdf
 docs/thesis/*.pages
+docs/thesis/*.zip
+docs/thesis/latex/
 # Private meeting-prep docs (same policy as docs/supervisor/)
 docs/nlp-expert-meeting/
 
