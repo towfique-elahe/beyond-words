@@ -9,101 +9,101 @@
         {
           "district": "all",
           "clips": 1666,
-          "wer": 0.7071,
-          "cer": 0.4706,
+          "wer": 0.6454,
+          "cer": 0.3329,
           "dialect_words": 21119,
-          "dialect_recall": 0.1921,
-          "formal_recall": 0.4554
+          "dialect_recall": 0.2663,
+          "formal_recall": 0.6198
         },
         {
           "district": "barishal",
           "clips": 105,
-          "wer": 0.7667,
-          "cer": 0.5207,
+          "wer": 0.7382,
+          "cer": 0.4171,
           "dialect_words": 1247,
-          "dialect_recall": 0.1564,
-          "formal_recall": 0.4163
+          "dialect_recall": 0.2141,
+          "formal_recall": 0.5999
         },
         {
           "district": "chittagong",
           "clips": 174,
-          "wer": 0.843,
-          "cer": 0.5291,
+          "wer": 0.9255,
+          "cer": 0.525,
           "dialect_words": 2748,
-          "dialect_recall": 0.1474,
-          "formal_recall": 0.3622
+          "dialect_recall": 0.1863,
+          "formal_recall": 0.4728
         },
         {
           "district": "habiganj",
           "clips": 117,
-          "wer": 0.7273,
-          "cer": 0.487,
+          "wer": 0.632,
+          "cer": 0.3065,
           "dialect_words": 1950,
-          "dialect_recall": 0.22,
-          "formal_recall": 0.4468
+          "dialect_recall": 0.3215,
+          "formal_recall": 0.6245
         },
         {
           "district": "kishoreganj",
           "clips": 204,
-          "wer": 0.8171,
-          "cer": 0.5087,
+          "wer": 0.8392,
+          "cer": 0.48,
           "dialect_words": 2270,
-          "dialect_recall": 0.1419,
-          "formal_recall": 0.4204
+          "dialect_recall": 0.1727,
+          "formal_recall": 0.4895
         },
         {
           "district": "narail",
           "clips": 183,
-          "wer": 0.6582,
-          "cer": 0.3997,
+          "wer": 0.6033,
+          "cer": 0.296,
           "dialect_words": 1640,
-          "dialect_recall": 0.1915,
-          "formal_recall": 0.5249
+          "dialect_recall": 0.2476,
+          "formal_recall": 0.6258
         },
         {
           "district": "narsingdi",
           "clips": 136,
-          "wer": 0.629,
-          "cer": 0.4221,
+          "wer": 0.5327,
+          "cer": 0.257,
           "dialect_words": 1528,
-          "dialect_recall": 0.2022,
-          "formal_recall": 0.4891
+          "dialect_recall": 0.2762,
+          "formal_recall": 0.662
         },
         {
           "district": "rangpur",
           "clips": 131,
-          "wer": 0.6696,
-          "cer": 0.4383,
+          "wer": 0.6063,
+          "cer": 0.3004,
           "dialect_words": 1165,
-          "dialect_recall": 0.1348,
-          "formal_recall": 0.4609
+          "dialect_recall": 0.1751,
+          "formal_recall": 0.6021
         },
         {
           "district": "sandwip",
           "clips": 129,
-          "wer": 0.7731,
-          "cer": 0.5125,
+          "wer": 0.734,
+          "cer": 0.3891,
           "dialect_words": 1999,
-          "dialect_recall": 0.1701,
-          "formal_recall": 0.3647
+          "dialect_recall": 0.2271,
+          "formal_recall": 0.4739
         },
         {
           "district": "sylhet",
           "clips": 356,
-          "wer": 0.686,
-          "cer": 0.4835,
+          "wer": 0.5898,
+          "cer": 0.2945,
           "dialect_words": 5818,
-          "dialect_recall": 0.2434,
-          "formal_recall": 0.4662
+          "dialect_recall": 0.364,
+          "formal_recall": 0.6995
         },
         {
           "district": "tangail",
           "clips": 131,
-          "wer": 0.5683,
-          "cer": 0.407,
+          "wer": 0.3857,
+          "cer": 0.1641,
           "dialect_words": 754,
-          "dialect_recall": 0.2255,
-          "formal_recall": 0.503
+          "dialect_recall": 0.2944,
+          "formal_recall": 0.7196
         }
       ]
     },
@@ -113,101 +113,101 @@
         {
           "district": "all",
           "clips": 1666,
-          "wer": 0.7749,
-          "cer": 0.5318,
+          "wer": 0.7519,
+          "cer": 0.4836,
           "dialect_words": 21119,
-          "dialect_recall": 0.0343,
-          "formal_recall": 0.3687
+          "dialect_recall": 0.0398,
+          "formal_recall": 0.4161
         },
         {
           "district": "barishal",
           "clips": 105,
-          "wer": 0.8108,
-          "cer": 0.5859,
+          "wer": 0.7998,
+          "cer": 0.56,
           "dialect_words": 1247,
-          "dialect_recall": 0.0313,
-          "formal_recall": 0.2936
+          "dialect_recall": 0.0337,
+          "formal_recall": 0.3135
         },
         {
           "district": "chittagong",
           "clips": 174,
-          "wer": 0.9023,
-          "cer": 0.6124,
+          "wer": 0.8985,
+          "cer": 0.6034,
           "dialect_words": 2748,
-          "dialect_recall": 0.016,
-          "formal_recall": 0.2418
+          "dialect_recall": 0.0164,
+          "formal_recall": 0.2527
         },
         {
           "district": "habiganj",
           "clips": 117,
-          "wer": 0.788,
-          "cer": 0.52,
+          "wer": 0.7672,
+          "cer": 0.4768,
           "dialect_words": 1950,
-          "dialect_recall": 0.0323,
-          "formal_recall": 0.3983
+          "dialect_recall": 0.0354,
+          "formal_recall": 0.4374
         },
         {
           "district": "kishoreganj",
           "clips": 204,
-          "wer": 0.9152,
-          "cer": 0.6886,
+          "wer": 0.9157,
+          "cer": 0.6887,
           "dialect_words": 2270,
           "dialect_recall": 0.0132,
-          "formal_recall": 0.1916
+          "formal_recall": 0.1924
         },
         {
           "district": "narail",
           "clips": 183,
-          "wer": 0.7119,
-          "cer": 0.4359,
+          "wer": 0.6925,
+          "cer": 0.3977,
           "dialect_words": 1640,
-          "dialect_recall": 0.0421,
-          "formal_recall": 0.4545
+          "dialect_recall": 0.047,
+          "formal_recall": 0.4898
         },
         {
           "district": "narsingdi",
           "clips": 136,
-          "wer": 0.6919,
-          "cer": 0.4969,
+          "wer": 0.6763,
+          "cer": 0.4725,
           "dialect_words": 1528,
-          "dialect_recall": 0.0353,
-          "formal_recall": 0.4304
+          "dialect_recall": 0.0373,
+          "formal_recall": 0.4515
         },
         {
           "district": "rangpur",
           "clips": 131,
-          "wer": 0.7143,
-          "cer": 0.4988,
+          "wer": 0.6998,
+          "cer": 0.4765,
           "dialect_words": 1165,
-          "dialect_recall": 0.0575,
-          "formal_recall": 0.3912
+          "dialect_recall": 0.0644,
+          "formal_recall": 0.4095
         },
         {
           "district": "sandwip",
           "clips": 129,
-          "wer": 0.8599,
-          "cer": 0.6106,
+          "wer": 0.8531,
+          "cer": 0.5914,
           "dialect_words": 1999,
           "dialect_recall": 0.026,
-          "formal_recall": 0.2498
+          "formal_recall": 0.2641
         },
         {
           "district": "sylhet",
           "clips": 356,
-          "wer": 0.7802,
-          "cer": 0.5169,
+          "wer": 0.7507,
+          "cer": 0.4288,
           "dialect_words": 5818,
-          "dialect_recall": 0.039,
-          "formal_recall": 0.3931
+          "dialect_recall": 0.049,
+          "formal_recall": 0.4913
         },
         {
           "district": "tangail",
           "clips": 131,
-          "wer": 0.5908,
-          "cer": 0.4049,
+          "wer": 0.4994,
+          "cer": 0.2797,
           "dialect_words": 754,
-          "dialect_recall": 0.1061,
-          "formal_recall": 0.4797
+          "dialect_recall": 0.1432,
+          "formal_recall": 0.5848
         }
       ]
     },
@@ -217,101 +217,101 @@
         {
           "district": "all",
           "clips": 1666,
-          "wer": 0.9598,
-          "cer": 0.808,
+          "wer": 0.9778,
+          "cer": 0.6599,
           "dialect_words": 21119,
-          "dialect_recall": 0.0158,
-          "formal_recall": 0.0613
+          "dialect_recall": 0.0403,
+          "formal_recall": 0.1468
         },
         {
           "district": "barishal",
           "clips": 105,
-          "wer": 0.9664,
-          "cer": 0.8134,
+          "wer": 0.9966,
+          "cer": 0.6808,
           "dialect_words": 1247,
-          "dialect_recall": 0.008,
-          "formal_recall": 0.0528
+          "dialect_recall": 0.0233,
+          "formal_recall": 0.1115
         },
         {
           "district": "chittagong",
           "clips": 174,
-          "wer": 0.9791,
-          "cer": 0.7866,
+          "wer": 1.0636,
+          "cer": 0.7079,
           "dialect_words": 2748,
-          "dialect_recall": 0.0087,
-          "formal_recall": 0.0453
+          "dialect_recall": 0.0204,
+          "formal_recall": 0.0951
         },
         {
           "district": "habiganj",
           "clips": 117,
-          "wer": 0.9605,
-          "cer": 0.8061,
+          "wer": 0.9797,
+          "cer": 0.6464,
           "dialect_words": 1950,
-          "dialect_recall": 0.0282,
-          "formal_recall": 0.0661
+          "dialect_recall": 0.0692,
+          "formal_recall": 0.167
         },
         {
           "district": "kishoreganj",
           "clips": 204,
-          "wer": 0.9798,
-          "cer": 0.7919,
+          "wer": 1.1424,
+          "cer": 0.834,
           "dialect_words": 2270,
-          "dialect_recall": 0.0097,
-          "formal_recall": 0.048
+          "dialect_recall": 0.0181,
+          "formal_recall": 0.078
         },
         {
           "district": "narail",
           "clips": 183,
-          "wer": 0.9508,
-          "cer": 0.7713,
+          "wer": 1.004,
+          "cer": 0.6634,
           "dialect_words": 1640,
-          "dialect_recall": 0.0159,
-          "formal_recall": 0.0693
+          "dialect_recall": 0.0457,
+          "formal_recall": 0.1529
         },
         {
           "district": "narsingdi",
           "clips": 136,
-          "wer": 0.9447,
-          "cer": 0.8125,
+          "wer": 0.8884,
+          "cer": 0.5877,
           "dialect_words": 1528,
-          "dialect_recall": 0.0209,
-          "formal_recall": 0.0711
+          "dialect_recall": 0.0445,
+          "formal_recall": 0.1872
         },
         {
           "district": "rangpur",
           "clips": 131,
-          "wer": 0.9525,
-          "cer": 0.797,
+          "wer": 0.9517,
+          "cer": 0.6271,
           "dialect_words": 1165,
-          "dialect_recall": 0.0206,
-          "formal_recall": 0.0606
+          "dialect_recall": 0.0395,
+          "formal_recall": 0.15
         },
         {
           "district": "sandwip",
           "clips": 129,
-          "wer": 0.9682,
-          "cer": 0.8049,
+          "wer": 1.0168,
+          "cer": 0.678,
           "dialect_words": 1999,
-          "dialect_recall": 0.0105,
-          "formal_recall": 0.0511
+          "dialect_recall": 0.0195,
+          "formal_recall": 0.0997
         },
         {
           "district": "sylhet",
           "clips": 356,
-          "wer": 0.9583,
-          "cer": 0.8325,
+          "wer": 0.9353,
+          "cer": 0.6425,
           "dialect_words": 5818,
-          "dialect_recall": 0.0175,
-          "formal_recall": 0.0645
+          "dialect_recall": 0.0553,
+          "formal_recall": 0.1699
         },
         {
           "district": "tangail",
           "clips": 131,
-          "wer": 0.9443,
-          "cer": 0.82,
+          "wer": 0.8792,
+          "cer": 0.5679,
           "dialect_words": 754,
-          "dialect_recall": 0.0239,
-          "formal_recall": 0.0677
+          "dialect_recall": 0.0531,
+          "formal_recall": 0.1798
         }
       ]
     },
