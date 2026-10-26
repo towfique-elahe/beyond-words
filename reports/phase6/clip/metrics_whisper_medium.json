@@ -1,0 +1,20 @@
+{
+  "model": "openai/whisper-medium",
+  "family": "whisper",
+  "seed": 42,
+  "epochs": 12,
+  "best_epoch": 9,
+  "val_macroF1": 0.9737551699157527,
+  "test_macroF1": 0.984297729083762,
+  "per_class_F1": {
+    "Barishal": 0.9806094182825484,
+    "Chattogram": 0.9545454545454546,
+    "Dhaka": 0.9907407407407407,
+    "Formal": 0.9853249475890985,
+    "Khulna": 1.0,
+    "Mymensingh": 0.9834983498349835,
+    "Noakhali": 0.9799426934097422,
+    "Rajshahi": 0.9876543209876543,
+    "Sylhet": 0.9963636363636363
+  }
+}

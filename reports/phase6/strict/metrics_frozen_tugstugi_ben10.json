@@ -1,0 +1,18 @@
+{
+  "embeddings": "embeddings_tugstugi_ben10.npz",
+  "seed": 42,
+  "epochs": 60,
+  "val_macroF1": 0.7774844151224926,
+  "test_macroF1": 0.8567962150550863,
+  "per_class_F1": {
+    "Barishal": 0.8385744234800838,
+    "Chattogram": 0.7964601769911505,
+    "Dhaka": 0.8493150684931506,
+    "Formal": 0.9135802469135802,
+    "Khulna": 0.9629629629629629,
+    "Mymensingh": 0.8435374149659864,
+    "Noakhali": 0.7821229050279329,
+    "Rajshahi": 0.8571428571428571,
+    "Sylhet": 0.8674698795180723
+  }
+}

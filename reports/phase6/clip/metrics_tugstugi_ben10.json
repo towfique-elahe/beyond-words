@@ -1,0 +1,20 @@
+{
+  "model": "bengaliAI/tugstugi_bengaliai-regional-asr_whisper-medium",
+  "family": "whisper",
+  "seed": 42,
+  "epochs": 12,
+  "best_epoch": 9,
+  "val_macroF1": 0.9802646869237732,
+  "test_macroF1": 0.9803412215312817,
+  "per_class_F1": {
+    "Barishal": 0.9746478873239437,
+    "Chattogram": 0.9596412556053812,
+    "Dhaka": 0.986046511627907,
+    "Formal": 0.9873417721518988,
+    "Khulna": 1.0,
+    "Mymensingh": 0.9798657718120806,
+    "Noakhali": 0.958217270194986,
+    "Rajshahi": 0.9918032786885246,
+    "Sylhet": 0.9855072463768116
+  }
+}

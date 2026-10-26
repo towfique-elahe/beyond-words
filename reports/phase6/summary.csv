@@ -1,0 +1,9 @@
+tag,model,pretraining,regime,clip_f1,strict_f1,drop
+mfcc,MFCC statistics + MLP,none,hand-crafted,0.7275,0.4795,0.248
+frozen_whisper_small,"Whisper-small, frozen + MLP",multilingual,frozen,0.9172,0.7933,0.1239
+frozen_tugstugi_ben10,"Tugstugi (Ben-10), frozen + MLP",Bangla,frozen,0.936,0.8568,0.0792
+xlsr,"XLS-R-300M, fine-tuned",multilingual,fine-tuned,0.9518,0.8084,0.1434
+whisper_medium,"Whisper-medium, fine-tuned",multilingual,fine-tuned,0.9843,0.9192,0.0651
+tugstugi_ben10,"Tugstugi (Ben-10), fine-tuned",Bangla,fine-tuned,0.9803,0.9208,0.0595
+tugstugi,"Tugstugi, fine-tuned",Bangla,fine-tuned,0.9812,0.9081,0.0731
+hishab,"Hishab FastConformer, fine-tuned",Bangla,fine-tuned,0.9013,0.7464,0.1549
