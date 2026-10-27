@@ -71,12 +71,17 @@ the rest are canonical and safely citable.
 
 ## 2.3 Bangla speech and dialect resources
 
-- ⚑ **"Bengali Accent Classification from Speech Using Different Machine
-  Learning and Deep Learning Techniques" (Springer, 2020/21).** The closest
-  prior line to v1 (hand-crafted features + classical/DL classifiers); position
-  the thesis against it and note the public replication of the v1-style
-  approach that motivated the v2 pivot.
-  https://link.springer.com/chapter/10.1007/978-981-15-7394-1_46
+- **Badhon, Rahaman, Rupon & Abujar, 2020 — "Bengali Accent Classification
+  from Speech Using Different Machine Learning and Deep Learning Techniques"
+  (Advances in Intelligent Systems and Computing, Springer, pp. 503–513;
+  doi 10.1007/978-981-15-7394-1_46).** The closest prior line to v1
+  (hand-crafted features + classical/DL classifiers) **and one of the two
+  studies the corpus was gathered for** — cite as dataset origin in Ch. 3.
+- **Alam, Bhuiyan & Monir, 2023 — "Bangla Speaker Accent Variation
+  Classification from Audio Using Deep Neural Networks: A Distinct Approach"
+  (TENCON 2023, IEEE; doi 10.1109/tencon58879.2023.10322411).** The second
+  study the corpus was gathered for; deep-network accent classification on
+  the same audio — cite as dataset origin and as prior audio-based work.
 - ⚑ **"Bangla Dialect Classification Across 11 Regions Using Machine Learning
   and Transformer-Based Models" (IEEE, 2025).** Text-based dialect
   classification (BanglaDial; BanglaBERT ~88.7 %) on *human-written* dialect

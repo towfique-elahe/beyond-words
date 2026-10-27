@@ -49,7 +49,9 @@ combined result. The title "Beyond Words" is read literally.
   lexical route's precedent
 
 ## 3. Dataset
-- Source: TV, film, online media; ~5 s clips; 16 kHz mono PCM-16
+- Source: corpus gathered for Badhon et al. (2020, doi 10.1007/978-981-15-7394-1_46)
+  and Alam et al. (2023, TENCON, doi 10.1109/tencon58879.2023.10322411) — cite
+  both as the dataset origin; TV, film, online media; ~5 s clips; 16 kHz mono PCM-16
 - 9,303 usable clips (~13.1 h; 2 duplicate .ogg files excluded); 750–1,652 per class
 - The "Formal" design choice: a register, not a region — argued explicitly
 - Metadata reality: 557/1,652 Formal clips have recoverable YouTube source IDs
