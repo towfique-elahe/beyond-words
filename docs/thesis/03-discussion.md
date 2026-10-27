@@ -36,13 +36,15 @@ clip-level split).
 The Phase 3 comparison (frozen Whisper-small vs fine-tuned XLS-R: +3.5 clip,
 +1.5 strict n.s., larger drop for the fine-tuned model) suggested fine-tuning
 mainly buys channel exploitation. Phase 6 shows that was an encoder effect:
-- On one checkpoint, fine-tuning helps clearly (Tugstugi Ben-10: 0.857 → 0.921
-  strict, CI +3.6 to +10.4) and *reduces* the leakage drop (7.9 → 6.0).
+- On one checkpoint, fine-tuning helps clearly (Whisper-medium: 0.782 → 0.919
+  strict, CI +6.5 to +22.3; Tugstugi Ben-10: 0.857 → 0.921, CI +3.6 to +10.4)
+  and *reduces* the leakage drop (13.8 → 6.5; 7.9 → 6.0).
 - XLS-R (contrastive SSL on raw audio) is the channel exploiter (drop 14.4);
   the transcription-pretrained Whisper-medium family drops 6–7 and reaches
   0.92 on unseen speakers.
-- Bangla-specific pretraining adds nothing measurable (Whisper-medium ≈
-  Tugstugi ≈ Tugstugi Ben-10); architecture/size matter more (Hishab
+- Bangla-specific pretraining helps frozen (Tugstugi Ben-10 0.857 vs
+  Whisper-medium 0.782, significant) but adds nothing once fine-tuned
+  (Whisper-medium ≈ Tugstugi ≈ Tugstugi Ben-10); architecture/size matter more (Hishab
   FastConformer, 115M, CTC, news: 0.746 strict, drop 15.5; possibly
   under-trained, best epoch 18/20).
 Guidance: pick an encoder pretrained to transcribe, then fine-tune; a frozen
@@ -133,9 +135,10 @@ trained on this corpus would raise the lexical ceiling, at the cost of the
   conversational or telephone speech is untested.
 - **Phase 6 models are single runs** (one seed, one schedule); Hishab may be
   under-trained.
-- **Fusion was built on XLS-R**: the Whisper-medium family alone (0.92) now
-  exceeds the XLS-R + text fusion (0.856); fusion with the stronger model is
-  untested.
+- **Fusion helps only a weak acoustic model**: with Whisper-medium the words
+  lower strict macro-F1 0.919 → 0.909 (CI −2.5 to −0.03); the transcript
+  information is largely a subset of what the strong encoder extracts. Only
+  late log-linear fusion was tried.
 - **Single-seed fine-tuning**: XLS-R results are one seed each; bootstrap CIs
   cover test-set sampling noise, not training-seed variance.
 - **Whisper pooling includes padding**: Whisper's encoder always sees 30 s of

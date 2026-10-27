@@ -112,7 +112,8 @@ them?
         checkpoints (Tugstugi) and a Bangla FastConformer (Hishab) to the
         original three. Fine-tuned Whisper-medium raises the honest headline
         to 0.92 with half the leakage drop of XLS-R; Bangla-specific
-        pretraining adds nothing measurable (\cref{sec:res-encoders,sec:disc-finetune}).
+        pretraining helps a frozen encoder but adds nothing once it is
+        fine-tuned (\cref{sec:res-encoders,sec:disc-finetune}).
   \item The lexical route: five off-the-shelf Bangla speech recognisers compared
         by how much dialect they preserve, using an automated dialect-word
         recall over 1,666 human-transcribed clips; regional-word matching with

@@ -277,7 +277,7 @@ are in \path{reports/phase6/}.
     MFCC statistics + MLP            & ---          & 0.727 (0.676--0.753) & 0.480 (0.368--0.552) & 24.8 \\
     \addlinespace
     Whisper-small, frozen + MLP      & multilingual & 0.917 (0.894--0.932) & 0.793 (0.688--0.808) & 12.4 \\
-    Whisper-medium, frozen + MLP     & multilingual & \todo{pending} & \todo{pending} & --- \\
+    Whisper-medium, frozen + MLP     & multilingual & 0.919 (0.896--0.934) & 0.782 (0.662--0.793) & 13.8 \\
     Tugstugi (Ben-10), frozen + MLP  & Bangla       & 0.936 (0.916--0.949) & 0.857 (0.725--0.870) & 7.9 \\
     \addlinespace
     XLS-R-300M, fine-tuned           & multilingual & 0.952 (0.935--0.963) & 0.808 (0.717--0.838) & 14.4 \\
@@ -309,27 +309,34 @@ are in \path{reports/phase6/}.
         interval is widened by the single-cluster Barishal cell. At clip level
         all three gains ($+2.9$ to $+3.3$) are significant. The intervals are
         wide because the strict test set has 230 speaker groups.
-  \item \textbf{The three Whisper-medium checkpoints are statistically
-        indistinguishable.} Their pairwise strict gaps are $-0.2$, $+1.1$ and
-        $+1.3$ points, every interval straddling zero (e.g.\ Whisper-medium vs
-        Tugstugi (Ben-10): $-4.7$ to $+2.0$). The Bangla speech-recognition
-        adaptation that distinguishes Tugstugi from Whisper-medium, and the
-        dialect adaptation that distinguishes Tugstugi (Ben-10) from Tugstugi,
-        add nothing measurable to the dialect task once the encoder is
-        fine-tuned.
-  \item \textbf{Fine-tuning helps on the same checkpoint.} Tugstugi (Ben-10)
-        frozen scores 0.857 strict and 0.936 clip-level; fine-tuned, 0.921 and
-        0.980. Both gains are significant ($+6.4$, interval $+3.6$ to $+10.4$;
-        $+4.4$, interval $+3.3$ to $+6.4$). The earlier comparison of frozen
+  \item \textbf{Once fine-tuned, the three Whisper-medium checkpoints are
+        statistically indistinguishable.} Their pairwise strict gaps are
+        $-0.2$, $+1.1$ and $+1.3$ points, every interval straddling zero (e.g.\
+        Whisper-medium vs Tugstugi (Ben-10): $-4.7$ to $+2.0$). Frozen, the
+        Bangla-adapted encoder is clearly better: Tugstugi (Ben-10) scores
+        0.857 strict against 0.782 for frozen Whisper-medium ($+7.5$, interval
+        $+0.4$ to $+12.3$), and frozen Whisper-medium is no better than frozen
+        Whisper-small (0.782 vs 0.793). The Bangla speech-recognition and
+        dialect adaptations therefore help a frozen encoder, but add nothing
+        measurable once the encoder is fine-tuned on the dialect task.
+  \item \textbf{Fine-tuning helps on the same checkpoint.} Whisper-medium
+        goes from 0.782 frozen to 0.919 fine-tuned under the strict split
+        ($+13.8$, interval $+6.5$ to $+22.3$) and from 0.919 to 0.984 at clip
+        level ($+6.5$, interval $+5.2$ to $+8.5$); Tugstugi (Ben-10) from 0.857
+        to 0.921 ($+6.4$, interval $+3.6$ to $+10.4$) and from 0.936 to 0.980
+        ($+4.4$, interval $+3.3$ to $+6.4$). The earlier comparison of frozen
         Whisper-small with fine-tuned XLS-R (\cref{sec:res-strict}), which found
         no significant strict-split difference, therefore mixed the effect of
         the regime with that of the encoder.
-  \item \textbf{The leakage drop halves.} The Whisper-medium family loses
-        6.0--7.3 points from the clip-level to the strict split, against 12.4
-        for frozen Whisper-small and 14.4 for XLS-R: the larger,
-        transcription-trained encoders depend less on speaker and channel
-        overlap. The frozen Tugstugi (Ben-10) row drops 7.9, so most of this
-        robustness belongs to the encoder, not to fine-tuning.
+  \item \textbf{Fine-tuning a transcription-pretrained encoder halves the
+        leakage drop.} The fine-tuned Whisper-medium family loses 6.0--7.3
+        points from the clip-level to the strict split, against 12.4--13.8 for
+        the frozen Whisper encoders and 14.4 for fine-tuned XLS-R. For
+        Whisper-medium the drop falls from 13.8 frozen to 6.5 fine-tuned, so
+        the robustness is produced by fine-tuning the encoder, not inherited
+        from it; XLS-R's fine-tuning did not have this effect. The
+        Bangla-adapted Tugstugi (Ben-10) is already robust when frozen
+        (drop 7.9).
   \item \textbf{Hishab's FastConformer is the weakest pretrained model} at
         0.746 strict and 0.901 clip-level, below frozen Whisper-small and 6.2
         points below XLS-R under the strict split (interval $-14.7$ to $-0.2$).
@@ -442,10 +449,9 @@ empty outputs per class.
 \subsection{Classification from transcripts}
 
 \Cref{tab:lexical} and \cref{fig:lexical} report the three classifiers for each
-front-end, using the in-domain lexicon. Fusion is with XLS-R, the strongest
-acoustic model at the time the lexical route was built; fusion with the
-Whisper-medium family of \cref{sec:res-encoders} is not reported
-(\cref{sec:disc-limits}).
+front-end, using the in-domain lexicon. Fusion here is with XLS-R, the
+strongest acoustic model at the time the lexical route was built;
+\cref{sec:res-fusion-wm} repeats it with fine-tuned Whisper-medium.
 
 \begin{table}[ht]
   \centering
@@ -589,3 +595,39 @@ F1 of 0.600 is the only strong word-matching result. Khulna, the acoustic
 model's best class, is the one class that fusion hurts. Formal is the only class
 on which the text classifier alone beats XLS-R: the standard register is marked
 in its vocabulary.
+
+\subsection{Fusion with the stronger acoustic model}
+\label{sec:res-fusion-wm}
+
+The fusion above was built on XLS-R. Repeating it with fine-tuned
+Whisper-medium (\cref{sec:res-encoders}) as the acoustic partner, with the
+same TF-IDF model, the same Ben-10 transcripts and $\alpha$ re-tuned on
+validation, gives \cref{tab:fusion-wm}. Under the strict split the words no
+longer help: fusion scores 0.909 against 0.919 for Whisper-medium alone, a loss
+of 1.1 points whose speaker-group interval ($-2.5$ to $-0.03$) just excludes
+zero. Fusion changes 102 of the 1,327 test predictions, repairing 38 and
+breaking 50. The validation score rises (0.803 to 0.847), which is why
+$\alpha = 0.25$ is selected, but the gain does not transfer to the test
+speakers. The classes XLS-R found hardest and the words repaired---Barishal and
+Sylhet---are already at 0.88--0.94 for Whisper-medium, so there is little left
+for the text to fix. At clip level the fusion is a null result: 0.984 against
+0.984, with five predictions changed, two repaired and two broken.
+
+\begin{table}[ht]
+  \centering
+  \caption{Late fusion of the TF-IDF transcript classifier (Ben-10 front-end)
+  with each acoustic model. Test macro-F1; gap with 95\,\% speaker-group
+  interval.}
+  \label{tab:fusion-wm}
+  \small
+  \begin{tabular}{llcccc}
+    \toprule
+    Split & Acoustic model & Alone & With words & $\alpha$ & Gap (CI) \\
+    \midrule
+    Strict     & XLS-R          & 0.808 & 0.856 & 0.25 & $+4.8$ ($-0.3$, $+6.8$) \\
+    Strict     & Whisper-medium & 0.919 & 0.909 & 0.25 & $-1.1$ ($-2.5$, $-0.03$) \\
+    Clip-level & XLS-R          & 0.952 & 0.967 & 0.30 & $+1.5$ ($+0.9$, $+2.4$) \\
+    Clip-level & Whisper-medium & 0.984 & 0.984 & 0.40 & $+0.01$ ($-0.4$, $+0.4$) \\
+    \bottomrule
+  \end{tabular}
+\end{table}

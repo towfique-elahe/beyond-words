@@ -92,6 +92,28 @@
           0.9155,
           0.9489
         ]
+      },
+      "frozen_whisper_medium": {
+        "point": 0.9192,
+        "ci95_clip": [
+          0.9045,
+          0.9331
+        ],
+        "ci95_group": [
+          0.896,
+          0.9335
+        ]
+      },
+      "fusion_wm": {
+        "point": 0.9844,
+        "ci95_clip": [
+          0.9773,
+          0.9905
+        ],
+        "ci95_group": [
+          0.9751,
+          0.991
+        ]
       }
     },
     "gaps": {
@@ -179,6 +201,30 @@
         ],
         "p_gap_le_0_group": 1.0
       },
+      "MFCC - frozen_whisper_medium": {
+        "point": -0.1917,
+        "ci95_clip": [
+          -0.2167,
+          -0.1661
+        ],
+        "ci95_group": [
+          -0.2357,
+          -0.1671
+        ],
+        "p_gap_le_0_group": 1.0
+      },
+      "MFCC - fusion_wm": {
+        "point": -0.2569,
+        "ci95_clip": [
+          -0.2823,
+          -0.2342
+        ],
+        "ci95_group": [
+          -0.3066,
+          -0.2312
+        ],
+        "p_gap_le_0_group": 1.0
+      },
       "Whisper - XLS-R": {
         "point": -0.0346,
         "ci95_clip": [
@@ -251,6 +297,30 @@
         ],
         "p_gap_le_0_group": 0.972
       },
+      "Whisper - frozen_whisper_medium": {
+        "point": -0.002,
+        "ci95_clip": [
+          -0.0192,
+          0.015
+        ],
+        "ci95_group": [
+          -0.0193,
+          0.0149
+        ],
+        "p_gap_le_0_group": 0.595
+      },
+      "Whisper - fusion_wm": {
+        "point": -0.0671,
+        "ci95_clip": [
+          -0.0821,
+          -0.0536
+        ],
+        "ci95_group": [
+          -0.0877,
+          -0.0538
+        ],
+        "p_gap_le_0_group": 1.0
+      },
       "XLS-R - whisper_medium": {
         "point": -0.0325,
         "ci95_clip": [
@@ -311,6 +381,30 @@
         ],
         "p_gap_le_0_group": 0.026
       },
+      "XLS-R - frozen_whisper_medium": {
+        "point": 0.0326,
+        "ci95_clip": [
+          0.0171,
+          0.0492
+        ],
+        "ci95_group": [
+          0.0167,
+          0.052
+        ],
+        "p_gap_le_0_group": 0.0
+      },
+      "XLS-R - fusion_wm": {
+        "point": -0.0326,
+        "ci95_clip": [
+          -0.0438,
+          -0.0211
+        ],
+        "ci95_group": [
+          -0.0471,
+          -0.0216
+        ],
+        "p_gap_le_0_group": 1.0
+      },
       "whisper_medium - tugstugi_ben10": {
         "point": 0.004,
         "ci95_clip": [
@@ -359,6 +453,30 @@
         ],
         "p_gap_le_0_group": 0.0
       },
+      "whisper_medium - frozen_whisper_medium": {
+        "point": 0.0651,
+        "ci95_clip": [
+          0.052,
+          0.0796
+        ],
+        "ci95_group": [
+          0.0521,
+          0.0854
+        ],
+        "p_gap_le_0_group": 0.0
+      },
+      "whisper_medium - fusion_wm": {
+        "point": -0.0001,
+        "ci95_clip": [
+          -0.0029,
+          0.0029
+        ],
+        "ci95_group": [
+          -0.0037,
+          0.0038
+        ],
+        "p_gap_le_0_group": 0.555
+      },
       "tugstugi_ben10 - tugstugi": {
         "point": -0.0008,
         "ci95_clip": [
@@ -395,6 +513,30 @@
         ],
         "p_gap_le_0_group": 0.0
       },
+      "tugstugi_ben10 - frozen_whisper_medium": {
+        "point": 0.0612,
+        "ci95_clip": [
+          0.0464,
+          0.0764
+        ],
+        "ci95_group": [
+          0.0475,
+          0.0823
+        ],
+        "p_gap_le_0_group": 0.0
+      },
+      "tugstugi_ben10 - fusion_wm": {
+        "point": -0.004,
+        "ci95_clip": [
+          -0.0119,
+          0.0036
+        ],
+        "ci95_group": [
+          -0.0128,
+          0.0042
+        ],
+        "p_gap_le_0_group": 0.8395
+      },
       "tugstugi - hishab": {
         "point": 0.0799,
         "ci95_clip": [
@@ -419,6 +561,30 @@
         ],
         "p_gap_le_0_group": 0.0
       },
+      "tugstugi - frozen_whisper_medium": {
+        "point": 0.062,
+        "ci95_clip": [
+          0.0488,
+          0.0756
+        ],
+        "ci95_group": [
+          0.0487,
+          0.0823
+        ],
+        "p_gap_le_0_group": 0.0
+      },
+      "tugstugi - fusion_wm": {
+        "point": -0.0032,
+        "ci95_clip": [
+          -0.0113,
+          0.0043
+        ],
+        "ci95_group": [
+          -0.0105,
+          0.0037
+        ],
+        "p_gap_le_0_group": 0.819
+      },
       "hishab - frozen_tugstugi_ben10": {
         "point": -0.0347,
         "ci95_clip": [
@@ -428,6 +594,66 @@
         "ci95_group": [
           -0.0547,
           -0.0163
+        ],
+        "p_gap_le_0_group": 1.0
+      },
+      "hishab - frozen_whisper_medium": {
+        "point": -0.0179,
+        "ci95_clip": [
+          -0.0348,
+          -0.0006
+        ],
+        "ci95_group": [
+          -0.037,
+          0.0003
+        ],
+        "p_gap_le_0_group": 0.9725
+      },
+      "hishab - fusion_wm": {
+        "point": -0.0831,
+        "ci95_clip": [
+          -0.0988,
+          -0.0681
+        ],
+        "ci95_group": [
+          -0.1048,
+          -0.0694
+        ],
+        "p_gap_le_0_group": 1.0
+      },
+      "frozen_tugstugi_ben10 - frozen_whisper_medium": {
+        "point": 0.0168,
+        "ci95_clip": [
+          0.0012,
+          0.033
+        ],
+        "ci95_group": [
+          -0.0007,
+          0.0353
+        ],
+        "p_gap_le_0_group": 0.0295
+      },
+      "frozen_tugstugi_ben10 - fusion_wm": {
+        "point": -0.0484,
+        "ci95_clip": [
+          -0.0618,
+          -0.0352
+        ],
+        "ci95_group": [
+          -0.0673,
+          -0.036
+        ],
+        "p_gap_le_0_group": 1.0
+      },
+      "frozen_whisper_medium - fusion_wm": {
+        "point": -0.0652,
+        "ci95_clip": [
+          -0.0793,
+          -0.0516
+        ],
+        "ci95_group": [
+          -0.0855,
+          -0.0525
         ],
         "p_gap_le_0_group": 1.0
       }
@@ -535,6 +761,28 @@
           0.7247,
           0.8695
         ]
+      },
+      "frozen_whisper_medium": {
+        "point": 0.7815,
+        "ci95_clip": [
+          0.7575,
+          0.8035
+        ],
+        "ci95_group": [
+          0.662,
+          0.793
+        ]
+      },
+      "fusion_wm": {
+        "point": 0.9086,
+        "ci95_clip": [
+          0.8922,
+          0.9231
+        ],
+        "ci95_group": [
+          0.7959,
+          0.9215
+        ]
       }
     },
     "gaps": {
@@ -634,6 +882,30 @@
         ],
         "p_gap_le_0_group": 1.0
       },
+      "MFCC - frozen_whisper_medium": {
+        "point": -0.302,
+        "ci95_clip": [
+          -0.3338,
+          -0.2696
+        ],
+        "ci95_group": [
+          -0.3324,
+          -0.1901
+        ],
+        "p_gap_le_0_group": 1.0
+      },
+      "MFCC - fusion_wm": {
+        "point": -0.429,
+        "ci95_clip": [
+          -0.4591,
+          -0.4006
+        ],
+        "ci95_group": [
+          -0.5049,
+          -0.2696
+        ],
+        "p_gap_le_0_group": 1.0
+      },
       "Whisper - XLS-R": {
         "point": -0.0151,
         "ci95_clip": [
@@ -718,6 +990,30 @@
         ],
         "p_gap_le_0_group": 0.871
       },
+      "Whisper - frozen_whisper_medium": {
+        "point": 0.0118,
+        "ci95_clip": [
+          -0.0106,
+          0.0353
+        ],
+        "ci95_group": [
+          -0.0051,
+          0.045
+        ],
+        "p_gap_le_0_group": 0.0605
+      },
+      "Whisper - fusion_wm": {
+        "point": -0.1152,
+        "ci95_clip": [
+          -0.1377,
+          -0.0935
+        ],
+        "ci95_group": [
+          -0.1843,
+          -0.0333
+        ],
+        "p_gap_le_0_group": 1.0
+      },
       "XLS-R - XLS-R+aug": {
         "point": 0.0602,
         "ci95_clip": [
@@ -790,6 +1086,30 @@
         ],
         "p_gap_le_0_group": 0.669
       },
+      "XLS-R - frozen_whisper_medium": {
+        "point": 0.0269,
+        "ci95_clip": [
+          -0.0002,
+          0.0531
+        ],
+        "ci95_group": [
+          -0.0023,
+          0.1003
+        ],
+        "p_gap_le_0_group": 0.035
+      },
+      "XLS-R - fusion_wm": {
+        "point": -0.1001,
+        "ci95_clip": [
+          -0.1221,
+          -0.0791
+        ],
+        "ci95_group": [
+          -0.1532,
+          -0.0044
+        ],
+        "p_gap_le_0_group": 0.986
+      },
       "XLS-R+aug - whisper_medium": {
         "point": -0.171,
         "ci95_clip": [
@@ -850,6 +1170,30 @@
         ],
         "p_gap_le_0_group": 0.9065
       },
+      "XLS-R+aug - frozen_whisper_medium": {
+        "point": -0.0333,
+        "ci95_clip": [
+          -0.0608,
+          -0.0053
+        ],
+        "ci95_group": [
+          -0.0619,
+          0.0508
+        ],
+        "p_gap_le_0_group": 0.627
+      },
+      "XLS-R+aug - fusion_wm": {
+        "point": -0.1603,
+        "ci95_clip": [
+          -0.1846,
+          -0.1375
+        ],
+        "ci95_group": [
+          -0.2168,
+          -0.04
+        ],
+        "p_gap_le_0_group": 1.0
+      },
       "whisper_medium - tugstugi_ben10": {
         "point": -0.0016,
         "ci95_clip": [
@@ -898,6 +1242,30 @@
         ],
         "p_gap_le_0_group": 0.0
       },
+      "whisper_medium - frozen_whisper_medium": {
+        "point": 0.1377,
+        "ci95_clip": [
+          0.1158,
+          0.1611
+        ],
+        "ci95_group": [
+          0.0653,
+          0.2229
+        ],
+        "p_gap_le_0_group": 0.0
+      },
+      "whisper_medium - fusion_wm": {
+        "point": 0.0107,
+        "ci95_clip": [
+          -0.0028,
+          0.0238
+        ],
+        "ci95_group": [
+          0.0003,
+          0.025
+        ],
+        "p_gap_le_0_group": 0.023
+      },
       "tugstugi_ben10 - tugstugi": {
         "point": 0.0127,
         "ci95_clip": [
@@ -934,6 +1302,30 @@
         ],
         "p_gap_le_0_group": 0.0
       },
+      "tugstugi_ben10 - frozen_whisper_medium": {
+        "point": 0.1393,
+        "ci95_clip": [
+          0.1164,
+          0.1628
+        ],
+        "ci95_group": [
+          0.0547,
+          0.2057
+        ],
+        "p_gap_le_0_group": 0.0
+      },
+      "tugstugi_ben10 - fusion_wm": {
+        "point": 0.0122,
+        "ci95_clip": [
+          -0.0056,
+          0.0304
+        ],
+        "ci95_group": [
+          -0.0356,
+          0.0351
+        ],
+        "p_gap_le_0_group": 0.371
+      },
       "tugstugi - hishab": {
         "point": 0.1618,
         "ci95_clip": [
@@ -958,6 +1350,30 @@
         ],
         "p_gap_le_0_group": 0.0
       },
+      "tugstugi - frozen_whisper_medium": {
+        "point": 0.1266,
+        "ci95_clip": [
+          0.1055,
+          0.1491
+        ],
+        "ci95_group": [
+          0.0636,
+          0.1874
+        ],
+        "p_gap_le_0_group": 0.0
+      },
+      "tugstugi - fusion_wm": {
+        "point": -0.0004,
+        "ci95_clip": [
+          -0.0174,
+          0.0167
+        ],
+        "ci95_group": [
+          -0.0368,
+          0.0296
+        ],
+        "p_gap_le_0_group": 0.5245
+      },
       "hishab - frozen_tugstugi_ben10": {
         "point": -0.1104,
         "ci95_clip": [
@@ -969,6 +1385,66 @@
           0.0038
         ],
         "p_gap_le_0_group": 0.961
+      },
+      "hishab - frozen_whisper_medium": {
+        "point": -0.0351,
+        "ci95_clip": [
+          -0.061,
+          -0.0087
+        ],
+        "ci95_group": [
+          -0.0751,
+          0.0341
+        ],
+        "p_gap_le_0_group": 0.767
+      },
+      "hishab - fusion_wm": {
+        "point": -0.1622,
+        "ci95_clip": [
+          -0.1851,
+          -0.1399
+        ],
+        "ci95_group": [
+          -0.2561,
+          -0.0514
+        ],
+        "p_gap_le_0_group": 1.0
+      },
+      "frozen_tugstugi_ben10 - frozen_whisper_medium": {
+        "point": 0.0753,
+        "ci95_clip": [
+          0.0523,
+          0.0978
+        ],
+        "ci95_group": [
+          0.0041,
+          0.123
+        ],
+        "p_gap_le_0_group": 0.0115
+      },
+      "frozen_tugstugi_ben10 - fusion_wm": {
+        "point": -0.0518,
+        "ci95_clip": [
+          -0.0724,
+          -0.0319
+        ],
+        "ci95_group": [
+          -0.1102,
+          -0.0259
+        ],
+        "p_gap_le_0_group": 1.0
+      },
+      "frozen_whisper_medium - fusion_wm": {
+        "point": -0.1271,
+        "ci95_clip": [
+          -0.1499,
+          -0.1036
+        ],
+        "ci95_group": [
+          -0.2075,
+          -0.0542
+        ],
+        "p_gap_le_0_group": 1.0
       }
     }
   }

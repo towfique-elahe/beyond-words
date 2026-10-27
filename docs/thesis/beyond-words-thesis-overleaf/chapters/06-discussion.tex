@@ -50,26 +50,29 @@ on its own, that suggested end-to-end adaptation mainly buys channel
 exploitation. The Phase 6 runs (\cref{sec:res-encoders}) show that the
 suggestion was an artefact of comparing two different encoders.
 
-Held on one checkpoint, fine-tuning is clearly worth it: Tugstugi (Ben-10)
-goes from 0.857 frozen to 0.921 fine-tuned under the strict split, a
-significant 6.4-point gain, and the fine-tuned model's leakage drop (6.0) is
-smaller than the frozen one's (7.9), not larger. What the first comparison
+Held on one checkpoint, fine-tuning is clearly worth it: Whisper-medium goes
+from 0.782 frozen to 0.919 fine-tuned under the strict split, a 13.8-point
+gain, and Tugstugi (Ben-10) from 0.857 to 0.921; both are significant, and in
+both cases the fine-tuned model's leakage drop is smaller than the frozen
+one's (13.8 to 6.5, and 7.9 to 6.0), not larger. What the first comparison
 measured was the encoder. XLS-R-300M, pretrained by contrastive
 self-supervision on raw audio, is the model that exploits speaker and channel
-overlap; the Whisper-medium family, pretrained to transcribe, loses only
-6--7 points from the clip-level to the strict split and reaches 0.92 on
-speakers it has never heard. The practical lesson changes accordingly:
-choose an encoder whose pretraining targets the content of speech, and then
-fine-tune it; a frozen baseline still protects against shortcut learning, but
-it is not a substitute.
+overlap when fine-tuned; the Whisper-medium family, pretrained to transcribe,
+loses only 6--7 points from the clip-level to the strict split once fine-tuned
+and reaches 0.92 on speakers it has never heard. The practical lesson changes
+accordingly: choose an encoder whose pretraining targets the content of
+speech, and then fine-tune it; a frozen baseline still protects against
+shortcut learning, but it is not a substitute.
 
 Two further findings follow from \cref{tab:encoders}. First, Bangla-specific
-pretraining adds nothing measurable here: Whisper-medium, its standard-Bangla
-adaptation (Tugstugi) and its dialect adaptation (Tugstugi (Ben-10)) are
-within two points of each other with every interval straddling zero. Whatever
-the Bangla speech-recognition fine-tuning taught those encoders about Bangla
-phonetics, the dialect fine-tuning recovers from the multilingual model on
-its own. Second, architecture and size matter more than language: Hishab's
+pretraining helps a frozen encoder but not a fine-tuned one. Frozen, the
+dialect-adapted Tugstugi (Ben-10) beats frozen Whisper-medium by 7.5 strict
+points, and frozen Whisper-medium is no better than frozen Whisper-small;
+fine-tuned, Whisper-medium, Tugstugi and Tugstugi (Ben-10) are within two
+points of each other with every interval straddling zero. Whatever the Bangla
+speech-recognition fine-tuning taught those encoders about Bangla phonetics,
+the dialect fine-tuning recovers from the multilingual model on its own.
+Second, architecture and size matter more than language: Hishab's
 Bangla FastConformer, a quarter of the size and trained with a CTC objective
 on broadcast news, scores below frozen Whisper-small under the strict split
 and shows the largest leakage drop of any pretrained model. Whether that
@@ -130,16 +133,22 @@ thresholds. Word matching keeps its value as an \emph{explanation}---it shows
 which words decided a clip and how strongly each belongs to each region---rather
 than as the classifier.
 
-\paragraph{Words and sound are complementary, modestly.} Fusion raises the
-honest headline from 0.808 to 0.856, a gain that is borderline under the
-speaker-group bootstrap (a 4\,\% probability of no gain), and the clip-level
-score from 0.952 to 0.967, which is significant. The gain lands where the
-acoustic model is weakest under the strict split---Barishal (+21 points) and
-Sylhet (+8), the dialect with the most distinctive and best-transcribed
-vocabulary---and is negative only for Khulna, where the acoustics are already
-near perfect. The two routes fail on different clips, which is the condition
-under which fusion helps, and this is evidence that the text carries dialect
-information of its own rather than a noisier copy of the acoustic decision.
+\paragraph{Words and sound are complementary only while the acoustic model
+is weak.} With XLS-R, fusion raises the strict-split score from 0.808 to
+0.856, a gain that is borderline under the speaker-group bootstrap (a 4\,\%
+probability of no gain), and the clip-level score from 0.952 to 0.967, which
+is significant. The gain lands where XLS-R is weakest under the strict
+split---Barishal (+21 points) and Sylhet (+8), the dialect with the most
+distinctive and best-transcribed vocabulary---and is negative only for
+Khulna, where the acoustics are already near perfect. The two routes fail on
+different clips, which is the condition under which fusion helps, and this is
+evidence that the text carries dialect information of its own rather than a
+noisier copy of the acoustic decision. With fine-tuned Whisper-medium as the
+partner, however, the same words lower the strict-split score from 0.919 to
+0.909 (\cref{sec:res-fusion-wm}): the classes the text could repair are
+already solved, and what the text adds elsewhere is noise. The information in
+the words is real but largely a subset of what a strong acoustic encoder
+already extracts from the signal.
 
 \paragraph{The answer.} For clips this short, dialect identity lies
 \emph{mostly beyond the words}. Words alone (0.633) sit between hand-crafted
@@ -173,11 +182,11 @@ at the cost of the off-the-shelf setting that makes the comparison clean.
         one schedule (12 or 20 epochs); Hishab's FastConformer in particular
         may be under-trained, and none of the Whisper-medium runs explored
         learning rates or longer inputs.
-  \item \textbf{Fusion was built on XLS-R.} The lexical route's fusion
-        partner was the best acoustic model at the time; the Whisper-medium
-        family alone (0.92) now exceeds the XLS-R-plus-text fusion (0.856), and
-        whether the words still add anything to the stronger acoustic model
-        has not been tested.
+  \item \textbf{Fusion is late and single-seeded.} Only log-linear late
+        fusion with one weight was tried; a joint model (text features into the
+        acoustic head) or a confidence-gated combination might behave
+        differently with the Whisper-medium partner, and $\alpha$ was chosen
+        on a validation split whose gains did not transfer.
   \item \textbf{Single-seed fine-tuning.} Each XLS-R result is one seed; the
         bootstrap intervals cover test-set sampling noise, not training-seed
         variance.
@@ -224,7 +233,9 @@ at the cost of the off-the-shelf setting that makes the comparison clean.
         estimate.
   \item Larger encoders (Whisper-large, XLS-R-1B, MMS) within the same
         free-GPU budget, and repeated seeds for the Phase 6 models.
-  \item Fusion of the lexical route with the Whisper-medium family.
+  \item Joint rather than late fusion of the lexical route with the
+        Whisper-medium family, and a test of whether the words help on longer
+        clips.
   \item Longer inputs, and aggregation of clip decisions to speaker or
         recording level.
   \item Cross-domain evaluation on conversational and telephone speech.

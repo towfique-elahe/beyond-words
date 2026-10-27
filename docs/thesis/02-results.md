@@ -123,7 +123,7 @@ run on a T4, ~9 GPU-hours in all) plus frozen rows for two of them.
 |---|---|---|---|---|
 | MFCC statistics + MLP | — | 0.727 (0.676–0.753) | 0.480 (0.368–0.552) | 24.8 |
 | Whisper-small, frozen + MLP | multilingual | 0.917 (0.894–0.932) | 0.793 (0.688–0.808) | 12.4 |
-| Whisper-medium, frozen + MLP | multilingual | *pending* | *pending* | |
+| Whisper-medium, frozen + MLP | multilingual | 0.919 (0.896–0.934) | 0.782 (0.662–0.793) | 13.8 |
 | Tugstugi (Ben-10), frozen + MLP | Bangla | 0.936 (0.916–0.949) | 0.857 (0.725–0.870) | 7.9 |
 | XLS-R-300M, fine-tuned | multilingual | 0.952 (0.935–0.963) | 0.808 (0.717–0.838) | 14.4 |
 | Whisper-medium, fine-tuned | multilingual | **0.984** (0.975–0.991) | 0.919 (0.808–0.931) | 6.5 |
@@ -135,13 +135,18 @@ run on a T4, ~9 GPU-hours in all) plus frozen rows for two of them.
    +1.5 to +16.8, P(≤0) = 0.005); Tugstugi +10.0 (+0.7 to +14.4); Tugstugi
    (Ben-10) +11.2 (−0.6 to +16.3, P = 0.04, widened by the single-cluster
    Barishal cell). Clip-level gains +2.9 to +3.3, all significant.
-2. **The three Whisper-medium checkpoints are indistinguishable**: pairwise
-   strict gaps −0.2 / +1.1 / +1.3, every CI straddling zero.
-3. **Fine-tuning helps on the same checkpoint**: Tugstugi (Ben-10) 0.857 → 0.921
-   strict (+6.4, CI +3.6 to +10.4), 0.936 → 0.980 clip (+4.4, CI +3.3 to +6.4).
-   The Phase 3 "frozen ≈ fine-tuned under strict" finding was an encoder effect.
-4. **Leakage drop halves** for the Whisper-medium family (6.0–7.3 vs 12.4 / 14.4);
-   the frozen Tugstugi row drops 7.9, so the robustness belongs to the encoder.
+2. **Fine-tuned, the three Whisper-medium checkpoints are indistinguishable**
+   (pairwise strict gaps −0.2 / +1.1 / +1.3, every CI straddling zero); frozen,
+   Tugstugi (Ben-10) beats Whisper-medium by +7.5 strict (CI +0.4 to +12.3) and
+   frozen Whisper-medium ≈ frozen Whisper-small (0.782 vs 0.793).
+3. **Fine-tuning helps on the same checkpoint**: Whisper-medium 0.782 → 0.919
+   strict (+13.8, CI +6.5 to +22.3), 0.919 → 0.984 clip (+6.5, CI +5.2 to +8.5);
+   Tugstugi (Ben-10) 0.857 → 0.921 (+6.4, CI +3.6 to +10.4), 0.936 → 0.980
+   (+4.4, CI +3.3 to +6.4). The Phase 3 "frozen ≈ fine-tuned under strict"
+   finding was an encoder effect.
+4. **Fine-tuning a transcription-pretrained encoder halves the leakage drop**:
+   Whisper-medium 13.8 frozen → 6.5 fine-tuned (XLS-R: 14.4 fine-tuned); the
+   Bangla-adapted Tugstugi (Ben-10) is already robust frozen (7.9 → 6.0).
 5. **Hishab FastConformer is the weakest pretrained model** (0.746 strict, 6.2
    below XLS-R, CI −14.7 to −0.2; 115M params, 18 × 512, CTC, news; best epoch
    18/20; drop 15.5).
@@ -149,7 +154,12 @@ run on a T4, ~9 GPU-hours in all) plus frozen rows for two of them.
 Per-class strict (XLS-R → Whisper-medium / Tugstugi (Ben-10)): Barishal 0.508 →
 0.882 / 0.927; Sylhet 0.750 → 0.937 / 0.947; Khulna 0.957 → 0.971 / 0.924. Val
 macro-F1 stays below test for all models under strict (0.76–0.80 vs 0.91–0.92).
-Fusion in §5.6 remains with XLS-R; fusion with Whisper-medium untested.
+Fusion with Whisper-medium (TF-IDF on Ben-10 transcripts, α re-tuned on val):
+strict 0.909 vs 0.919 alone (−1.1, CI −2.5 to −0.03; val 0.803 → 0.847 so
+α = 0.25 is chosen but the gain does not transfer; 102 predictions changed,
+38 fixed / 50 broken); clip-level 0.984 vs 0.984 (+0.01, CI −0.4 to +0.4; 5
+changed, 2 fixed / 2 broken). Artifacts
+`reports/phase6/metrics_tugstugi_ben10__fusion_whisper_medium_{strict,clip}.json`.
 
 ## 5.6 The lexical route: words versus sound
 

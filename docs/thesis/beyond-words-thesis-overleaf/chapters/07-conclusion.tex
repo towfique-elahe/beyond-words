@@ -13,9 +13,10 @@ Whisper-small embeddings reach a macro-F1 of 0.917, fine-tuned XLS-R-300M
 0.952 and fine-tuned Whisper-medium 0.984, against 0.727 for MFCC statistics.
 Frozen Whisper embeddings trained on 10\,\% of the labels outperform MFCC
 features trained on all of them. Among encoders, size and a transcription
-pretraining objective matter more than Bangla-specific pretraining: the three
-Whisper-medium checkpoints, multilingual or adapted to Bangla, are
-indistinguishable, and a smaller Bangla FastConformer trails them by far.
+pretraining objective matter more than Bangla-specific pretraining: once
+fine-tuned, the three Whisper-medium checkpoints, multilingual or adapted to
+Bangla, are indistinguishable (the adaptation helps only while the encoder is
+frozen), and a smaller Bangla FastConformer trails them by far.
 
 \paragraph{RQ2: the effect of leakage.} A strict split built from ECAPA-TDNN
 pseudo-speaker clusters, calibrated against the known sources of the Formal
@@ -23,7 +24,8 @@ clips, lowers frozen Whisper-small and fine-tuned XLS-R to 0.793 and 0.808:
 12--14 points of their clip-level scores came from speaker and channel
 overlap. The Whisper-medium family loses only 6--7 points and keeps 0.92 on
 unseen speakers, the honest headline of this thesis. Fine-tuning a given
-encoder helps under both protocols (Tugstugi (Ben-10): 0.857 to 0.921 strict),
+encoder helps under both protocols (Whisper-medium: 0.782 to 0.919 strict;
+Tugstugi (Ben-10): 0.857 to 0.921),
 and channel-suppression augmentation that perturbs pitch and tempo lowers
 XLS-R's score to 0.748.
 
@@ -35,11 +37,14 @@ into the standard form. Matching regional word lists therefore identifies the
 dialect poorly (0.360 under the strict split), and a text classifier over the
 full transcript reaches 0.633---between hand-crafted and pretrained acoustics.
 
-\paragraph{RQ4: complementarity.} The routes are complementary, modestly.
-Combining the text classifier with the acoustic model raises the strict-split
-score from 0.808 to 0.856 (borderline under the speaker-group bootstrap) and the
-clip-level score from 0.952 to 0.967 (significant). The gain is largest on the
-classes the acoustic model finds hardest.
+\paragraph{RQ4: complementarity.} The routes are complementary only while
+the acoustic model is weak. Combining the text classifier with XLS-R raises the
+strict-split score from 0.808 to 0.856 (borderline under the speaker-group
+bootstrap) and the clip-level score from 0.952 to 0.967 (significant), with the
+gain largest on the classes XLS-R finds hardest. Combined with fine-tuned
+Whisper-medium, the same words lower the strict-split score from 0.919 to
+0.909: what the transcripts carry is largely a subset of what a strong acoustic
+encoder already extracts.
 
 \medskip
 The overall conclusion is that, on clips this short, Bangla dialect identity lies
@@ -47,8 +52,8 @@ mostly \emph{beyond the words}: in pronunciation, rhythm and intonation that
 pretrained speech models capture and that speech recognition trained on the
 standard language discards. The honest headline for this corpus is 0.92 from
 sound alone (fine-tuned Whisper-medium), on speakers the models have never
-heard; with the earlier XLS-R model, adding the words raised 0.808 to 0.856,
-and whether they add to the stronger model remains to be tested.
+heard; adding the words helped the earlier XLS-R model (0.808 to 0.856) but
+not the stronger one.
 Two practical lessons extend beyond Bangla: dialect and accent scores on found
 data should be reported under a speaker-disjoint protocol, because the
 clip-level numbers flatter every model and some more than others; and text-based
