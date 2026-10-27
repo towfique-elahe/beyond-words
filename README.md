@@ -266,7 +266,7 @@ Test macro-F1 with 95 % speaker-group bootstrap CIs (`reports/phase6/summary.csv
 |---|---|---|---|---|
 | MFCC statistics + MLP | — | 0.727 (0.676–0.753) | 0.480 (0.368–0.552) | 24.8 |
 | Whisper-small, frozen + MLP | multilingual | 0.917 (0.894–0.932) | 0.793 (0.688–0.808) | 12.4 |
-| Whisper-medium, frozen + MLP | multilingual | *pending* | *pending* | |
+| Whisper-medium, frozen + MLP | multilingual | 0.919 (0.896–0.934) | 0.782 (0.662–0.793) | 13.8 |
 | Tugstugi (Ben-10), frozen + MLP | Bangla | 0.936 (0.916–0.949) | 0.857 (0.725–0.870) | 7.9 |
 | XLS-R-300M, fine-tuned | multilingual | 0.952 (0.935–0.963) | 0.808 (0.717–0.838) | 14.4 |
 | Whisper-medium, fine-tuned | multilingual | **0.984** (0.975–0.991) | 0.919 (0.808–0.931) | 6.5 |
@@ -281,19 +281,25 @@ Test macro-F1 with 95 % speaker-group bootstrap CIs (`reports/phase6/summary.csv
 - **New honest headline: 0.92.** Fine-tuned Whisper-medium beats XLS-R by 11.1
   points under the strict split (group CI +1.5 to +16.8) and by 3.3 at clip
   level (CI +2.2 to +4.7). Barishal, XLS-R's worst class (0.51), reaches 0.88–0.93.
-- **Fine-tuning helps on the same checkpoint**: Tugstugi (Ben-10) frozen 0.857 →
-  fine-tuned 0.921 strict (CI +3.6 to +10.4). The earlier "frozen Whisper-small ≈
-  fine-tuned XLS-R under the strict split" finding was an encoder effect, not a
-  regime effect.
-- **Bangla-specific pretraining adds nothing measurable**: Whisper-medium, Tugstugi
-  and Tugstugi (Ben-10) are within 1.3 points of each other with every CI
-  straddling zero.
-- **The leakage drop halves** for the Whisper-medium family (6–7 points vs 12–14),
-  and is largest for Hishab's CTC-trained FastConformer (15.5), the weakest
-  pretrained model (0.746 strict; 115M parameters, best epoch 18/20).
+- **Fine-tuning helps on the same checkpoint**: Whisper-medium frozen 0.782 →
+  fine-tuned 0.919 strict (CI +6.5 to +22.3); Tugstugi (Ben-10) 0.857 → 0.921
+  (CI +3.6 to +10.4). The earlier "frozen Whisper-small ≈ fine-tuned XLS-R under
+  the strict split" finding was an encoder effect, not a regime effect.
+- **Bangla-specific pretraining helps frozen, not fine-tuned**: frozen Tugstugi
+  (Ben-10) beats frozen Whisper-medium by 7.5 strict points (CI +0.4 to +12.3),
+  but fine-tuned Whisper-medium, Tugstugi and Tugstugi (Ben-10) are within 1.3
+  points of each other with every CI straddling zero.
+- **Fine-tuning a transcription-pretrained encoder halves the leakage drop**
+  (Whisper-medium 13.8 frozen → 6.5 fine-tuned; XLS-R stays at 14.4). The drop is
+  largest for Hishab's CTC-trained FastConformer (15.5), the weakest pretrained
+  model (0.746 strict; 115M parameters, best epoch 18/20).
 - Each Whisper-medium run took 64–76 min on a T4 (12 epochs); the eight runs
-  used ~9 GPU-hours. Fusion in Phase 5 below is still with XLS-R; fusion with
-  Whisper-medium has not been run.
+  used ~9 GPU-hours.
+- **Fusion with the words no longer helps once the acoustic model is this strong**:
+  the Phase 5 late fusion repeated with Whisper-medium as the partner scores
+  0.909 strict vs 0.919 alone (−1.1, CI −2.5 to −0.03; 38 predictions fixed, 50
+  broken) and 0.984 vs 0.984 clip-level (±0.0). With XLS-R it had given +4.8 / +1.5
+  (`reports/phase6/metrics_tugstugi_ben10__fusion_whisper_medium_*.json`).
 
 ## Lexical route (Phase 5: is the dialect in the words or in the sound?)
 

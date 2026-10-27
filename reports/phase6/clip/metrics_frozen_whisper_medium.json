@@ -1,0 +1,18 @@
+{
+  "embeddings": "embeddings_whisper_medium.npz",
+  "seed": 42,
+  "epochs": 60,
+  "val_macroF1": 0.9157862061256457,
+  "test_macroF1": 0.9191887388487606,
+  "per_class_F1": {
+    "Barishal": 0.8876712328767123,
+    "Chattogram": 0.8687782805429864,
+    "Dhaka": 0.9357798165137615,
+    "Formal": 0.9578059071729957,
+    "Khulna": 0.9813084112149533,
+    "Mymensingh": 0.8758620689655172,
+    "Noakhali": 0.8530259365994236,
+    "Rajshahi": 0.9516129032258065,
+    "Sylhet": 0.9608540925266904
+  }
+}
