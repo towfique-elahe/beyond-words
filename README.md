@@ -23,7 +23,7 @@ Classifying regional Bangla accents from short audio clips. v2 replaces the orig
 | Sylhet | 958 |
 | **Total** | **9,303** (~13.1 hours; 2 duplicate `.ogg` files in Formal are excluded) |
 
-Clips are `.wav`, standardized to 16 kHz mono PCM-16, and nominally 5 s long (median 5.0 s; 1,067 fall outside 4.5–5.5 s, range 1.1–8.0 s). Audio was collected from TV shows, films, and online content, originally in mp4.
+Clips are `.wav`, standardized to 16 kHz mono PCM-16, and nominally 5 s long (median 5.0 s; 1,067 fall outside 4.5–5.5 s, range 1.1–8.0 s). Audio was collected from TV shows, films, and online content, originally in mp4. The corpus was gathered for two earlier Bangla accent-classification studies, Badhon et al. (2020) [1] and Alam et al. (2023) [2] (see Acknowledgements); it is not redistributed here.
 
 **Note on "Formal":** Formal is a *speech register* (standard/prescribed Bangla), not a regional category. Treating it as a ninth class is a deliberate design choice, discussed in the thesis.
 
@@ -460,6 +460,11 @@ Generated artifacts (manifests, `embeddings.npz`, `ecapa_embeddings.npz`,
 git — regenerate them with the pipeline above.
 
 ## Acknowledgements
+
+The speech corpus was gathered for the following studies, which this project builds on:
+
+1. S. M. S. I. Badhon, H. Rahaman, F. R. Rupon, and S. Abujar, "Bengali Accent Classification from Speech Using Different Machine Learning and Deep Learning Techniques," *Advances in Intelligent Systems and Computing*, Springer Singapore, pp. 503–513, 2020. doi: [10.1007/978-981-15-7394-1_46](https://doi.org/10.1007/978-981-15-7394-1_46).
+2. K. Alam, M. H. Bhuiyan, and M. F. Monir, "Bangla Speaker Accent Variation Classification from Audio Using Deep Neural Networks: A Distinct Approach," *TENCON 2023 – 2023 IEEE Region 10 Conference*, IEEE, 2023. doi: [10.1109/tencon58879.2023.10322411](https://doi.org/10.1109/tencon58879.2023.10322411).
 
 Built on [OpenAI Whisper](https://github.com/openai/whisper) encoders, [XLS-R](https://huggingface.co/facebook/wav2vec2-xls-r-300m) fine-tuning via the Hugging Face `transformers` ecosystem, [SpeechBrain](https://speechbrain.github.io/)'s ECAPA-TDNN for speaker clustering, and [audiomentations](https://github.com/iver56/audiomentations) for the augmentation study.
 
