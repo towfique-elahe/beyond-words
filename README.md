@@ -6,6 +6,8 @@ Classifying regional Bangla accents from short audio clips. v2 replaces the orig
 
 > Thesis: *A Neural Network Approach to Classifying Bangla Accentual Diversity* — framed as a Dialect Identification (DID) task.
 
+> **Live demo:** [huggingface.co/spaces/towfiqueelahe/beyond-words-dialect-id](https://huggingface.co/spaces/towfiqueelahe/beyond-words-dialect-id) (fine-tuned Whisper-medium, strict checkpoint; record or upload Bangla speech). Weights: [towfiqueelahe/beyond-words-whisper-medium-did](https://huggingface.co/towfiqueelahe/beyond-words-whisper-medium-did). Defence deck: `docs/defence/index.html`.
+
 ---
 
 ## Dialect classes (9)
@@ -430,6 +432,11 @@ The project runs on a zero-hardware budget. Phases 0–1 were developed on an **
 ├── summarize_phase6.py    # Phase 6: every acoustic model x split
 ├── make_phase5_figures.py # Phase 5 figures
 ├── make_phase6_figures.py # Phase 6 figure
+├── make_dataset_figures.py # thesis Ch. 3: class sizes, durations, spectrograms, LTAS, pseudo-speaker groups
+├── make_results_figures.py # thesis Ch. 5: metric heatmap, confusions, curves, forest plot, t-SNE frozen vs fine-tuned
+├── dump_embeddings.py     # pooled encoder embeddings of a fine-tuned checkpoint (for t-SNE)
+├── export_hf_model.py     # export a fine-tuned Whisper classifier to Hugging Face format
+├── app/                   # Gradio demo (Hugging Face Space): record or upload speech -> dialect
 ├── splits/                # committed splits (relative paths, reproducibility)
 │   ├── manifest_split_rel.csv         # canonical clip-level split
 │   └── manifest_split_strict_rel.csv  # Phase 3 strict pseudo-speaker split
