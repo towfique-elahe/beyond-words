@@ -1,341 +1,448 @@
-% Author lists, venues and years were checked against arXiv, Crossref, NCBI and
-% Mendeley records on 2026-10-27. Remaining [Verify] notes mark model cards
-% without a paper.
+% Keys follow LastnameYEARKeyword (first author's surname, year, first meaningful
+% title word). Author names as initials + surname. Style: IEEEtran (numeric).
 
 % ---------------- Dialect / language / speaker identification ----------------
-@inproceedings{snyder2018xvectors,
-  author    = {Snyder, David and Garcia-Romero, Daniel and Sell, Gregory and Povey, Daniel and Khudanpur, Sanjeev},
-  title     = {X-Vectors: Robust {DNN} Embeddings for Speaker Recognition},
-  booktitle = {Proceedings of ICASSP},
+@inproceedings{Snyder2018Xvectors,
+  author    = {D. Snyder and D. Garcia-Romero and G. Sell and D. Povey and S. Khudanpur},
+  title     = {X-vectors: Robust {DNN} embeddings for speaker recognition},
+  booktitle = {Proc. IEEE Int. Conf. Acoust., Speech Signal Process. (ICASSP)},
+  address   = {Calgary, AB, Canada},
+  year      = {2018},
+  month     = {Apr.},
   pages     = {5329--5333},
-  year      = {2018}
+  doi       = {10.1109/ICASSP.2018.8461375}
 }
-@inproceedings{ali2019mgb5,
-  author    = {Ali, Ahmed and Shon, Suwon and Samih, Younes and Mubarak, Hamdy and Abdelali, Ahmed and Glass, James and Renals, Steve and Choukri, Khalid},
-  title     = {The {MGB-5} Challenge: Recognition and Dialect Identification of Dialectal {Arabic} Speech},
-  booktitle = {Proceedings of IEEE ASRU},
-  year      = {2019}
+@inproceedings{Ali2019MGB5,
+  author    = {A. Ali and S. Shon and Y. Samih and H. Mubarak and A. Abdelali and J. Glass and S. Renals and K. Choukri},
+  title     = {The {MGB-5} challenge: Recognition and dialect identification of dialectal {Arabic} speech},
+  booktitle = {Proc. IEEE Autom. Speech Recognit. Understanding Workshop (ASRU)},
+  address   = {Singapore},
+  year      = {2019},
+  month     = {Dec.},
+  pages     = {1026--1033},
+  doi       = {10.1109/ASRU46091.2019.9003960}
 }
-@incollection{khaled2025arabic,
-  author    = {Khaled, M. Moneb and Elnagar, Ashraf},
-  title     = {{Arabic} Dialect Audio Identification Using {Wav2Vec2}},
+@incollection{Khaled2025Arabic,
+  author    = {M. M. Khaled and A. Elnagar},
+  title     = {{Arabic} dialect audio identification using {Wav2Vec2}},
   booktitle = {Communications in Computer and Information Science},
   publisher = {Springer},
+  address   = {Cham, Switzerland},
   year      = {2025},
   doi       = {10.1007/978-3-031-80438-0_6}
 }
-@misc{sullivan2023robustness,
-  author       = {Sullivan, Peter and Elmadany, AbdelRahim and Abdul-Mageed, Muhammad},
-  title        = {On the Robustness of {Arabic} Speech Dialect Identification},
+@misc{Sullivan2023Robustness,
+  author       = {P. Sullivan and A. Elmadany and M. Abdul-Mageed},
+  title        = {On the robustness of {Arabic} speech dialect identification},
   howpublished = {arXiv:2306.03789},
-  year         = {2023}
+  year         = {2023},
+  month        = {Jun.},
+  doi          = {10.48550/arXiv.2306.03789}
 }
-@inproceedings{hamalainen2021finnish,
-  author    = {Hämäläinen, Mika and Alnajjar, Khalid and Partanen, Niko and Rueter, Jack},
-  title     = {{Finnish} Dialect Identification: The Effect of Audio and Text},
-  booktitle = {Proceedings of EMNLP},
+@inproceedings{Hamalainen2021Finnish,
+  author    = {M. H{\"a}m{\"a}l{\"a}inen and K. Alnajjar and N. Partanen and J. Rueter},
+  title     = {{Finnish} dialect identification: The effect of audio and text},
+  booktitle = {Proc. Conf. Empirical Methods Natural Lang. Process. (EMNLP)},
+  address   = {Punta Cana, Dominican Republic},
   year      = {2021},
-  note      = {arXiv:2111.03800}
+  month     = {Nov.},
+  pages     = {8777--8783},
+  doi       = {10.18653/v1/2021.emnlp-main.692}
 }
-@inproceedings{valk2021voxlingua,
-  author    = {Valk, Jörgen and Alumäe, Tanel},
-  title     = {{VoxLingua107}: A Dataset for Spoken Language Recognition},
-  booktitle = {Proceedings of IEEE SLT},
-  year      = {2021}
+@inproceedings{Valk2021VoxLingua107,
+  author    = {J. Valk and T. Alum{\"a}e},
+  title     = {{VoxLingua107}: A dataset for spoken language recognition},
+  booktitle = {Proc. IEEE Spoken Lang. Technol. Workshop (SLT)},
+  address   = {Shenzhen, China},
+  year      = {2021},
+  month     = {Jan.},
+  pages     = {652--658},
+  doi       = {10.1109/SLT48900.2021.9383459}
 }
-@inproceedings{kukk2022accented,
-  author    = {Kukk, Kunnar and Alumäe, Tanel},
-  title     = {Improving Language Identification of Accented Speech},
-  booktitle = {Proceedings of Interspeech},
+@inproceedings{Kukk2022Improving,
+  author    = {K. Kukk and T. Alum{\"a}e},
+  title     = {Improving language identification of accented speech},
+  booktitle = {Proc. Interspeech},
+  address   = {Incheon, Korea},
   year      = {2022},
-  note      = {arXiv:2203.16972}
+  month     = {Sep.},
+  pages     = {1288--1292},
+  doi       = {10.21437/Interspeech.2022-10455}
 }
 
 % ---------------- Pretrained speech representations ----------------
-@inproceedings{baevski2020wav2vec,
-  author    = {Baevski, Alexei and Zhou, Yuhao and Mohamed, Abdelrahman and Auli, Michael},
-  title     = {wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations},
-  booktitle = {Advances in Neural Information Processing Systems},
+@inproceedings{Baevski2020wav2vec,
+  author    = {A. Baevski and Y. Zhou and A. Mohamed and M. Auli},
+  title     = {wav2vec 2.0: A framework for self-supervised learning of speech representations},
+  booktitle = {Proc. Adv. Neural Inf. Process. Syst. (NeurIPS)},
   volume    = {33},
-  year      = {2020}
+  year      = {2020},
+  month     = {Dec.},
+  pages     = {12449--12460}
 }
-@inproceedings{babu2022xlsr,
-  author    = {Babu, Arun and Wang, Changhan and Tjandra, Andros and Lakhotia, Kushal and Xu, Qiantong and Goyal, Naman and Singh, Kritika and von Platen, Patrick and Saraf, Yatharth and Pino, Juan and Baevski, Alexei and Conneau, Alexis and Auli, Michael},
-  title     = {{XLS-R}: Self-supervised Cross-lingual Speech Representation Learning at Scale},
-  booktitle = {Proceedings of Interspeech},
-  year      = {2022}
+@inproceedings{Babu2022XLSR,
+  author    = {A. Babu and C. Wang and A. Tjandra and K. Lakhotia and Q. Xu and N. Goyal and K. Singh and P. von Platen and Y. Saraf and J. Pino and A. Baevski and A. Conneau and M. Auli},
+  title     = {{XLS-R}: Self-supervised cross-lingual speech representation learning at scale},
+  booktitle = {Proc. Interspeech},
+  address   = {Incheon, Korea},
+  year      = {2022},
+  month     = {Sep.},
+  pages     = {2278--2282},
+  doi       = {10.21437/Interspeech.2022-143}
 }
-@inproceedings{radford2023whisper,
-  author    = {Radford, Alec and Kim, Jong Wook and Xu, Tao and Brockman, Greg and McLeavey, Christine and Sutskever, Ilya},
-  title     = {Robust Speech Recognition via Large-Scale Weak Supervision},
-  booktitle = {Proceedings of the 40th International Conference on Machine Learning},
+@inproceedings{Radford2023Robust,
+  author    = {A. Radford and J. W. Kim and T. Xu and G. Brockman and C. McLeavey and I. Sutskever},
+  title     = {Robust speech recognition via large-scale weak supervision},
+  booktitle = {Proc. 40th Int. Conf. Mach. Learn. (ICML)},
   series    = {PMLR},
   volume    = {202},
-  year      = {2023}
-}
-@inproceedings{yang2021superb,
-  author    = {Yang, Shu-wen and Chi, Po-Han and Chuang, Yung-Sung and Lai, Cheng-I Jeff and Lakhotia, Kushal and Lin, Yist Y. and others},
-  title     = {{SUPERB}: Speech Processing Universal {PER}formance Benchmark},
-  booktitle = {Proceedings of Interspeech},
-  year      = {2021}
-}
-@inproceedings{yang2023accent,
-  author    = {Yang, Mu and Shekar, Ram C. M. C. and Kang, Okim and Hansen, John H. L.},
-  title     = {What Can an Accent Identifier Learn? Probing Phonetic and Prosodic Information in a {Wav2vec2}-based Accent Identification Model},
-  booktitle = {Proceedings of Interspeech},
+  address   = {Honolulu, HI, USA},
   year      = {2023},
-  note      = {arXiv:2306.06524}
+  month     = {Jul.},
+  pages     = {28492--28518}
 }
-@inproceedings{desplanques2020ecapa,
-  author    = {Desplanques, Brecht and Thienpondt, Jenthe and Demuynck, Kris},
-  title     = {{ECAPA-TDNN}: Emphasized Channel Attention, Propagation and Aggregation in {TDNN} Based Speaker Verification},
-  booktitle = {Proceedings of Interspeech},
-  year      = {2020}
+@inproceedings{Yang2021SUPERB,
+  author    = {S.-W. Yang and P.-H. Chi and Y.-S. Chuang and C.-I. J. Lai and K. Lakhotia and Y. Y. Lin and A. T. Liu and J. Shi and X. Chang and G.-T. Lin and T.-H. Huang and W.-C. Tseng and K.-T. Lee and D.-R. Liu and Z. Huang and S. Dong and S.-W. Li and S. Watanabe and A. Mohamed and H.-Y. Lee},
+  title     = {{SUPERB}: Speech processing universal performance benchmark},
+  booktitle = {Proc. Interspeech},
+  address   = {Brno, Czechia},
+  year      = {2021},
+  month     = {Aug.},
+  pages     = {1194--1198},
+  doi       = {10.21437/Interspeech.2021-1775}
+}
+@inproceedings{Yang2023Accent,
+  author    = {M. Yang and R. C. M. C. Shekar and O. Kang and J. H. L. Hansen},
+  title     = {What can an accent identifier learn? {Probing} phonetic and prosodic information in a {wav2vec2}-based accent identification model},
+  booktitle = {Proc. Interspeech},
+  address   = {Dublin, Ireland},
+  year      = {2023},
+  month     = {Aug.},
+  pages     = {1923--1927},
+  doi       = {10.21437/Interspeech.2023-1702}
+}
+@inproceedings{Desplanques2020ECAPA,
+  author    = {B. Desplanques and J. Thienpondt and K. Demuynck},
+  title     = {{ECAPA-TDNN}: Emphasized channel attention, propagation and aggregation in {TDNN} based speaker verification},
+  booktitle = {Proc. Interspeech},
+  address   = {Shanghai, China},
+  year      = {2020},
+  month     = {Oct.},
+  pages     = {3830--3834},
+  doi       = {10.21437/Interspeech.2020-2650}
 }
 
 % ---------------- Bangla speech and dialect resources ----------------
-@incollection{badhon2020accent,
-  author    = {Badhon, S. M. Saiful Islam and Rahaman, Habibur and Rupon, Farea Rehnuma and Abujar, Sheikh},
-  title     = {{Bengali} Accent Classification from Speech Using Different Machine Learning and Deep Learning Techniques},
+@incollection{Badhon2020Bengali,
+  author    = {S. M. S. I. Badhon and H. Rahaman and F. R. Rupon and S. Abujar},
+  title     = {{Bengali} accent classification from speech using different machine learning and deep learning techniques},
   booktitle = {Advances in Intelligent Systems and Computing},
-  publisher = {Springer Singapore},
-  pages     = {503--513},
+  publisher = {Springer},
+  address   = {Singapore},
   year      = {2020},
+  month     = {Nov.},
+  pages     = {503--513},
   doi       = {10.1007/978-981-15-7394-1_46}
 }
-@inproceedings{alam2023accent,
-  author    = {Alam, Khorshed and Bhuiyan, Mahbubul Haq and Monir, Md Fahad},
-  title     = {{Bangla} Speaker Accent Variation Classification from Audio Using Deep Neural Networks: A Distinct Approach},
-  booktitle = {TENCON 2023 -- 2023 IEEE Region 10 Conference (TENCON)},
-  publisher = {IEEE},
+@inproceedings{Alam2023Bangla,
+  author    = {K. Alam and M. H. Bhuiyan and M. F. Monir},
+  title     = {{Bangla} speaker accent variation classification from audio using deep neural networks: A distinct approach},
+  booktitle = {Proc. IEEE Region 10 Conf. (TENCON)},
+  address   = {Chiang Mai, Thailand},
   year      = {2023},
-  doi       = {10.1109/tencon58879.2023.10322411}
+  month     = {Oct.},
+  doi       = {10.1109/TENCON58879.2023.10322411}
 }
-@inproceedings{bangladial2026,
-  author    = {Sadiq, Nafis and Islam, Rubiath and Ahmed, Rafi and Farzana, Most. Atkia and Hasan, Md. Rraf and Zami, Abduz},
-  title     = {{Bangla} Dialect Classification Across 11 Regions Using Machine Learning and Transformer-Based Models},
-  booktitle = {2026 5th International Conference on Electrical, Computer and Telecommunication Engineering (ICECTE)},
-  publisher = {IEEE},
+@inproceedings{Sadiq2026Bangla,
+  author    = {N. Sadiq and R. Islam and R. Ahmed and M. A. Farzana and M. R. Hasan and A. Zami},
+  title     = {{Bangla} dialect classification across 11 regions using machine learning and transformer-based models},
+  booktitle = {Proc. 5th Int. Conf. Elect., Comput. Telecommun. Eng. (ICECTE)},
   year      = {2026},
-  doi       = {10.1109/icecte69292.2026.11429342}
+  doi       = {10.1109/ICECTE69292.2026.11429342}
 }
-@misc{bdregionalspeech,
-  author       = {Rahman, M. Sakib and Shimul, Shahrier and Ramim, Salman Nur and Begum, Nasima},
-  title        = {{Bangla} Regional Dialects Speech Dataset},
+@misc{Rahman2026Bangla,
+  author       = {M. S. Rahman and S. Shimul and S. N. Ramim and N. Begum},
+  title        = {{Bangla} regional dialects speech dataset},
   howpublished = {Mendeley Data, V5},
   year         = {2026},
   doi          = {10.17632/777wsgjgtm.5}
 }
-@article{brads2025,
-  author  = {Aiman, Umme and Islam, Md Nakibul and Chowdhury, MD Hana Sultan and Rahman, Md. Sadekur and Habib, Md. Tarek and Hasan, Mahady},
-  title   = {{BRADS} and {BRWDS}: Multipurpose Audio and Text Datasets for Automatic {Bangla} Regional Speech Recognition},
-  journal = {Data in Brief},
+@article{Aiman2025BRADS,
+  author  = {U. Aiman and M. N. Islam and M. H. S. Chowdhury and M. S. Rahman and M. T. Habib and M. Hasan},
+  title   = {{BRADS} and {BRWDS}: Multipurpose audio and text datasets for automatic {Bangla} regional speech recognition},
+  journal = {Data Brief},
+  year    = {2025},
   volume  = {63},
   pages   = {112177},
-  year    = {2025},
+  month   = {Dec.},
   doi     = {10.1016/j.dib.2025.112177}
 }
-@misc{alam2022commonvoice,
-  author       = {Alam, Samiul and Sushmit, Asif and Abdullah, Zaowad and Nakkhatra, Shahrin and Ansary, MD. Nazmuddoha and Hossen, Syed Mobassir and Mehnaz, Sazia Morshed and Reasat, Tahsin and Humayun, Ahmed Imtiaz},
-  title        = {{Bengali} {Common Voice} Speech Dataset for Automatic Speech Recognition},
+@misc{Alam2022Bengali,
+  author       = {S. Alam and A. Sushmit and Z. Abdullah and S. Nakkhatra and M. N. Ansary and S. M. Hossen and S. M. Mehnaz and T. Reasat and A. I. Humayun},
+  title        = {{Bengali} {Common Voice} speech dataset for automatic speech recognition},
   howpublished = {arXiv:2206.14053},
-  year         = {2022}
+  year         = {2022},
+  month        = {Jun.},
+  doi          = {10.48550/arXiv.2206.14053}
 }
-@article{bengaliasrsurvey2021,
-  author  = {Mridha, M. F. and Ohi, Abu Quwsar and Hamid, Md. Abdul and Monowar, Muhammad Mostafa},
-  title   = {Challenges and Opportunities of Speech Recognition for {Bengali} Language},
-  journal = {Artificial Intelligence Review},
-  year    = {2021},
-  note    = {arXiv:2109.13217}
+@article{Mridha2021Challenges,
+  author  = {M. F. Mridha and A. Q. Ohi and M. A. Hamid and M. M. Monowar},
+  title   = {A study on the challenges and opportunities of speech recognition for {Bengali} language},
+  journal = {Artif. Intell. Rev.},
+  year    = {2022},
+  volume  = {55},
+  pages   = {3431--3455},
+  month   = {Apr.},
+  doi     = {10.1007/s10462-021-10083-3}
 }
-
-% ---------------- Leakage and shortcuts ----------------
-@article{geirhos2020shortcut,
-  author  = {Geirhos, Robert and Jacobsen, Jörn-Henrik and Michaelis, Claudio and Zemel, Richard and Brendel, Wieland and Bethge, Matthias and Wichmann, Felix A.},
-  title   = {Shortcut Learning in Deep Neural Networks},
-  journal = {Nature Machine Intelligence},
-  volume  = {2},
-  number  = {11},
-  pages   = {665--673},
-  year    = {2020}
-}
-@misc{spuraudio2026,
-  author       = {Abu Ayoub, Giries and Tukan, Morad and Mualem, Loay},
-  title        = {{SpurAudio}: A Benchmark for Studying Shortcut Learning in Few-Shot Audio Classification},
-  howpublished = {arXiv:2605.13672},
-  year         = {2026}
-}
-@misc{echohawk2026,
-  author       = {Shulman, David},
-  title        = {{EchoHawk}: A Reproducible Acoustic Pipeline for Drone Detection, Classification, and Direction-Finding, with a Cautionary Study of Session-Level Data Leakage},
-  howpublished = {arXiv:2606.29589},
-  year         = {2026}
-}
-@inproceedings{leakage2025iciis,
-  author    = {Puvanendran, Rukshani and Sayakkara, Asanka P. and Jeyarathna, Titus and Ragel, Roshan G.},
-  title     = {Benchmarking Data Leakage and Generalization in Audio Classification: An Empirical Analysis},
-  booktitle = {2025 IEEE 19th International Conference on Industrial and Information Systems (ICIIS)},
-  publisher = {IEEE},
-  year      = {2026},
-  doi       = {10.1109/iciis69028.2026.11450559}
-}
-
-% ---------------- Augmentation ----------------
-@inproceedings{ko2015augmentation,
-  author    = {Ko, Tom and Peddinti, Vijayaditya and Povey, Daniel and Khudanpur, Sanjeev},
-  title     = {Audio Augmentation for Speech Recognition},
-  booktitle = {Proceedings of Interspeech},
-  year      = {2015}
-}
-@inproceedings{park2019specaugment,
-  author    = {Park, Daniel S. and Chan, William and Zhang, Yu and Chiu, Chung-Cheng and Zoph, Barret and Cubuk, Ekin D. and Le, Quoc V.},
-  title     = {{SpecAugment}: A Simple Data Augmentation Method for Automatic Speech Recognition},
-  booktitle = {Proceedings of Interspeech},
-  year      = {2019}
-}
-
-% ---------------- Bangla ASR and dialect speech (lexical route) ----------------
-@inproceedings{dipto2025ben10,
-  author    = {Dipto, Tawsif Tashwar and Hossain, Azmol and Faruque, Rubayet Sabbir and Hassan, Md. Rezuwan and Fatema, Kanij and Shome, Tanmoy and Naswan, Ruwad and Zihad, Md. Foriduzzaman and Anam, Mohaymen Ul and Tasnim, Nazia and Mahmud, Hasan and Hasan, Md. Kamrul and Shawon, Md. Mehedi Hasan and Sadeque, Farig and Reasat, Tahsin},
-  title     = {Are {ASR} Foundation Models Generalized Enough to Capture Features of Regional Dialects for Low-Resource Languages?},
-  booktitle = {Proceedings of IJCNLP-AACL 2025 (Short Papers)},
-  pages     = {178--188},
+@inproceedings{Dipto2025ASR,
+  author    = {T. T. Dipto and A. Hossain and R. S. Faruque and M. R. Hassan and K. Fatema and T. Shome and R. Naswan and M. F. Zihad and M. U. Anam and N. Tasnim and H. Mahmud and M. K. Hasan and M. M. H. Shawon and F. Sadeque and T. Reasat},
+  title     = {Are {ASR} foundation models generalized enough to capture features of regional dialects for low-resource languages?},
+  booktitle = {Proc. 14th Int. Joint Conf. Natural Lang. Process. and 4th Conf. Asia-Pacific Chapter Assoc. Comput. Linguistics (IJCNLP-AACL)},
+  address   = {Mumbai, India},
   year      = {2025},
-  url       = {https://aclanthology.org/2025.ijcnlp-short.17/}
+  month     = {Dec.},
+  pages     = {178--188},
+  doi       = {10.18653/v1/2025.ijcnlp-short.17}
 }
-@inproceedings{rakib2023oodspeech,
-  author    = {Rakib, Fazle Rabbi and Dip, Souhardya Saha and Alam, Samiul and Tasnim, Nazia and Shihab, Md. Istiak Hossain and Ansary, Md. Nazmuddoha and Hossen, Syed Mobassir and Meghla, Marsia Haque and Mamun, Mamunur and Sadeque, Farig and Chowdhury, Sayma Sultana and Reasat, Tahsin and Sushmit, Asif and Humayun, Ahmed Imtiaz},
-  title     = {{OOD-Speech}: A Large {Bengali} Speech Recognition Dataset for Out-of-Distribution Benchmarking},
-  booktitle = {Proceedings of Interspeech},
+@misc{Hassan2025RegSpeech12,
+  author       = {M. R. Hassan and A. Hossain and K. Fatema and R. S. Faruque and T. Shome and R. Naswan and T. Chakraborty and M. F. Zihad and T. T. Dipto and N. Tasnim and N. Ansary and M. M. H. Shawon and A. I. Humayun and M. G. R. Alam and F. Sadeque and A. Sushmit},
+  title        = {{RegSpeech12}: A regional corpus of {Bengali} spontaneous speech across dialects},
+  howpublished = {arXiv:2510.24096},
+  year         = {2025},
+  month        = {Oct.},
+  doi          = {10.48550/arXiv.2510.24096}
+}
+@mastersthesis{Hassan2024Character,
+  author  = {M. R. Hassan},
+  title   = {A character gram modeling approach towards {Bengali} speech to text with regional dialects},
+  school  = {Dept. Comput. Sci. Eng., BRAC Univ.},
+  address = {Dhaka, Bangladesh},
+  year    = {2024},
+  month   = {Nov.},
+  note    = {[Online]. Available: \url{http://hdl.handle.net/10361/25982}}
+}
+@inproceedings{Niloy2026Meaning,
+  author    = {S. D. Niloy and S. S. Rahman and M. E. Sobhani and M. G. R. Alam and F. Y. Sadeque and M. R. Hassan},
+  title     = {Meaning over morphology: A multi-metric benchmark of {LLMs} for {Bangla} dialect translation},
+  booktitle = {Proc. 1st Workshop Dialects NLP: A Resource Perspective (DIALRES), LREC 2026},
+  address   = {Palma de Mallorca, Spain},
+  year      = {2026},
+  month     = {May},
+  pages     = {238--255},
+  doi       = {10.63317/3h8y7fs2zbq4}
+}
+@inproceedings{Rakib2023OODSpeech,
+  author    = {F. R. Rakib and S. S. Dip and S. Alam and N. Tasnim and M. I. H. Shihab and M. N. Ansary and S. M. Hossen and M. H. Meghla and M. Mamun and F. Sadeque and S. S. Chowdhury and T. Reasat and A. Sushmit and A. I. Humayun},
+  title     = {{OOD-Speech}: A large {Bengali} speech recognition dataset for out-of-distribution benchmarking},
+  booktitle = {Proc. Interspeech},
+  address   = {Dublin, Ireland},
   year      = {2023},
-  note      = {arXiv:2305.09688}
+  month     = {Aug.},
+  pages     = {4225--4229},
+  doi       = {10.21437/Interspeech.2023-1927}
 }
-@misc{bengaliai2023competition,
+@misc{BengaliAI2023Speech,
   author       = {{Bengali.AI}},
-  title        = {{Bengali.AI} Speech Recognition},
+  title        = {{Bengali.AI} speech recognition},
   howpublished = {Kaggle competition},
   year         = {2023},
-  url          = {https://www.kaggle.com/competitions/bengaliai-speech}
+  note         = {[Online]. Available: \url{https://www.kaggle.com/competitions/bengaliai-speech}}
 }
-@misc{nandi2023hishab,
+@misc{Hishab2023FastConformer,
   author       = {{Hishab}},
-  title        = {{hishab\_bn\_fastconformer}: {Bangla} {FastConformer} Speech Recognition Model},
+  title        = {{hishab\_bn\_fastconformer}: {Bangla} {FastConformer} speech recognition model},
   howpublished = {Hugging Face model card},
   year         = {2023},
-  url          = {https://huggingface.co/hishab/hishab_bn_fastconformer},
-  note         = {Cited by the Ben-10 benchmark as Nandi et al.\ (2023). \textbf{[Verify year; cite the underlying paper if one exists]}}
+  note         = {[Online]. Available: \url{https://huggingface.co/hishab/hishab_bn_fastconformer}}
 }
-@misc{arijitx2022wav2vec2,
+@misc{Arijitx2022wav2vec2,
   author       = {{arijitx}},
   title        = {{wav2vec2-xls-r-300m-bengali}},
   howpublished = {Hugging Face model card},
   year         = {2022},
-  url          = {https://huggingface.co/arijitx/wav2vec2-xls-r-300m-bengali},
-  note         = {\textbf{[Verify year]}}
+  note         = {[Online]. Available: \url{https://huggingface.co/arijitx/wav2vec2-xls-r-300m-bengali}}
 }
-@misc{faria2023vashantor,
-  author       = {Faria, Fatema Tuj Johora and Moin, Mukaffi Bin and Al Wase, Ahmed and Ahmmed, Mehidi and Sani, Md. Rabius and Muhammad, Tashreef},
-  title        = {{Vashantor}: A Large-scale Multilingual Benchmark Dataset for Automated Translation of {Bangla} Regional Dialects to {Bangla} Language},
+@misc{Faria2023Vashantor,
+  author       = {F. T. J. Faria and M. B. Moin and A. Al Wase and M. Ahmmed and M. R. Sani and T. Muhammad},
+  title        = {{Vashantor}: A large-scale multilingual benchmark dataset for automated translation of {Bangla} regional dialects to {Bangla} language},
   howpublished = {arXiv:2311.11142},
   year         = {2023},
-  note         = {Data: Mendeley Data bj5jgk878b, v2}
+  month        = {Nov.},
+  doi          = {10.48550/arXiv.2311.11142}
 }
-@misc{hassan2025regspeech12,
-  author       = {Hassan, Md. Rezuwan and Hossain, Azmol and Fatema, Kanij and Faruque, Rubayet Sabbir and Shome, Tanmoy and Naswan, Ruwad and Chakraborty, Trina and Zihad, Md. Foriduzzaman and Dipto, Tawsif Tashwar and Tasnim, Nazia and Ansary, Nazmuddoha and Shawon, Md. Mehedi Hasan and Humayun, Ahmed Imtiaz and Alam, Md. Golam Rabiul and Sadeque, Farig and Sushmit, Asif},
-  title        = {{RegSpeech12}: A Regional Corpus of {Bengali} Spontaneous Speech Across Dialects},
-  howpublished = {arXiv:2510.24096},
-  year         = {2025}
-}
-@inproceedings{bangladialecto2024,
-  author    = {Samin, Md. Nazmus Sadat and Ahad, Jawad Ibn and Medha, Tanjila Ahmed and Rahman, Fuad and Amin, Mohammad Ruhul and Mohammed, Nabeel and Rahman, Shafin},
-  title     = {{BanglaDialecto}: An End-to-End {AI}-Powered Regional Speech Standardization},
-  booktitle = {Proceedings of the 2024 IEEE International Conference on Big Data (BigData)},
+@inproceedings{Samin2024BanglaDialecto,
+  author    = {M. N. S. Samin and J. I. Ahad and T. A. Medha and F. Rahman and M. R. Amin and N. Mohammed and S. Rahman},
+  title     = {{BanglaDialecto}: An end-to-end {AI}-powered regional speech standardization},
+  booktitle = {Proc. IEEE Int. Conf. Big Data (BigData)},
+  address   = {Washington, DC, USA},
   year      = {2024},
-  note      = {arXiv:2411.10879}
+  month     = {Dec.},
+  doi       = {10.48550/arXiv.2411.10879}
+}
+
+% ---------------- Leakage and shortcuts ----------------
+@article{Geirhos2020Shortcut,
+  author  = {R. Geirhos and J.-H. Jacobsen and C. Michaelis and R. Zemel and W. Brendel and M. Bethge and F. A. Wichmann},
+  title   = {Shortcut learning in deep neural networks},
+  journal = {Nature Mach. Intell.},
+  year    = {2020},
+  volume  = {2},
+  number  = {11},
+  pages   = {665--673},
+  month   = {Nov.},
+  doi     = {10.1038/s42256-020-00257-z}
+}
+@misc{AbuAyoub2026SpurAudio,
+  author       = {G. {Abu Ayoub} and M. Tukan and L. Mualem},
+  title        = {{SpurAudio}: A benchmark for studying shortcut learning in few-shot audio classification},
+  howpublished = {arXiv:2605.13672},
+  year         = {2026},
+  month        = {May},
+  doi          = {10.48550/arXiv.2605.13672}
+}
+@misc{Shulman2026EchoHawk,
+  author       = {D. Shulman},
+  title        = {{EchoHawk}: A reproducible acoustic pipeline for drone detection, classification, and direction-finding, with a cautionary study of session-level data leakage},
+  howpublished = {arXiv:2606.29589},
+  year         = {2026},
+  month        = {Jun.},
+  doi          = {10.48550/arXiv.2606.29589}
+}
+@inproceedings{Puvanendran2025Benchmarking,
+  author    = {R. Puvanendran and A. P. Sayakkara and T. Jeyarathna and R. G. Ragel},
+  title     = {Benchmarking data leakage and generalization in audio classification: An empirical analysis},
+  booktitle = {Proc. IEEE 19th Int. Conf. Ind. Inf. Syst. (ICIIS)},
+  year      = {2025},
+  doi       = {10.1109/ICIIS69028.2026.11450559}
+}
+
+% ---------------- Augmentation ----------------
+@inproceedings{Ko2015Audio,
+  author    = {T. Ko and V. Peddinti and D. Povey and S. Khudanpur},
+  title     = {Audio augmentation for speech recognition},
+  booktitle = {Proc. Interspeech},
+  address   = {Dresden, Germany},
+  year      = {2015},
+  month     = {Sep.},
+  pages     = {3586--3589},
+  doi       = {10.21437/Interspeech.2015-711}
+}
+@inproceedings{Park2019SpecAugment,
+  author    = {D. S. Park and W. Chan and Y. Zhang and C.-C. Chiu and B. Zoph and E. D. Cubuk and Q. V. Le},
+  title     = {{SpecAugment}: A simple data augmentation method for automatic speech recognition},
+  booktitle = {Proc. Interspeech},
+  address   = {Graz, Austria},
+  year      = {2019},
+  month     = {Sep.},
+  pages     = {2613--2617},
+  doi       = {10.21437/Interspeech.2019-2680}
 }
 
 % ---------------- Methods, statistics and software ----------------
-@inproceedings{loshchilov2019adamw,
-  author    = {Loshchilov, Ilya and Hutter, Frank},
-  title     = {Decoupled Weight Decay Regularization},
-  booktitle = {International Conference on Learning Representations},
-  year      = {2019}
+@inproceedings{Loshchilov2019Decoupled,
+  author    = {I. Loshchilov and F. Hutter},
+  title     = {Decoupled weight decay regularization},
+  booktitle = {Proc. Int. Conf. Learn. Represent. (ICLR)},
+  address   = {New Orleans, LA, USA},
+  year      = {2019},
+  month     = {May}
 }
-@inproceedings{graves2006ctc,
-  author    = {Graves, Alex and Fernández, Santiago and Gomez, Faustino and Schmidhuber, Jürgen},
-  title     = {Connectionist Temporal Classification: Labelling Unsegmented Sequence Data with Recurrent Neural Networks},
-  booktitle = {Proceedings of the 23rd International Conference on Machine Learning},
+@inproceedings{Graves2006Connectionist,
+  author    = {A. Graves and S. Fern{\'a}ndez and F. Gomez and J. Schmidhuber},
+  title     = {Connectionist temporal classification: Labelling unsegmented sequence data with recurrent neural networks},
+  booktitle = {Proc. 23rd Int. Conf. Mach. Learn. (ICML)},
+  address   = {Pittsburgh, PA, USA},
+  year      = {2006},
+  month     = {Jun.},
   pages     = {369--376},
-  year      = {2006}
+  doi       = {10.1145/1143844.1143891}
 }
-@article{hubert1985ari,
-  author  = {Hubert, Lawrence and Arabie, Phipps},
-  title   = {Comparing Partitions},
-  journal = {Journal of Classification},
+@article{Hubert1985Comparing,
+  author  = {L. Hubert and P. Arabie},
+  title   = {Comparing partitions},
+  journal = {J. Classif.},
+  year    = {1985},
   volume  = {2},
   number  = {1},
   pages   = {193--218},
-  year    = {1985}
+  month   = {Dec.},
+  doi     = {10.1007/BF01908075}
 }
-@book{efron1993bootstrap,
-  author    = {Efron, Bradley and Tibshirani, Robert J.},
+@book{Efron1993Introduction,
+  author    = {B. Efron and R. J. Tibshirani},
   title     = {An Introduction to the Bootstrap},
   publisher = {Chapman \& Hall},
+  address   = {New York, NY, USA},
   year      = {1993}
 }
-@article{vandermaaten2008tsne,
-  author  = {van der Maaten, Laurens and Hinton, Geoffrey},
-  title   = {Visualizing Data using {t-SNE}},
-  journal = {Journal of Machine Learning Research},
+@article{Maaten2008Visualizing,
+  author  = {L. van der Maaten and G. Hinton},
+  title   = {Visualizing data using {t-SNE}},
+  journal = {J. Mach. Learn. Res.},
+  year    = {2008},
   volume  = {9},
   pages   = {2579--2605},
-  year    = {2008}
+  month   = {Nov.}
 }
-@article{pedregosa2011sklearn,
-  author  = {Pedregosa, Fabian and Varoquaux, Gaël and Gramfort, Alexandre and Michel, Vincent and Thirion, Bertrand and Grisel, Olivier and others},
-  title   = {Scikit-learn: Machine Learning in {Python}},
-  journal = {Journal of Machine Learning Research},
+@article{Pedregosa2011Scikit,
+  author  = {F. Pedregosa and G. Varoquaux and A. Gramfort and V. Michel and B. Thirion and O. Grisel and M. Blondel and P. Prettenhofer and R. Weiss and V. Dubourg and J. Vanderplas and A. Passos and D. Cournapeau and M. Brucher and M. Perrot and {\'E}. Duchesnay},
+  title   = {Scikit-learn: Machine learning in {Python}},
+  journal = {J. Mach. Learn. Res.},
+  year    = {2011},
   volume  = {12},
   pages   = {2825--2830},
-  year    = {2011}
+  month   = {Oct.}
 }
-@inproceedings{paszke2019pytorch,
-  author    = {Paszke, Adam and Gross, Sam and Massa, Francisco and Lerer, Adam and Bradbury, James and Chanan, Gregory and others},
-  title     = {{PyTorch}: An Imperative Style, High-Performance Deep Learning Library},
-  booktitle = {Advances in Neural Information Processing Systems},
+@inproceedings{Paszke2019PyTorch,
+  author    = {A. Paszke and S. Gross and F. Massa and A. Lerer and J. Bradbury and G. Chanan and T. Killeen and Z. Lin and N. Gimelshein and L. Antiga and A. Desmaison and A. K{\"o}pf and E. Yang and Z. DeVito and M. Raison and A. Tejani and S. Chilamkurthy and B. Steiner and L. Fang and J. Bai and S. Chintala},
+  title     = {{PyTorch}: An imperative style, high-performance deep learning library},
+  booktitle = {Proc. Adv. Neural Inf. Process. Syst. (NeurIPS)},
   volume    = {32},
-  year      = {2019}
+  address   = {Vancouver, BC, Canada},
+  year      = {2019},
+  month     = {Dec.},
+  pages     = {8024--8035}
 }
-@inproceedings{wolf2020transformers,
-  author    = {Wolf, Thomas and Debut, Lysandre and Sanh, Victor and Chaumond, Julien and Delangue, Clement and Moi, Anthony and others},
-  title     = {Transformers: State-of-the-Art Natural Language Processing},
-  booktitle = {Proceedings of EMNLP: System Demonstrations},
+@inproceedings{Wolf2020Transformers,
+  author    = {T. Wolf and L. Debut and V. Sanh and J. Chaumond and C. Delangue and A. Moi and P. Cistac and T. Rault and R. Louf and M. Funtowicz and J. Davison and S. Shleifer and P. von Platen and C. Ma and Y. Jernite and J. Plu and C. Xu and T. Le Scao and S. Gugger and M. Drame and Q. Lhoest and A. M. Rush},
+  title     = {Transformers: State-of-the-art natural language processing},
+  booktitle = {Proc. Conf. Empirical Methods Natural Lang. Process.: Syst. Demonstrations (EMNLP)},
+  year      = {2020},
+  month     = {Oct.},
   pages     = {38--45},
-  year      = {2020}
+  doi       = {10.18653/v1/2020.emnlp-demos.6}
 }
-@misc{ravanelli2021speechbrain,
-  author       = {Ravanelli, Mirco and Parcollet, Titouan and Plantinga, Peter and Rouhe, Aku and Cornell, Samuele and others},
-  title        = {{SpeechBrain}: A General-Purpose Speech Toolkit},
+@misc{Ravanelli2021SpeechBrain,
+  author       = {M. Ravanelli and T. Parcollet and P. Plantinga and A. Rouhe and S. Cornell and L. Lugosch and C. Subakan and N. Dawalatabad and A. Heba and J. Zhong and J.-C. Chou and S.-L. Yeh and S.-W. Fu and C.-F. Liao and E. Rastorgueva and F. Grondin and W. Aris and H. Na and Y. Gao and R. De Mori and Y. Bengio},
+  title        = {{SpeechBrain}: A general-purpose speech toolkit},
   howpublished = {arXiv:2106.04624},
-  year         = {2021}
+  year         = {2021},
+  month        = {Jun.},
+  doi          = {10.48550/arXiv.2106.04624}
 }
-@misc{kuchaiev2019nemo,
-  author       = {Kuchaiev, Oleksii and others},
-  title        = {{NeMo}: A Toolkit for Building {AI} Applications Using Neural Modules},
+@misc{Kuchaiev2019NeMo,
+  author       = {O. Kuchaiev and J. Li and H. Nguyen and O. Hrinchuk and R. Leary and B. Ginsburg and S. Kriman and S. Beliaev and V. Lavrukhin and J. Cook and P. Castonguay and M. Popova and J. Huang and J. M. Cohen},
+  title        = {{NeMo}: A toolkit for building {AI} applications using neural modules},
   howpublished = {arXiv:1909.09577},
-  year         = {2019}
+  year         = {2019},
+  month        = {Sep.},
+  doi          = {10.48550/arXiv.1909.09577}
 }
-@inproceedings{mcfee2015librosa,
-  author    = {McFee, Brian and Raffel, Colin and Liang, Dawen and Ellis, Daniel P. W. and McVicar, Matt and Battenberg, Eric and Nieto, Oriol},
-  title     = {librosa: Audio and Music Signal Analysis in {Python}},
-  booktitle = {Proceedings of the 14th Python in Science Conference},
+@inproceedings{McFee2015librosa,
+  author    = {B. McFee and C. Raffel and D. Liang and D. P. W. Ellis and M. McVicar and E. Battenberg and O. Nieto},
+  title     = {librosa: Audio and music signal analysis in {Python}},
+  booktitle = {Proc. 14th Python Sci. Conf. (SciPy)},
+  address   = {Austin, TX, USA},
+  year      = {2015},
+  month     = {Jul.},
   pages     = {18--25},
-  year      = {2015}
+  doi       = {10.25080/Majora-7b98e3ed-003}
 }
-@misc{jiwer,
+@misc{Jitsi2024JiWER,
   author       = {{Jitsi}},
-  title        = {{JiWER}: Similarity Measures for Automatic Speech Recognition Evaluation},
-  howpublished = {Python package, version 4.0.0},
-  year         = {n.d.},
-  url          = {https://github.com/jitsi/jiwer}
+  title        = {{JiWER}: Similarity measures for automatic speech recognition evaluation},
+  howpublished = {Python package, version 4.0},
+  year         = {2024},
+  note         = {[Online]. Available: \url{https://github.com/jitsi/jiwer}}
 }

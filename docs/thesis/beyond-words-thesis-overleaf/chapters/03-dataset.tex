@@ -1,10 +1,10 @@
-\chapter{Dataset}
+\chapter{DATASET}
 \label{ch:dataset}
 
 \section{Source and composition}
 
 The corpus was gathered for two earlier studies of Bangla accent
-classification, \citet{badhon2020accent} and \citet{alam2023accent}, and is
+classification, Badhon \etal~\cite{Badhon2020Bengali} and Alam \etal~\cite{Alam2023Bangla}, and is
 used here with the same class labels. It consists of short clips of Bangla
 speech cut from television shows, films and online video, originally
 distributed as MP4 and grouped into one folder per class. It contains nine classes: eight regional dialects named after
@@ -12,6 +12,27 @@ the district or division they are associated with, and the standard register,
 labelled Formal (\cref{tab:classes}). After validation, 9,303 clips totalling
 about 13.1 hours are usable; two duplicate \path{.ogg} files in the Formal
 folder are excluded. Class sizes range from 750 (Khulna) to 1,652 (Formal).
+\Cref{fig:data-pipeline} summarises how the raw clips become the committed
+splits used by every experiment, and \cref{fig:class-sizes} shows the class
+balance in clips and in hours: Formal is the largest class in both, and the
+eight regional classes range from about one hour (Khulna, Dhaka) to 1.75 hours
+(Barishal).
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{data-pipeline.pdf}
+  \caption{The data pipeline: raw media clips are validated and standardised,
+  described in a manifest, and split under two protocols that are committed to
+  the repository.}
+  \label{fig:data-pipeline}
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{dataset_class_sizes.pdf}
+  \caption{Corpus composition: (a) clips and (b) hours of audio per class.}
+  \label{fig:class-sizes}
+\end{figure}
 
 \begin{table}[ht]
   \centering
@@ -47,7 +68,80 @@ duration is 5.0\,s and the mean 5.08\,s, but 1,067 clips fall outside
 dialects but excludes longer-range cues such as discourse markers and phrase-level
 intonation. Because the material is broadcast and online media, recording
 conditions vary widely within and across classes, from studio news to
-outdoor drama scenes.
+outdoor drama scenes. \Cref{fig:durations} shows the duration distribution:
+every regional clip is exactly 5.0\,s, so the spread in panel (a) and the only
+visible box in panel (b) come from the Formal class, whose clips were cut to
+sentence boundaries rather than to a fixed length. \Cref{fig:spectrograms}
+shows one held-out clip per class as a waveform and an 80-band log-mel
+spectrogram, the representation Whisper consumes. The examples already hint at
+the variation the models face: the Barishal and Khulna clips contain short
+silences where the source was cut, the Dhaka clip is quieter with more
+background energy between words, and the Mymensingh and Rajshahi clips carry
+strong low-frequency energy from close microphones.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{dataset_durations.pdf}
+  \caption{Clip durations: (a) histogram over all clips (log scale) and (b) per
+  class. Regional clips are fixed at 5.0\,s; only Formal clips vary.}
+  \label{fig:durations}
+\end{figure}
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=0.95\textwidth]{dataset_spectrograms.pdf}
+  \caption{One test clip per class: waveform (top of each panel) and 80-band
+  log-mel spectrogram (0--8\,kHz, 5\,s).}
+  \label{fig:spectrograms}
+\end{figure}
+
+\subsection{Long-term average spectrum}
+\label{sec:data-ltas}
+
+A long-term average spectrum (LTAS) averages the power spectrum of speech over
+many seconds, removing the phonetic detail of individual sounds and leaving the
+gross spectral shape that voice quality, speaking style and the recording
+channel impose. \Cref{fig:ltas} shows the LTAS of each class, computed as the
+Welch power spectral density of every clip (1,024-point Hann windows, 50\,\%
+overlap) normalised to unit total power so that recording level does not
+dominate, averaged within the class, and plotted in decibels against the
+corpus-wide average. \Cref{fig:ltas-diff} shows the same curves as differences
+from the corpus mean.
+
+\begin{figure}[p]
+  \centering
+  \includegraphics[width=0.95\textwidth]{dataset_ltas.pdf}
+  \caption{Long-term average spectrum per class (blue) against the corpus mean
+  (grey). Each clip's Welch PSD is normalised to unit power before averaging.}
+  \label{fig:ltas}
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{dataset_ltas_diff.pdf}
+  \caption{Each class's LTAS minus the corpus mean. Formal is highlighted;
+  the eight regional classes are drawn in the same colour because the point is
+  their spread, not their identity.}
+  \label{fig:ltas-diff}
+\end{figure}
+
+Three observations follow. First, all nine classes share the expected shape of
+speech: a peak below 500\,Hz and a roll-off of about 6\,dB per octave above
+it, with the sharp drop above 7.6\,kHz that comes from the original
+compression of the media. Second, the classes nevertheless differ by up to
+$\pm 5$\,dB over broad bands. Formal sits 2--3\,dB below the mean between
+1 and 3\,kHz and above it from 4.5\,kHz upward, which is consistent with
+studio speech recorded with less low-frequency proximity effect and more
+high-frequency clarity than field or drama audio. Third, two regional classes,
+Barishal and Noakhali, show a fine periodic ripple between 4 and 7\,kHz that
+no speech process produces; it is the signature of a codec or a particular
+recording chain shared by many clips of those classes. The LTAS therefore
+records something the thesis has to take seriously: part of what separates the
+classes acoustically is the channel they were recorded through, not the
+dialect spoken. A classifier can learn such channel signatures, and a clip-level
+split rewards it for doing so. This is the empirical motivation for the strict
+split of \cref{sec:method-splits} and for the leakage measurement of
+\cref{sec:res-strict}.
 
 \section{The Formal class}
 
@@ -72,7 +166,19 @@ the corpus---nothing prevents clips of the same speaker, or from the same
 programme and recording channel, from appearing on both sides of a random
 train/test split. \Cref{sec:method-splits} describes how the thesis estimates
 pseudo-speaker groups to control this, and \cref{sec:res-strict} measures its
-effect.
+effect. \Cref{fig:speaker-groups} previews the result of that estimation: the
+1,683 pseudo-speaker groups are very unequal in size---760 are single clips,
+the median group has two, and the largest has 251---and the number of groups
+per class ranges from 82 (Khulna) to 344 (Noakhali), which is why some strict
+test cells are dominated by one cluster.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{dataset_speaker_groups.pdf}
+  \caption{Pseudo-speaker groups used by the strict split: (a) distribution of
+  group sizes and (b) number of groups per class.}
+  \label{fig:speaker-groups}
+\end{figure}
 
 The clips were collected from films and dramas as well as from news and
 interviews, so some speakers may be actors performing a dialect rather than
@@ -87,16 +193,16 @@ resources in addition to the corpus. None contributes training audio to any
 dialect classifier.
 
 \begin{description}
-  \item[OOD-Speech] \citep{rakib2023oodspeech}: the 963,636 training sentences
+  \item[OOD-Speech] \cite{Rakib2023OODSpeech}: the 963,636 training sentences
     of standard Bangla, distributed with the 2023 Bengali.AI competition
-    \citep{bengaliai2023competition}, define the standard-Bangla vocabulary.
-  \item[Ben-10] \citep{dipto2025ben10}: the district-labelled dialect
+    \cite{BengaliAI2023Speech}, define the standard-Bangla vocabulary.
+  \item[Ben-10] \cite{Dipto2025ASR}: the district-labelled dialect
     transcripts of its training set (13,342 clips) contribute regional words for
     the three districts it shares with this corpus (Barishal, Chattogram,
     Sylhet); its public validation set (1,666 clips with audio and human
     transcripts) is the reference for measuring speech-recognition quality.
     Released under CC0.
-  \item[Vashantor] \citep{faria2023vashantor}: regional--standard sentence
+  \item[Vashantor] \cite{Faria2023Vashantor}: regional--standard sentence
     pairs for Chittagong, Noakhali, Sylhet, Barishal and Mymensingh contribute
     regional words for those five classes. Released under CC BY 4.0.
 \end{description}

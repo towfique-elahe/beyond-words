@@ -1,4 +1,4 @@
-\chapter{Conclusion}
+\chapter{CONCLUSION}
 \label{ch:conclusion}
 
 This thesis set out to identify nine Bangla dialect classes from 5-second clips
@@ -62,4 +62,8 @@ recogniser preserves, which should be measured before the classifier is built.
 
 All code, split files, transcripts, word lists and per-clip predictions are
 released, and \cref{app:repro} maps every number in this thesis to the command
-that produces it.
+that produces it. The best model, fine-tuned Whisper-medium trained under the
+strict split, is published with a browser demonstration that accepts recorded
+or uploaded speech and returns the dialect probabilities
+(\url{https://huggingface.co/spaces/towfiqueelahe/beyond-words-dialect-id};
+weights at \url{https://huggingface.co/towfiqueelahe/beyond-words-whisper-medium-did}).

@@ -1,4 +1,4 @@
-\chapter{Discussion}
+\chapter{DISCUSSION}
 \label{ch:discussion}
 
 \section{What the strict split reveals}
@@ -8,7 +8,12 @@ The central methodological result is that a disclaimer became a measurement.
 Most audio classification on found data either ignores speaker and channel
 leakage or mentions it qualitatively. Here the pseudo-speaker split bounds it:
 12--14 macro-F1 points for pretrained representations and about 25 for
-hand-crafted features. Three implications follow.
+hand-crafted features. The long-term average spectra of \cref{sec:data-ltas}
+show the mechanism from the data side: classes differ by several decibels over
+broad bands, and two of them carry a periodic high-frequency ripple that only a
+shared codec or recording chain can produce, so a model that learns ``what
+Barishal sounds like'' from a clip-level split partly learns what Barishal's
+recordings sound like. Three implications follow.
 
 \begin{enumerate}
   \item \textbf{Scores reported on clip-level splits of found-data corpora are
@@ -85,11 +90,11 @@ reflects the objective, the domain or under-training (its best epoch was the
 The channel-suppression chain lowered strict-split macro-F1 by six points. The
 chain included pitch shift ($\pm 2$ semitones) and time stretch (0.9--1.1),
 transforms that are standard and beneficial in speech recognition
-\citep{ko2015augmentation}, where the transcript is invariant to prosody.
+\cite{Ko2015Audio}, where the transcript is invariant to prosody.
 Dialect identification inverts this: pitch contour, rhythm and tempo carry
 dialect, so these transforms corrupt the evidence for the label rather than
 removing nuisance variation. Probing work showing that accent fine-tuning
-reshapes prosodic encoding in wav2vec~2.0 \citep{yang2023accent} supports this
+reshapes prosodic encoding in wav2vec~2.0 \cite{Yang2023Accent} supports this
 reading, and the validation score, depressed throughout training (0.702 against
 0.757), indicates a harder target rather than an unlucky checkpoint.
 
@@ -116,7 +121,7 @@ regional clips is barely less standard than on Formal clips. The one front-end
 fine-tuned on dialect speech reproduces 27\,\%, which is both the best available
 and a hard ceiling for any word-list method: nearly three of four dialect words
 never reach the text. This confirms, with an automated measure over the full
-validation set, the observation that \citet{dipto2025ben10} made by hand, and it
+validation set, the observation that Dipto \etal~\cite{Dipto2025ASR} made by hand, and it
 is the single most important fact about the lexical route.
 
 \paragraph{Filtering to regional words discards evidence.} The intuitive

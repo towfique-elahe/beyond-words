@@ -1,68 +1,104 @@
 % =====================================================================
 %  Beyond Words: Bangla Dialect Identification from Sound and Words
-%  Compiler: pdfLaTeX  (Overleaf's default; the fastest to compile)
-%  Bibliography: BibTeX (natbib, author-year)
+%  East Delta University undergraduate thesis format
+%  Compiler: pdfLaTeX   Bibliography: BibTeX, IEEEtran (numeric)
 % =====================================================================
 \documentclass[12pt,a4paper,oneside]{report}
 
-% ---------- Title-page details: fill these in -------------------------
-\newcommand{\thesistitle}{A Neural Network Approach to Classifying Bangla Accentual Diversity}
-\newcommand{\thesissubtitle}{Dialect Identification from Sound and from Words}
+% ---------- Thesis details ---------------------------------------------
+\newcommand{\thesistitle}{A Neural Network Approach to Classifying Bangla Accentual Diversity: Dialect Identification from Sound and from Words}
 \newcommand{\thesisauthor}{Towfique Elahe}
 \newcommand{\studentid}{183001112}
 \newcommand{\thesisauthortwo}{Injamamul Hoque Sikder}
 \newcommand{\studentidtwo}{183003012}
-\newcommand{\thesisdegree}{Bachelor of Science in Computer Science and Engineering}
-\newcommand{\thesisdepartment}{Department of Computer Science and Engineering}
+\newcommand{\thesisdegree}{Bachelor of Science}
+\newcommand{\thesisprogramme}{Computer Science and Engineering}
+\newcommand{\thesisdepartment}{Department of Computer Science \& Engineering}
+\newcommand{\thesisschool}{School of Science, Engineering \& Technology}
 \newcommand{\thesisuniversity}{East Delta University}
-\newcommand{\thesissupervisor}{Ashrafur Rahman Chowdhury, Lecturer}
+\newcommand{\thesisaddress}{Noman Society, East Nasirabad, Chittagong-4209}
+\newcommand{\thesissupervisor}{Ashrafur Rahman Chowdhury}
+\newcommand{\supervisordesignation}{Lecturer}
 \newcommand{\thesisdate}{November 2026}
+\newcommand{\declarationdate}{\today}
 
-% ---------- Fonts (pdfLaTeX) ------------------------------------------
+% ---------- Fonts and language ------------------------------------------
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage{lmodern}
+\usepackage{newtxtext,newtxmath}          % Times, as in the university sample
+\usepackage[english]{babel}
 
-% ---------- Layout ----------------------------------------------------
-\usepackage[a4paper,margin=2.5cm,bindingoffset=0.5cm]{geometry}
+% ---------- Page layout ---------------------------------------------------
+\usepackage[a4paper,top=2.5cm,bottom=2.5cm,left=3cm,right=2.5cm]{geometry}
 \usepackage{setspace}
 \onehalfspacing
 \setlength{\emergencystretch}{1.5em}
+\setlength{\parskip}{4pt}
+\pagestyle{plain}                          % page number bottom centre
+
+% ---------- Headings: "CHAPTER 1" centred, title centred below -------------
 \usepackage{titlesec}
 \titleformat{\chapter}[display]
-  {\normalfont\bfseries\Huge}{\large\MakeUppercase{\chaptertitlename}\ \thechapter}{8pt}{}
-\titlespacing*{\chapter}{0pt}{-10pt}{24pt}
-\usepackage{fancyhdr}
-\pagestyle{fancy}
-\fancyhf{}
-\fancyhead[L]{\small\nouppercase{\leftmark}}
-\fancyhead[R]{\small\thepage}
-\renewcommand{\headrulewidth}{0.4pt}
-\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\small\thepage}\renewcommand{\headrulewidth}{0pt}}
-\setlength{\headheight}{15pt}
+  {\normalfont\bfseries\Large\centering}
+  {\MakeUppercase{\chaptertitlename}\ \thechapter}{14pt}{\Large}
+\titleformat{name=\chapter,numberless}[display]
+  {\normalfont\bfseries\Large\centering}{}{0pt}{}
+\titlespacing*{\chapter}{0pt}{0pt}{30pt}
+\titleformat{\section}{\normalfont\large\bfseries}{\thesection}{0.8em}{}
+\titleformat{\subsection}{\normalfont\normalsize\bfseries}{\thesubsection}{0.8em}{}
+\titleformat{\subsubsection}{\normalfont\normalsize\bfseries\itshape}{\thesubsubsection}{0.8em}{}
+\titlespacing*{\section}{0pt}{14pt}{6pt}
+\titlespacing*{\subsection}{0pt}{10pt}{4pt}
 
-% ---------- Content packages ------------------------------------------
-\usepackage{amsmath,amssymb}
+% ---------- Contents lists ------------------------------------------------
+\usepackage{tocloft}
+\addto\captionsenglish{%           % babel resets these names at \begin{document}
+  \renewcommand{\contentsname}{TABLE OF CONTENTS}%
+  \renewcommand{\listtablename}{LIST OF TABLES}%
+  \renewcommand{\listfigurename}{LIST OF FIGURES}%
+  \renewcommand{\bibname}{REFERENCES}}
+\renewcommand{\cfttoctitlefont}{\hfill\Large\bfseries}
+\renewcommand{\cftaftertoctitle}{\hfill\mbox{}}
+\renewcommand{\cftlottitlefont}{\hfill\Large\bfseries}
+\renewcommand{\cftafterlottitle}{\hfill\mbox{}}
+\renewcommand{\cftloftitlefont}{\hfill\Large\bfseries}
+\renewcommand{\cftafterloftitle}{\hfill\mbox{}}
+\renewcommand{\cftchappresnum}{CHAPTER }
+\setlength{\cftchapnumwidth}{6.6em}
+\renewcommand{\cftchapfont}{\bfseries}
+\renewcommand{\cftchappagefont}{\bfseries}
+\renewcommand{\cftsecfont}{\bfseries}
+\renewcommand{\cftsecpagefont}{\bfseries}
+\renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftbeforechapskip}{4pt}
+\renewcommand{\cfttabpresnum}{Table }
+\setlength{\cfttabnumwidth}{4.6em}
+\renewcommand{\cftfigpresnum}{Figure }
+\setlength{\cftfignumwidth}{5.2em}
+\setcounter{tocdepth}{2}
+
+% ---------- Content packages -------------------------------------------------
+\usepackage{amsmath}   % amssymb clashes with newtxmath (\Bbbk); newtxmath supplies the symbols
 \usepackage{graphicx}
 \graphicspath{{figures/}}
-\usepackage{booktabs,tabularx,array,multirow,makecell}
+\usepackage{booktabs,tabularx,array,multirow,makecell,longtable}
 \usepackage{xcolor}
-\usepackage[font=small,labelfont=bf,skip=6pt]{caption}
+\usepackage[labelfont=bf,labelsep=space,font=small,justification=centering]{caption}
 \usepackage{enumitem}
 \setlist{itemsep=2pt,topsep=4pt}
 \usepackage{float}
-\usepackage[round,authoryear]{natbib}
-\bibliographystyle{plainnat}
+\usepackage{cite}                          % numeric [1], sorted and compressed
+\bibliographystyle{IEEEtrandoi}   % IEEEtran 1.14 + DOI (local file)
 \usepackage[obeyspaces,spaces]{xurl}
 \urlstyle{same}
 \usepackage[hidelinks,bookmarksnumbered]{hyperref}
 \usepackage[nameinlink,capitalise,noabbrev]{cleveref}
 
-% ---------- Helpers ---------------------------------------------------
+% ---------- Helpers ----------------------------------------------------------
 \newcommand{\fscore}[1]{#1}                       % keeps numbers greppable
 \newcommand{\hf}[1]{\path{#1}}                    % model / dataset identifiers
+\newcommand{\etal}{\textit{et al.}}               % Lead-author rule: 3+ authors
 \newcolumntype{L}{>{\raggedright\arraybackslash}X}
-\newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
 
 % Bangla words are pre-rendered (figures/src/bangla-words.tex, compiled with
 % XeLaTeX) so this document compiles with pdfLaTeX. Usage: \bn{slug}{বাংলা};
@@ -76,25 +112,35 @@
   \includegraphics[page=\bn@page]{bangla-words}}}
 \makeatother
 
-% If Overleaf still times out, compile one chapter at a time:
+% If Overleaf times out, compile one chapter at a time:
 % \includeonly{chapters/05-results}
 
 \begin{document}
 
-% ---------- Front matter ----------------------------------------------
+% ---------- Front matter ------------------------------------------------------
 \pagenumbering{roman}
 \input{frontmatter/titlepage}
+\setcounter{page}{2}                   % the title page is page i
+\input{frontmatter/innertitle}
+\input{frontmatter/examiners}
 \input{frontmatter/declaration}
-\input{frontmatter/abstract}
 \input{frontmatter/acknowledgements}
+\input{frontmatter/abstract}
+\input{frontmatter/ai-disclosure}
 
+\clearpage
 \tableofcontents
-\listoffigures
+\clearpage
+\phantomsection\addcontentsline{toc}{chapter}{LIST OF TABLES}
 \listoftables
+\clearpage
+\phantomsection\addcontentsline{toc}{chapter}{LIST OF FIGURES}
+\listoffigures
+\clearpage
 \input{frontmatter/abbreviations}
 
-% ---------- Main matter -----------------------------------------------
-\cleardoublepage
+% ---------- Main matter -------------------------------------------------------
+\clearpage
 \pagenumbering{arabic}
 \include{chapters/01-introduction}
 \include{chapters/02-background}
@@ -104,12 +150,13 @@
 \include{chapters/06-discussion}
 \include{chapters/07-conclusion}
 
-% ---------- Back matter -----------------------------------------------
-\cleardoublepage
+% ---------- References ----------------------------------------------------------
+\clearpage
 \phantomsection
-\addcontentsline{toc}{chapter}{Bibliography}
+\addcontentsline{toc}{chapter}{REFERENCES}
 \bibliography{references}
 
+% ---------- Appendices ----------------------------------------------------------
 \appendix
 \include{appendices/A-reproducibility}
 \include{appendices/B-settings}

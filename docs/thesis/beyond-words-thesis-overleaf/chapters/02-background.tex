@@ -1,4 +1,4 @@
-\chapter{Background and Related Work}
+\chapter{BACKGROUND AND RELATED WORK}
 \label{ch:background}
 
 This chapter places the thesis in five bodies of work: dialect and accent
@@ -15,7 +15,7 @@ addresses.
 
 Dialect identification is usually framed alongside language identification
 (LID) and speaker recognition. Modern systems in all three inherit the embedding
-paradigm of x-vectors \citep{snyder2018xvectors}: a network trained to
+paradigm of x-vectors \cite{Snyder2018Xvectors}: a network trained to
 discriminate classes produces a fixed-length utterance embedding on which a
 light classifier operates. The kinship with speaker recognition matters for
 this thesis. A representation good at separating speakers is also able to
@@ -25,86 +25,86 @@ speaker overlap between training and test data inflates dialect scores
 
 The largest DID benchmarks are for Arabic. The MGB-5 challenge's ADI17 task
 asks systems to identify 17 Arabic dialects from broadcast speech
-\citep{ali2019mgb5}, the closest analogue to the 9-way Bangla setting here.
-\citet{khaled2025arabic} fine-tune a cross-lingual wav2vec~2.0 model on Arabic
+\cite{Ali2019MGB5}, the closest analogue to the 9-way Bangla setting here.
+Khaled \& Elnagar~\cite{Khaled2025Arabic} fine-tune a cross-lingual wav2vec~2.0 model on Arabic
 dialect audio, the same design as this thesis's fine-tuned model, and
-\citet{sullivan2023robustness} show that Arabic DID systems degrade sharply when
+Sullivan \etal~\cite{Sullivan2023Robustness} show that Arabic DID systems degrade sharply when
 moved away from their training conditions. For another lower-resource language,
-\citet{hamalainen2021finnish} compare audio and text for Finnish dialect
+H\"{a}m\"{a}l\"{a}inen \etal~\cite{Hamalainen2021Finnish} compare audio and text for Finnish dialect
 identification, a precedent for asking whether dialect lives in the sound or in
-the words. At larger scale, VoxLingua107 \citep{valk2021voxlingua} builds a
+the words. At larger scale, VoxLingua107 \cite{Valk2021VoxLingua107} builds a
 107-language LID corpus from YouTube, illustrating both the power of found data
-and its channel confounds, and \citet{kukk2022accented} study how accent
+and its channel confounds, and Kukk \& Alum\"{a}e~\cite{Kukk2022Improving} study how accent
 interacts with language identification---relevant to treating the standard
 register as a class of its own.
 
 \section{Pretrained speech representations}
 \label{sec:bg-ssl}
 
-Wav2vec~2.0 \citep{baevski2020wav2vec} learns speech representations from raw
+Wav2vec~2.0 \cite{Baevski2020wav2vec} learns speech representations from raw
 audio by solving a contrastive task over masked, quantised latent features, and
-is then fine-tuned for a downstream task. XLS-R \citep{babu2022xlsr} scales the
+is then fine-tuned for a downstream task. XLS-R \cite{Babu2022XLSR} scales the
 same objective to 436,000 hours of speech in 128 languages, Bangla included; its
 300-million-parameter variant is the model fine-tuned in this thesis. Whisper
-\citep{radford2023whisper} takes a different route: an encoder--decoder
+\cite{Radford2023Robust} takes a different route: an encoder--decoder
 Transformer trained with weak supervision on 680,000 hours of transcribed,
 multilingual web audio. Its encoder consumes 80-channel log-mel spectrograms
 through two convolutional layers and a Transformer stack; this thesis uses the
 encoder of Whisper-small as a frozen feature extractor.
 
-The SUPERB benchmark \citep{yang2021superb} showed that frozen self-supervised
+The SUPERB benchmark \cite{Yang2021SUPERB} showed that frozen self-supervised
 representations with light task heads transfer well across many speech tasks,
 which motivates the frozen-embedding baseline here. Probing work on accent
-identification \citep{yang2023accent} shows that fine-tuning a wav2vec~2.0
+identification \cite{Yang2023Accent} shows that fine-tuning a wav2vec~2.0
 model for accent reshapes how its layers encode prosody---external support for
 this thesis's explanation of why pitch and tempo augmentation hurt dialect
 identification (\cref{sec:disc-augment}). The pseudo-speaker clustering in
-\cref{ch:method} uses ECAPA-TDNN speaker embeddings \citep{desplanques2020ecapa}.
+\cref{ch:method} uses ECAPA-TDNN speaker embeddings \cite{Desplanques2020ECAPA}.
 
 \section{Bangla speech and dialect resources}
 \label{sec:bg-bangla}
 
 Bangla speech processing is widely described as low-resource despite the
-language's size and dialectal diversity \citep{bengaliasrsurvey2021}. The
+language's size and dialectal diversity \cite{Mridha2021Challenges}. The
 closest prior work to the first version of this project classifies Bengali
 accents from hand-crafted acoustic features with classical and neural
-classifiers \citep{badhon2020accent}, and \citet{alam2023accent} classify Bangla
+classifiers \cite{Badhon2020Bengali}, and Alam \etal~\cite{Alam2023Bangla} classify Bangla
 accent variation from audio with deep neural networks. The corpus used in this
 thesis was gathered for those two studies (\cref{ch:dataset}). Text-based Bangla dialect classification
 has progressed further: on the BanglaDial dataset, transformer models such as
 BanglaBERT reach a reported score of about 89\,\% when classifying written
-dialect text from 11 regions \citep{bangladial2026}. That result is a precedent for the lexical
+dialect text from 11 regions \cite{Sadiq2026Bangla}. That result is a precedent for the lexical
 route, with one difference: its text is written by people, whereas the lexical
 route in this thesis has to obtain its text from speech recognition.
 
 Regional speech datasets are appearing: a five-region speech dataset
-\citep{bdregionalspeech}, the BRADS and BRWDS audio-and-text collections
-\citep{brads2025}, and the Ben-10 and RegSpeech12 corpora discussed in
+\cite{Rahman2026Bangla}, the BRADS and BRWDS audio-and-text collections
+\cite{Aiman2025BRADS}, and the Ben-10 and RegSpeech12 corpora discussed in
 \cref{sec:bg-asr}. Large-scale standard Bangla speech is available in the
-crowdsourced Bengali Common Voice corpus \citep{alam2022commonvoice} and in
-OOD-Speech \citep{rakib2023oodspeech}.
+crowdsourced Bengali Common Voice corpus \cite{Alam2022Bengali} and in
+OOD-Speech \cite{Rakib2023OODSpeech}.
 
 \section{Leakage, shortcuts and honest evaluation}
 \label{sec:bg-leakage}
 
 Deep networks exploit whatever regularity separates the training classes,
 including regularities that are not the intended signal
-\citep{geirhos2020shortcut}. In audio, recording channel, background and session
-are such shortcuts. SpurAudio \citep{spuraudio2026} benchmarks shortcut learning
-in audio classification directly, and EchoHawk \citep{echohawk2026} shows, for
+\cite{Geirhos2020Shortcut}. In audio, recording channel, background and session
+are such shortcuts. SpurAudio \cite{AbuAyoub2026SpurAudio} benchmarks shortcut learning
+in audio classification directly, and EchoHawk \cite{Shulman2026EchoHawk} shows, for
 acoustic drone detection, that clips sharing a recording session share their
 channel and background, and that session-disjoint evaluation collapses inflated
 scores---the same phenomenon this thesis measures for dialects. A survey of
 audio-classification practice finds evaluation protocols frequently
-under-specified \citep{leakage2025iciis}. Together these legitimise reporting the
+under-specified \cite{Puvanendran2025Benchmarking}. Together these legitimise reporting the
 drop from a clip-level to a group-disjoint split as a finding in itself.
 
 \section{Augmentation for speech}
 \label{sec:bg-aug}
 
 Speed and tempo perturbation is a standard and beneficial augmentation in speech
-recognition \citep{ko2015augmentation}, where the target transcript does not
-depend on prosody. SpecAugment \citep{park2019specaugment} masks time and
+recognition \cite{Ko2015Audio}, where the target transcript does not
+depend on prosody. SpecAugment \cite{Park2019SpecAugment} masks time and
 frequency bands of the spectrogram and is the canonical feature-level method.
 \Cref{sec:res-augment} shows that the analogous waveform-level transforms reduce
 dialect-identification accuracy, and \cref{sec:disc-augment} argues why the
@@ -115,16 +115,16 @@ recognition intuition does not carry over.
 
 The lexical route depends on three recent resources.
 
-\paragraph{OOD-Speech.} \citet{rakib2023oodspeech} released 1,178 hours of
+\paragraph{OOD-Speech.} Rakib \etal~\cite{Rakib2023OODSpeech} released 1,178 hours of
 crowd-read standard Bangla from 22,645 speakers, with a 23-hour test set drawn
 from 17 out-of-distribution domains. It was the training data of the 2023
-Bengali.AI speech-recognition competition \citep{bengaliai2023competition},
+Bengali.AI speech-recognition competition \cite{BengaliAI2023Speech},
 whose winning entry---a fine-tuned Whisper-medium released as
 \hf{bengaliAI/tugstugi_bengaliai-asr_whisper-medium} and referred to here as
 \emph{Tugstugi}---is one of this thesis's recognisers. Its training transcripts
 supply the standard-Bangla vocabulary in \cref{sec:method-lexical}.
 
-\paragraph{Ben-10.} \citet{dipto2025ben10} introduce Ben-10, 78 hours of mostly
+\paragraph{Ben-10.} Dipto \etal~\cite{Dipto2025ASR} introduce Ben-10, 78 hours of mostly
 spontaneous speech from 394 speakers in ten districts, transcribed in the
 dialect as spoken, and benchmark seven speech-recognition systems on it. Word
 error rates range from 1.13 for zero-shot Whisper-large-v3 and 1.03 for
@@ -139,20 +139,47 @@ models serve as transcription front-ends, and its manual dialect-recall
 analysis is repeated automatically over its full validation set
 (\cref{sec:res-asr}).
 
-\paragraph{Parallel dialect text.} Vashantor \citep{faria2023vashantor}
+\paragraph{Parallel dialect text.} Vashantor \cite{Faria2023Vashantor}
 provides 32,500 sentence pairs translating regional Bangla from Chittagong,
 Noakhali, Sylhet, Barishal and Mymensingh into standard Bangla. Because each
 pair contains both forms, a regional word can be defined as one that appears on
 the dialect side but not on the standard side. RegSpeech12
-\citep{hassan2025regspeech12}, from the same group as Ben-10, extends coverage to
-twelve dialects, and BanglaDialecto \citep{bangladialecto2024} provides Noakhali
+\cite{Hassan2025RegSpeech12}, from the same group as Ben-10, extends coverage to
+twelve dialects, and BanglaDialecto \cite{Samin2024BanglaDialecto} provides Noakhali
 speech with dialect and standard transcriptions; neither is used here, but both
 would extend word lists to more of this corpus's classes.
 
-The other recognisers used are Hishab's FastConformer \citep{nandi2023hishab},
+\paragraph{Where work on Bangladeshi dialects stands.} Taken together, the
+recent work on Bangladeshi dialects falls into three strands, none of which
+identifies the dialect from audio. The first is \emph{corpora}: Ben-10
+(Dipto \etal~\cite{Dipto2025ASR}) and RegSpeech12
+(Hassan \etal~\cite{Hassan2025RegSpeech12}), the latter about 100 hours of
+spontaneous speech from twelve regions---Ben-10's ten plus Comilla and
+Noakhali---with linguist-reviewed transcripts, released for public use. The
+second is \emph{speech recognition for dialect speech}: Hassan~\cite{Hassan2024Character}
+models regional Bangla speech-to-text with a character-gram approach on top of a
+wav2vec~2.0 recogniser, and the Ben-10 paper~\cite{Dipto2025ASR} is the existing
+\emph{benchmark} for the task, scoring seven recognisers by word and character
+error rate and finding that models trained on standard Bangla default to
+standard forms. The third is \emph{standardisation}: Vashantor~\cite{Faria2023Vashantor}
+and BanglaDialecto~\cite{Samin2024BanglaDialecto} translate dialect into
+standard Bangla, and Niloy \etal~\cite{Niloy2026Meaning} benchmark eight open
+large language models on translating fifteen Bangla dialects, Sylheti and
+Chittagonian among them, into standard Bangla with both surface metrics (BLEU,
+WER, CER) and semantic ones (BERTScore, METEOR, COMET), finding that
+morphological divergence rather than meaning is the main barrier. This thesis
+uses the first strand as a source of regional word lists and a reference for
+recognition quality, uses the recognisers of the second strand as transcription
+front-ends and reports its own results against the Ben-10 benchmark's
+findings, and shares with the third strand the observation that standard-trained
+recognisers normalise dialect away. What it adds is the missing fourth strand:
+identifying the dialect itself, from the audio, with pretrained speech encoders
+under a leakage-controlled evaluation.
+
+The other recognisers used are Hishab's FastConformer \cite{Hishab2023FastConformer},
 trained on about 18,000 hours of mostly broadcast-news Bangla, Whisper-large-v3
-\citep{radford2023whisper}, and a public wav2vec~2.0 XLS-R model fine-tuned for
-Bangla \citep{arijitx2022wav2vec2}, which stands in for the benchmark's
+\cite{Radford2023Robust}, and a public wav2vec~2.0 XLS-R model fine-tuned for
+Bangla \cite{Arijitx2022wav2vec2}, which stands in for the benchmark's
 ``Wav2Vec2 (SCB)'' system whose checkpoint is not public.
 
 \section{The gap}
