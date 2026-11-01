@@ -75,6 +75,9 @@ on 93.6 % of pilot clips; the committed numbers use the T4 transcripts.
 | Frozen Whisper-medium / Tugstugi (Ben-10) + MLP | `baseline_whisper.py cache --model <id> --out embeddings_<tag>.npz`, then `baseline_whisper.py train --emb embeddings_<tag>.npz --device cpu --out-dir reports/phase6/clip --tag frozen_<tag>` (strict: add `--remap-split manifest_split_strict.csv --out-dir reports/phase6/strict`) |
 | MFCC and frozen Whisper-small rows in the same format | `baseline_whisper.py train ... --out-dir reports/phase6/<split> --tag {mfcc,frozen_whisper_small}` (identical numbers to Phases 1/3) |
 | Summary table and figure | `summarize_phase6.py` → `reports/phase6/summary.csv`; `make_phase6_figures.py` → `reports/figures/phase6_models_split.pdf` |
+| Thesis dataset figures (Ch. 3) | `make_dataset_figures.py` → `reports/figures/dataset_*.pdf` (LTAS cached in `dataset_ltas.npz`; `--ltas-cache` re-plots) |
+| Thesis results figures (Ch. 5) | `dump_embeddings.py --checkpoint whisper_medium_best.pt --splits test` (Kaggle) → `embeddings_whisper_medium_ft_strict_test.npz`; then `make_results_figures.py` → `reports/figures/results_*.pdf`, `reports/phase6/metrics_all_models.csv`, `tsne_strict_test.npz` |
+| Public model and demo | `export_hf_model.py --checkpoint whisper_medium_best.pt --out hf_export/...` then `hf upload`; Space from `app/` |
 | Bootstrap CIs incl. Phase 6 models | `bootstrap_ci.py --out reports/phase6/bootstrap_ci.json --extra "strict:Whisper-medium FT=reports/phase6/strict/test_predictions_whisper_medium.csv" ...` |
 
 The XLS-R path of `finetune_xlsr.py` (default `--model`, `--tag xlsr`) is
