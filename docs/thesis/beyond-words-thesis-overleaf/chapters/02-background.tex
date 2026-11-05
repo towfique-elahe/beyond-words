@@ -35,8 +35,8 @@ identification, a precedent for asking whether dialect lives in the sound or in
 the words. At larger scale, VoxLingua107 \cite{Valk2021VoxLingua107} builds a
 107-language LID corpus from YouTube, illustrating both the power of found data
 and its channel confounds, and Kukk \& Alum\"{a}e~\cite{Kukk2022Improving} study how accent
-interacts with language identification---relevant to treating the standard
-register as a class of its own.
+interacts with language identification, which is relevant to treating the
+standard register as a class of its own.
 
 \section{Pretrained speech representations}
 \label{sec:bg-ssl}
@@ -46,7 +46,7 @@ audio by solving a contrastive task over masked, quantised latent features, and
 is then fine-tuned for a downstream task. XLS-R \cite{Babu2022XLSR} scales the
 same objective to 436,000 hours of speech in 128 languages, Bangla included; its
 300-million-parameter variant is the model fine-tuned in this thesis. Whisper
-\cite{Radford2023Robust} takes a different route: an encoder--decoder
+\cite{Radford2023Robust} takes a different route: an encoder-decoder
 Transformer trained with weak supervision on 680,000 hours of transcribed,
 multilingual web audio. Its encoder consumes 80-channel log-mel spectrograms
 through two convolutional layers and a Transformer stack; this thesis uses the
@@ -56,7 +56,7 @@ The SUPERB benchmark \cite{Yang2021SUPERB} showed that frozen self-supervised
 representations with light task heads transfer well across many speech tasks,
 which motivates the frozen-embedding baseline here. Probing work on accent
 identification \cite{Yang2023Accent} shows that fine-tuning a wav2vec~2.0
-model for accent reshapes how its layers encode prosody---external support for
+model for accent reshapes how its layers encode prosody, external support for
 this thesis's explanation of why pitch and tempo augmentation hurt dialect
 identification (\cref{sec:disc-augment}). The pseudo-speaker clustering in
 \cref{ch:method} uses ECAPA-TDNN speaker embeddings \cite{Desplanques2020ECAPA}.
@@ -66,7 +66,7 @@ identification (\cref{sec:disc-augment}). The pseudo-speaker clustering in
 
 Bangla speech processing is widely described as low-resource despite the
 language's size and dialectal diversity \cite{Mridha2021Challenges}. The
-closest prior work to the first version of this project classifies Bengali
+closest prior work to the first version of this project classifies Bangla
 accents from hand-crafted acoustic features with classical and neural
 classifiers \cite{Badhon2020Bengali}, and Alam \etal~\cite{Alam2023Bangla} classify Bangla
 accent variation from audio with deep neural networks. The corpus used in this
@@ -94,7 +94,7 @@ are such shortcuts. SpurAudio \cite{AbuAyoub2026SpurAudio} benchmarks shortcut l
 in audio classification directly, and EchoHawk \cite{Shulman2026EchoHawk} shows, for
 acoustic drone detection, that clips sharing a recording session share their
 channel and background, and that session-disjoint evaluation collapses inflated
-scores---the same phenomenon this thesis measures for dialects. A survey of
+scores, the same phenomenon this thesis measures for dialects. A survey of
 audio-classification practice finds evaluation protocols frequently
 under-specified \cite{Puvanendran2025Benchmarking}. Together these legitimise reporting the
 drop from a clip-level to a group-disjoint split as a finding in itself.
@@ -119,9 +119,9 @@ The lexical route depends on three recent resources.
 crowd-read standard Bangla from 22,645 speakers, with a 23-hour test set drawn
 from 17 out-of-distribution domains. It was the training data of the 2023
 Bengali.AI speech-recognition competition \cite{BengaliAI2023Speech},
-whose winning entry---a fine-tuned Whisper-medium released as
-\hf{bengaliAI/tugstugi_bengaliai-asr_whisper-medium} and referred to here as
-\emph{Tugstugi}---is one of this thesis's recognisers. Its training transcripts
+whose winning entry, a fine-tuned Whisper-medium referred to here as
+\emph{Tugstugi}, is one of this thesis's recognisers (its public identifier is
+given in \cref{tab:checkpoints}). Its training transcripts
 supply the standard-Bangla vocabulary in \cref{sec:method-lexical}.
 
 \paragraph{Ben-10.} Dipto \etal~\cite{Dipto2025ASR} introduce Ben-10, 78 hours of mostly
@@ -154,8 +154,8 @@ recent work on Bangladeshi dialects falls into three strands, none of which
 identifies the dialect from audio. The first is \emph{corpora}: Ben-10
 (Dipto \etal~\cite{Dipto2025ASR}) and RegSpeech12
 (Hassan \etal~\cite{Hassan2025RegSpeech12}), the latter about 100 hours of
-spontaneous speech from twelve regions---Ben-10's ten plus Comilla and
-Noakhali---with linguist-reviewed transcripts, released for public use. The
+spontaneous speech from twelve regions (Ben-10's ten plus Comilla and
+Noakhali) with linguist-reviewed transcripts, released for public use. The
 second is \emph{speech recognition for dialect speech}: Hassan~\cite{Hassan2024Character}
 models regional Bangla speech-to-text with a character-gram approach on top of a
 wav2vec~2.0 recogniser, and the Ben-10 paper~\cite{Dipto2025ASR} is the existing

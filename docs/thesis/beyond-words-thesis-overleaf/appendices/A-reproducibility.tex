@@ -2,20 +2,49 @@
 \label{app:repro}
 
 Every result maps to one command in the code repository, run at seed 42 on the
-committed split files \path{splits/manifest_split_rel.csv} (clip-level) and
-\path{splits/manifest_split_strict_rel.csv} (strict). Relative paths in the
-split files resolve against the audio root, which is not redistributed.
+committed split files \code{splits/manifest_split_rel.csv} (clip-level) and
+\code{splits/manifest_split_strict_rel.csv} (strict). Relative paths in the
+split files resolve against the audio root, which is not redistributed. Commands
+and identifiers are set in italics.
 
 \section{Environment}
 
 \begin{itemize}
-  \item \textbf{Local:} Python 3.12, \path{pip install -r requirements.txt}.
+  \item \textbf{Local:} Python 3.12, \code{pip install -r requirements.txt}.
         PyTorch selects CUDA, then Apple MPS, then CPU. MLP heads are trained on
         CPU for bit-reproducibility.
   \item \textbf{Cloud:} Kaggle T4 GPU for fine-tuning and transcription
-        (\path{kaggle kernels push --accelerator NvidiaTeslaT4}; Kaggle's
+        (\code{kaggle kernels push --accelerator NvidiaTeslaT4}; Kaggle's
         default P100 assignment is not supported by current PyTorch builds).
 \end{itemize}
+
+\section{Pretrained checkpoints}
+
+\Cref{tab:checkpoints} gives the public identifier of every pretrained model
+used, as named on the Hugging Face Hub.
+
+\begin{table}[ht]
+  \centering
+  \caption{Public identifiers of the pretrained models.}
+  \label{tab:checkpoints}
+  \small
+  \begin{tabularx}{\textwidth}{@{}lL@{}}
+    \toprule
+    Model (as named in the text) & Hub identifier \\
+    \midrule
+    Whisper-small (frozen encoder) & \code{openai/whisper-small} \\
+    Whisper-medium (frozen and fine-tuned) & \code{openai/whisper-medium} \\
+    Tugstugi & \code{bengaliAI/tugstugi_bengaliai-asr_whisper-medium} \\
+    Tugstugi (Ben-10) & \code{bengaliAI/tugstugi_bengaliai-regional-asr_whisper-medium} \\
+    XLS-R-300M & \code{facebook/wav2vec2-xls-r-300m} \\
+    Hishab FastConformer & \code{hishab/hishab_bn_fastconformer} \\
+    wav2vec2 Bengali (ASR front-end) & \code{arijitx/wav2vec2-xls-r-300m-bengali} \\
+    Whisper-large-v3 (ASR front-end) & \code{openai/whisper-large-v3} \\
+    ECAPA-TDNN speaker model & \code{speechbrain/spkrec-ecapa-voxceleb} \\
+    Released dialect classifier & \code{towfique-elahe/beyond-words-whisper-medium-did} \\
+    \bottomrule
+  \end{tabularx}
+\end{table}
 
 \section{Acoustic route}
 
@@ -24,24 +53,29 @@ split files resolve against the audio root, which is not redistributed.
   \toprule
   Result & Command \\
   \midrule
-  Whisper clip-level 0.917 & \path{baseline_whisper.py cache}, then \path{baseline_whisper.py train --device cpu} \\
-  Whisper strict 0.793 & same, with \path{--remap-split manifest_split_strict.csv} \\
-  MFCC clip-level 0.727 & \path{baseline_mfcc.py cache}, then \path{baseline_whisper.py train --emb features_v1.npz --device cpu} \\
-  MFCC strict 0.480 & same, with \path{--remap-split manifest_split_strict.csv} \\
-  XLS-R clip-level 0.952 & \path{finetune_xlsr.py --manifest splits/manifest_split_rel.csv} (T4, 20 epochs) \\
-  XLS-R strict 0.808 & \path{finetune_xlsr.py --manifest splits/manifest_split_strict_rel.csv} (T4, 20 epochs) \\
-  XLS-R strict + augmentation 0.748 & same, with \path{--augment} \\
-  Data efficiency & \path{data_efficiency.py} \\
-  Bootstrap intervals & \path{bootstrap_ci.py} $\rightarrow$ \path{reports/phase3/bootstrap_ci.json} \\
+  Whisper clip-level 0.917 & \code{baseline_whisper.py cache}, then \code{baseline_whisper.py train --device cpu} \\
+  Whisper strict 0.793 & same, with \code{--remap-split manifest_split_strict.csv} \\
+  MFCC clip-level 0.727 & \code{baseline_mfcc.py cache}, then \code{baseline_whisper.py train --emb features_v1.npz --device cpu} \\
+  MFCC strict 0.480 & same, with \code{--remap-split manifest_split_strict.csv} \\
+  XLS-R clip-level 0.952 & \code{finetune_xlsr.py --manifest splits/manifest_split_rel.csv} (T4, 20 epochs) \\
+  XLS-R strict 0.808 & \code{finetune_xlsr.py --manifest splits/manifest_split_strict_rel.csv} (T4, 20 epochs) \\
+  XLS-R strict + augmentation 0.748 & same, with \code{--augment} \\
+  Whisper-medium family, fine-tuned & \code{finetune_xlsr.py --model <checkpoint> --tag <tag> --epochs 12} (T4), via \code{notebooks/kaggle_finetune_encoders.ipynb} \\
+  Hishab FastConformer, fine-tuned & same notebook with \code{--family nemo}, 20 epochs \\
+  Frozen Whisper-medium and Tugstugi (Ben-10) & \code{baseline_whisper.py cache --model <checkpoint>}, then \code{baseline_whisper.py train --emb <cache>} \\
+  Data efficiency & \code{data_efficiency.py} \\
+  Bootstrap intervals & \code{bootstrap_ci.py} $\rightarrow$ \code{reports/phase3/bootstrap_ci.json}, \code{reports/phase6/bootstrap_ci.json} \\
+  Figures & \code{make_dataset_figures.py}, \code{make_results_figures.py} (t-SNE input from \code{dump_embeddings.py}) \\
+  Released model and demo & \code{export_hf_model.py}, then \code{modal deploy app/modal_app.py} \\
   \bottomrule
 \end{tabularx}
 \end{small}
 
 \section{Lexical route}
 
-External inputs (not redistributed): OOD-Speech \path{train.csv} (Kaggle
-competition \path{bengaliai-speech}), Ben-10 training and validation CSVs and
-validation audio (Hugging Face \path{bengaliAI/Ben-10}), and the Vashantor CSV
+External inputs (not redistributed): OOD-Speech \code{train.csv} (Kaggle
+competition \code{bengaliai-speech}), Ben-10 training and validation CSVs and
+validation audio (Hugging Face \code{bengaliAI/Ben-10}), and the Vashantor CSV
 release (Mendeley Data).
 
 \begin{small}
@@ -49,16 +83,16 @@ release (Mendeley Data).
   \toprule
   Result & Command \\
   \midrule
-  Transcripts (9,303 clips $\times$ 5 front-ends) & \path{notebooks/kaggle_transcribe.ipynb}, wrapping \path{transcribe.py} $\rightarrow$ \path{transcripts/<front-end>.csv} \\
-  Standard vocabulary & \path{build_lexicon.py formal --source data/ood_speech/train.csv} \\
-  External lexicon & \path{build_lexicon.py external --ben10 data/ben10/train.csv --vashantor data/vashantor/Vashantor_CSV_Format} \\
-  In-domain lexicons & \path{build_lexicon.py indomain --transcripts transcripts/<front-end>.csv --manifest splits/<split>.csv} \\
-  XLS-R probabilities for fusion & \path{predict.py --checkpoint checkpoints/xlsr_strict_best.pt --manifest splits/manifest_split_strict_rel.csv --dump-probs reports/phase5/xlsr_probs_strict.csv} \\
-  Word matching, TF-IDF, fusion & \path{lexical_did.py --transcripts ... --lexicon ... --xlsr-probs ...} $\rightarrow$ \path{reports/phase5/metrics_*.json} \\
-  Front-end diagnostics & \path{asr_diagnostics.py transcripts/<front-end>.csv --min-count 3} \\
-  Recognition quality on Ben-10 & \path{notebooks/kaggle_ben10_eval.ipynb}, then \path{ben10_eval.py transcripts/ben10_valid/*.csv} \\
-  Summary table and figures & \path{summarize_phase5.py}, \path{make_phase5_figures.py} \\
-  Bootstrap intervals & \path{bootstrap_ci.py --extra "strict:Fusion/...=..."} $\rightarrow$ \path{reports/phase5/bootstrap_ci.json} \\
+  Transcripts (9,303 clips $\times$ 5 front-ends) & \code{notebooks/kaggle_transcribe.ipynb}, wrapping \code{transcribe.py} $\rightarrow$ \code{transcripts/<front-end>.csv} \\
+  Standard vocabulary & \code{build_lexicon.py formal --source data/ood_speech/train.csv} \\
+  External lexicon & \code{build_lexicon.py external --ben10 data/ben10/train.csv --vashantor data/vashantor/Vashantor_CSV_Format} \\
+  In-domain lexicons & \code{build_lexicon.py indomain --transcripts transcripts/<front-end>.csv --manifest splits/<split>.csv} \\
+  XLS-R probabilities for fusion & \code{predict.py --checkpoint checkpoints/xlsr_strict_best.pt --manifest splits/manifest_split_strict_rel.csv --dump-probs reports/phase5/xlsr_probs_strict.csv} \\
+  Word matching, TF-IDF, fusion & \code{lexical_did.py --transcripts ... --lexicon ... --xlsr-probs ...} $\rightarrow$ \code{reports/phase5/metrics_*.json} \\
+  Front-end diagnostics & \code{asr_diagnostics.py transcripts/<front-end>.csv --min-count 3} \\
+  Recognition quality on Ben-10 & \code{notebooks/kaggle_ben10_eval.ipynb}, then \code{ben10_eval.py transcripts/ben10_valid/*.csv} \\
+  Summary table and figures & \code{summarize_phase5.py}, \code{make_phase5_figures.py} \\
+  Bootstrap intervals & \code{bootstrap_ci.py --extra "strict:Fusion/...=..."} $\rightarrow$ \code{reports/phase5/bootstrap_ci.json} \\
   \bottomrule
 \end{tabularx}
 \end{small}

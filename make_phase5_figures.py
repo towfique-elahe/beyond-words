@@ -28,6 +28,11 @@ FRONTS = [  # (tag, label) in the order used throughout the thesis
 # reference palette, first three categorical slots (validated all-pairs, light mode)
 BLUE, ORANGE, AQUA = "#2a78d6", "#eb6834", "#1baf7a"
 INK, INK2, GRID, SURFACE = "#0b0b0b", "#52514e", "#e4e3df", "#ffffff"
+DISPLAY = {"Formal": "Standard"}      # class name as printed in the thesis; data files keep "Formal"
+
+
+def disp(c):
+    return DISPLAY.get(c, c)
 
 plt.rcParams.update({
     "font.size": 9, "axes.titlesize": 10, "axes.labelsize": 9,
@@ -75,7 +80,7 @@ def fig_asr_dialect():
 
     for yi, f, r in zip(y, oov_formal, oov_regional):
         b.plot([f, r], [yi, yi], color=GRID, linewidth=2, zorder=1)
-    b.scatter(oov_formal, y, s=40, color=ORANGE, zorder=2, label="Formal clips",
+    b.scatter(oov_formal, y, s=40, color=ORANGE, zorder=2, label=f"{disp('Formal')} clips",
               edgecolor=SURFACE, linewidth=1.5)
     b.scatter(oov_regional, y, s=40, color=BLUE, zorder=2, label="regional clips (mean)",
               edgecolor=SURFACE, linewidth=1.5)
@@ -130,7 +135,7 @@ def fig_fusion_per_class():
                edgecolor=SURFACE, linewidth=1.5)
     ax.scatter(df.fusion, y, s=40, color=BLUE, zorder=2, label="XLS-R + TF-IDF fusion",
                edgecolor=SURFACE, linewidth=1.5)
-    ax.set_yticks(y, df.index)
+    ax.set_yticks(y, [disp(c) for c in df.index])
     ax.set_xlim(0.45, 1.02)
     ax.set_xlabel("test F1 per class (strict split); labels: change in points")
     ax.grid(axis="y", visible=False)

@@ -1,17 +1,21 @@
-% Dataset pipeline (Ch. 3). Compile with pdfLaTeX/Tectonic; copy data-pipeline.pdf to figures/.
+% Dataset pipeline (Ch. 3). Compile with tectonic: tectonic -o .. data-pipeline.tex
 \documentclass[12pt,border=2pt]{standalone}
 \usepackage[T1]{fontenc}\usepackage{newtxtext}
 \usepackage{tikz}\usetikzlibrary{positioning,arrows.meta,calc}
+\tikzset{
+  box/.style={draw, rounded corners=2pt, align=center, font=\small, minimum height=10mm, text width=27mm, fill=white, line width=0.5pt},
+  data/.style={box, fill=blue!10, draw=blue!55},
+  proc/.style={box, fill=orange!12, draw=orange!70!black!70},
+  res/.style={box, fill=green!12, draw=green!45!black!60},
+  arr/.style={-{Latex[length=2mm]}, thick, draw=blue!35!black!55}}
 \begin{document}
-\begin{tikzpicture}[node distance=4mm and 6mm,
-  box/.style={draw, rounded corners=2pt, align=center, font=\small, minimum height=11mm, text width=26mm, fill=white},
-  data/.style={box, fill=black!6}, arr/.style={-{Latex[length=2mm]}, thick}]
+\begin{tikzpicture}[node distance=4mm and 6mm, box/.append style={minimum height=11mm, text width=26mm}]
   \node[data] (raw) {TV, film and online\\media clips (MP4)};
-  \node[box, right=of raw] (std) {validate, 16 kHz\\mono PCM-16\\\texttt{build\_manifest.py}};
-  \node[box, right=of std] (man) {manifest: 9,303 clips,\\9 classes, durations,\\YouTube source IDs};
-  \node[box, above right=2mm and 6mm of man] (clip) {clip-level split\\75 / 10 / 15\\\texttt{build\_split.py}};
-  \node[box, below right=2mm and 6mm of man] (strict) {strict split:\\ECAPA pseudo-speakers\\$\rightarrow$ grouped split};
-  \node[data, right=6mm of $(clip.east)!0.5!(strict.east)$, text width=24mm] (out) {committed\\\texttt{splits/*.csv}};
+  \node[proc, right=of raw] (std) {validate and\\standardise:\\16 kHz mono PCM-16};
+  \node[data, right=of std] (man) {manifest: 9,303 clips,\\9 classes, durations,\\YouTube source IDs};
+  \node[proc, above right=2mm and 6mm of man] (clip) {clip-level split\\75 / 10 / 15\\stratified by class};
+  \node[proc, below right=2mm and 6mm of man] (strict) {strict split:\\ECAPA pseudo-speakers\\$\rightarrow$ grouped split};
+  \node[res, right=6mm of $(clip.east)!0.5!(strict.east)$, text width=24mm] (out) {committed split files\\(both protocols)};
   \draw[arr] (raw) -- (std); \draw[arr] (std) -- (man);
   \draw[arr] (man.east) -| ($(man.east)+(3mm,0)$) |- (clip.west);
   \draw[arr] (man.east) -| ($(man.east)+(3mm,0)$) |- (strict.west);

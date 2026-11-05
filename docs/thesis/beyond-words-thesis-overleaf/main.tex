@@ -87,7 +87,6 @@
 \usepackage{enumitem}
 \setlist{itemsep=2pt,topsep=4pt}
 \usepackage{float}
-\usepackage{cite}                          % numeric [1], sorted and compressed
 \bibliographystyle{IEEEtrandoi}   % IEEEtran 1.14 + DOI (local file)
 \usepackage[obeyspaces,spaces]{xurl}
 \urlstyle{same}
@@ -96,7 +95,8 @@
 
 % ---------- Helpers ----------------------------------------------------------
 \newcommand{\fscore}[1]{#1}                       % keeps numbers greppable
-\newcommand{\hf}[1]{\path{#1}}                    % model / dataset identifiers
+\newcommand{\hf}[1]{{\itshape\path{#1}}}             % model / dataset identifiers (appendices only)
+\newcommand{\code}[1]{{\itshape\path{#1}}}           % commands and file names (appendices only)
 \newcommand{\etal}{\textit{et al.}}               % Lead-author rule: 3+ authors
 \newcolumntype{L}{>{\raggedright\arraybackslash}X}
 
@@ -126,7 +126,6 @@
 \input{frontmatter/declaration}
 \input{frontmatter/acknowledgements}
 \input{frontmatter/abstract}
-\input{frontmatter/ai-disclosure}
 
 \clearpage
 \tableofcontents

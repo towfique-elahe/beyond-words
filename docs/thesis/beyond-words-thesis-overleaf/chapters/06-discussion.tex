@@ -114,10 +114,10 @@ out.
 
 \paragraph{Standard-Bangla speech recognition removes the dialect before a
 classifier can see it.} Recognisers trained on standard Bangla (Tugstugi,
-Hishab) transcribe regional speech into standard forms---\bn{biya}{বিয়া দিয়া দাও}
-(``arrange the marriage'') becomes \bn{biye}{বিয়ে দিয়ে দাও}---and reproduce only
+Hishab) transcribe regional speech into standard forms, so that \bn{biya}{বিয়া দিয়া দাও}
+(``arrange the marriage'') becomes \bn{biye}{বিয়ে দিয়ে দাও}, and reproduce only
 1--4\,\% of the dialect words in Ben-10's human transcripts. Their output on
-regional clips is barely less standard than on Formal clips. The one front-end
+regional clips is barely less standard than on Standard clips. The one front-end
 fine-tuned on dialect speech reproduces 27\,\%, which is both the best available
 and a hard ceiling for any word-list method: nearly three of four dialect words
 never reach the text. This confirms, with an automated measure over the full
@@ -125,8 +125,8 @@ validation set, the observation that Dipto \etal~\cite{Dipto2025ASR} made by han
 is the single most important fact about the lexical route.
 
 \paragraph{Filtering to regional words discards evidence.} The intuitive
-design---drop every word that standard Bangla also has and match what is left
-against regional word lists---scores 0.360 under the strict split, because
+design, which drops every word that standard Bangla also has and matches what
+is left against regional word lists, scores 0.360 under the strict split, because
 fewer than half of the 5-second clips keep any matchable word. A TF-IDF
 classifier over all words and character n-grams reaches 0.633 on the same
 transcripts. Two mechanisms plausibly explain the gap, though this thesis did
@@ -134,17 +134,17 @@ not isolate them: words that also exist in standard Bangla but are used at
 different rates across regions (pronouns, particles, common verbs), which the
 filter removes; and character n-grams, which generalise over rare inflected
 dialect forms such as verb endings that never reach the lexicon's frequency
-thresholds. Word matching keeps its value as an \emph{explanation}---it shows
-which words decided a clip and how strongly each belongs to each region---rather
-than as the classifier.
+thresholds. Word matching keeps its value as an \emph{explanation} rather than as the
+classifier: it shows which words decided a clip and how strongly each belongs
+to each region.
 
 \paragraph{Words and sound are complementary only while the acoustic model
 is weak.} With XLS-R, fusion raises the strict-split score from 0.808 to
 0.856, a gain that is borderline under the speaker-group bootstrap (a 4\,\%
 probability of no gain), and the clip-level score from 0.952 to 0.967, which
 is significant. The gain lands where XLS-R is weakest under the strict
-split---Barishal (+21 points) and Sylhet (+8), the dialect with the most
-distinctive and best-transcribed vocabulary---and is negative only for
+split, Barishal (+21 points) and Sylhet (+8), the dialect with the most
+distinctive and best-transcribed vocabulary, and is negative only for
 Khulna, where the acoustics are already near perfect. The two routes fail on
 different clips, which is the condition under which fusion helps, and this is
 evidence that the text carries dialect information of its own rather than a
@@ -171,7 +171,7 @@ at the cost of the off-the-shelf setting that makes the comparison clean.
 \label{sec:disc-limits}
 
 \begin{itemize}
-  \item \textbf{Pseudo-speakers are approximate.} Calibration against Formal's
+  \item \textbf{Pseudo-speakers are approximate.} Calibration against Standard's
         true sources reaches an ARI of 0.347, and clustering both over-merges (a
         251-clip Barishal cluster) and over-splits (many singletons). The strict
         split removes much, but not provably all, speaker and channel overlap;

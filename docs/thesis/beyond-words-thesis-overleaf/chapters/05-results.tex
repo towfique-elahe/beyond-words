@@ -1,8 +1,9 @@
 \chapter{RESULTS}
 \label{ch:results}
 
-All numbers are test macro-F1 unless stated otherwise. Artifacts are in
-\texttt{reports/} of the code repository.
+All numbers are test macro-F1 unless stated otherwise. Every table and figure
+in this chapter is computed from the per-clip test predictions released with
+the code.
 
 \section{Clip-level results}
 \label{sec:res-clip}
@@ -10,12 +11,16 @@ All numbers are test macro-F1 unless stated otherwise. Artifacts are in
 On the canonical clip-level split, frozen Whisper-small embeddings with an MLP
 head reach a macro-F1 of \fscore{0.917} (accuracy 0.916, $n = 1{,}329$), and
 end-to-end fine-tuned XLS-R-300M reaches \fscore{0.952}, 3.5 points higher.
-The MFCC baseline reaches \fscore{0.727}. \Cref{tab:clip-perclass} and
-\cref{fig:perclass-clip} give the per-class scores.
+The MFCC baseline reaches \fscore{0.727}. \Cref{tab:clip-perclass} lists the
+per-class scores of the three models, and \cref{fig:perclass-clip} plots the
+two pretrained models side by side; \cref{fig:perclass-baseline} in
+\cref{app:figures} repeats the frozen baseline's scores sorted by value. Khulna,
+Sylhet and Rajshahi are the easiest classes for every model, and Noakhali,
+Mymensingh, Chattogram and Barishal the hardest.
 
 \begin{table}[ht]
   \centering
-  \caption{Per-class test F1, clip-level split (upper bound).}
+  \caption{Per-class test F1 on the clip-level split.}
   \label{tab:clip-perclass}
   \begin{tabular}{lccc}
     \toprule
@@ -24,7 +29,7 @@ The MFCC baseline reaches \fscore{0.727}. \Cref{tab:clip-perclass} and
     Khulna     & 0.879 & 0.986 & 0.986 \\
     Sylhet     & 0.873 & 0.951 & 0.982 \\
     Rajshahi   & 0.781 & 0.947 & 0.980 \\
-    Formal     & 0.770 & 0.970 & 0.973 \\
+    Standard   & 0.770 & 0.970 & 0.973 \\
     Dhaka      & 0.655 & 0.913 & 0.972 \\
     Barishal   & 0.653 & 0.871 & 0.927 \\
     Chattogram & 0.597 & 0.880 & 0.924 \\
@@ -38,9 +43,8 @@ The MFCC baseline reaches \fscore{0.727}. \Cref{tab:clip-perclass} and
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=0.85\textwidth]{per_class_f1_comparison.png}
-  \caption{Per-class test F1 on the clip-level split: frozen Whisper-small with
-  an MLP head against fine-tuned XLS-R-300M.}
+  \includegraphics[width=0.85\textwidth]{per_class_f1_comparison.pdf}
+  \caption{Per-class clip-level F1: frozen Whisper-small against fine-tuned XLS-R.}
   \label{fig:perclass-clip}
 \end{figure}
 
@@ -51,32 +55,38 @@ Three observations follow.
         (+4.4). Task adaptation moves capacity towards the hard, acoustically
         close dialects.
   \item The dominant confusion is between Barishal and Noakhali, two southern
-        coastal dialects (\cref{fig:confusion}). Fine-tuning halves it, from 31
-        to 15 test errors, but does not remove it. Mymensingh, a transitional
-        dialect zone, spreads its errors across its neighbours. Errors follow
-        dialect geography rather than falling at random.
+        coastal dialects. Fine-tuning halves it but does not remove it.
+        Mymensingh, a transitional dialect zone, spreads its errors across its
+        neighbours. Errors follow dialect geography rather than falling at
+        random.
   \item Training converges: the 8-epoch pilot reached 0.865 and was still
         rising, while the 20-epoch run's validation score plateaus at about 0.95
-        from epoch 11 (\cref{fig:training-curve}).
+        from epoch 11.
 \end{itemize}
+
+\Cref{fig:confusion} shows the test confusion matrices of the two pretrained
+models, with true classes in rows and predictions in columns. In the frozen
+model's matrix the Barishal-Noakhali cell pair holds $14 + 17 = 31$ errors; in
+the fine-tuned model's it holds $10 + 5 = 15$. The other off-diagonal mass sits
+between Mymensingh and its neighbours and between the Standard class and the
+regional classes whose clips contain stretches of near-standard speech.
+\Cref{fig:training-curve} shows the XLS-R training run itself: the training
+loss falls steadily over the 20 epochs while validation macro-F1 rises quickly
+to about 0.9 by epoch 5 and flattens near 0.95 from epoch 11, which is the
+evidence that the lengthened schedule was sufficient.
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=0.64\textwidth]{confusion_matrix_baseline.png}\\[4pt]
-  \includegraphics[width=0.64\textwidth]{confusion_matrix_xlsr.png}
-  \caption{Test confusion matrices on the clip-level split. Top: frozen
-  Whisper-small with an MLP head. Bottom: fine-tuned XLS-R-300M. Rows are true
-  classes, columns predictions. The Barishal--Noakhali confusion falls from
-  $14 + 17 = 31$ to $10 + 5 = 15$ errors.}
+  \includegraphics[width=0.64\textwidth]{confusion_matrix_baseline.pdf}\\[4pt]
+  \includegraphics[width=0.64\textwidth]{confusion_matrix_xlsr.pdf}
+  \caption{Clip-level confusion matrices of the two pretrained models.}
   \label{fig:confusion}
 \end{figure}
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=0.85\textwidth]{training_curve_xlsr.png}
-  \caption{XLS-R-300M fine-tuning on the clip-level split: training loss (red,
-  left axis) and validation macro-F1 (blue, right axis) over 20 epochs on a
-  Kaggle T4.}
+  \includegraphics[width=0.85\textwidth]{training_curve_xlsr.pdf}
+  \caption{XLS-R fine-tuning curves on the clip-level split.}
   \label{fig:training-curve}
 \end{figure}
 
@@ -87,13 +97,15 @@ by side.
 \section{Strict-split results: quantifying leakage}
 \label{sec:res-strict}
 
-\Cref{tab:ablation} and \cref{fig:ablation} cross the three representations
-with the two split protocols, and add the augmentation variant of
-\cref{sec:method-acoustic}.
+\Cref{tab:ablation} crosses the three representations with the two split
+protocols and adds the augmentation variant of \cref{sec:method-acoustic};
+\cref{fig:ablation} plots the same numbers as paired bars, which makes the size
+of each drop visible at a glance. Every representation loses accuracy under the
+strict split, and the hand-crafted features lose the most.
 
 \begin{table}[ht]
   \centering
-  \caption{Representation $\times$ split protocol: test macro-F1.}
+  \caption{Representation by split protocol: test macro-F1.}
   \label{tab:ablation}
   \begin{tabular}{lccc}
     \toprule
@@ -102,16 +114,15 @@ with the two split protocols, and add the augmentation variant of
     MFCC statistics + MLP          & 0.727 & 0.480 & $-24.8$ \\
     Frozen Whisper-small + MLP     & 0.917 & 0.793 & $-12.4$ \\
     Fine-tuned XLS-R-300M          & 0.952 & 0.808 & $-14.4$ \\
-    XLS-R-300M + channel augmentation & --- & 0.748 & --- \\
+    XLS-R-300M + channel augmentation & n/a & 0.748 & n/a \\
     \bottomrule
   \end{tabular}
 \end{table}
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=0.85\textwidth]{ablation_representation_split.png}
-  \caption{Test macro-F1 for each representation under the clip-level split
-  (upper bound) and the strict pseudo-speaker split.}
+  \includegraphics[width=0.85\textwidth]{ablation_representation_split.pdf}
+  \caption{Test macro-F1 per representation under both split protocols.}
   \label{fig:ablation}
 \end{figure}
 
@@ -126,18 +137,23 @@ with the two split protocols, and add the augmentation variant of
         whereas its 3.5-point clip-level lead ($+1.8$ to $+5.3$) is significant.
         Fine-tuning's strict-split drop ($-14.4$) is slightly larger than the
         frozen model's ($-12.4$).
-  \item \textbf{Per-class strict scores are noisier than the macro average}
-        (\cref{tab:strict-perclass}). Some strict test cells are dominated by a
-        single large pseudo-speaker cluster: Barishal's strict test set is
-        essentially one 251-clip cluster, so its strict F1 of 0.603 (Whisper)
-        and 0.508 (XLS-R) measures generalisation to one speaker or source more
-        than to the class.
+  \item \textbf{Per-class strict scores are noisier than the macro average.}
+        Some strict test cells are dominated by a single large pseudo-speaker
+        cluster: Barishal's strict test set is essentially one 251-clip
+        cluster, so its strict F1 of 0.603 (Whisper) and 0.508 (XLS-R)
+        measures generalisation to one speaker or source more than to the
+        class.
 \end{enumerate}
+
+\Cref{tab:strict-perclass} gives the per-class strict scores behind the third
+observation. The two pretrained models fail differently under the strict split:
+frozen Whisper is better on Standard, Dhaka and Rajshahi, fine-tuned XLS-R on
+Chattogram, Noakhali, Mymensingh and Khulna. Their macro averages are close,
+but they are not the same model with different accuracy.
 
 \begin{table}[ht]
   \centering
-  \caption{Per-class test F1, strict split. Test sizes per class are in
-  \cref{tab:classes}.}
+  \caption{Per-class test F1 on the strict split.}
   \label{tab:strict-perclass}
   \begin{tabular}{lccc}
     \toprule
@@ -146,11 +162,11 @@ with the two split protocols, and add the augmentation variant of
     Barishal   & 0.130 & 0.603 & 0.508 \\
     Chattogram & 0.456 & 0.670 & 0.820 \\
     Dhaka      & 0.426 & 0.881 & 0.848 \\
-    Formal     & 0.694 & 0.929 & 0.785 \\
     Khulna     & 0.679 & 0.887 & 0.957 \\
     Mymensingh & 0.495 & 0.813 & 0.904 \\
     Noakhali   & 0.454 & 0.694 & 0.862 \\
     Rajshahi   & 0.372 & 0.900 & 0.842 \\
+    Standard   & 0.694 & 0.929 & 0.785 \\
     Sylhet     & 0.611 & 0.763 & 0.750 \\
     \midrule
     Macro      & \textbf{0.480} & \textbf{0.793} & \textbf{0.808} \\
@@ -158,22 +174,18 @@ with the two split protocols, and add the augmentation variant of
   \end{tabular}
 \end{table}
 
-The two pretrained models fail differently under the strict split: frozen
-Whisper is better on Formal, Dhaka and Rajshahi, fine-tuned XLS-R on
-Chattogram, Noakhali, Mymensingh and Khulna. Their macro averages are close,
-but they are not the same model with different accuracy.
-
 \paragraph{Statistical uncertainty.} \Cref{tab:ci-acoustic} gives the 95\,\%
-intervals from the group bootstrap of \cref{sec:method-eval}. Clip bootstrap
-intervals are narrower but understate the variance. Under the group bootstrap,
-every MFCC-versus-pretrained gap is significant, as are XLS-R's clip-level lead
-over Whisper and the augmentation drop ($-6.0$, interval $-9.4$ to $-0.9$);
-XLS-R's strict-split lead over Whisper is not.
+intervals from the group bootstrap of \cref{sec:method-eval}, with $B =
+2{,}000$ resamples over the 565 groups of the clip-level test set and the 230
+of the strict one. Clip bootstrap intervals are narrower but understate the
+variance. Under the group bootstrap, every MFCC-versus-pretrained gap is
+significant, as are XLS-R's clip-level lead over Whisper and the augmentation
+drop ($-6.0$, interval $-9.4$ to $-0.9$); XLS-R's strict-split lead over
+Whisper is not.
 
 \begin{table}[ht]
   \centering
-  \caption{Test macro-F1 with 95\,\% speaker-group bootstrap intervals
-  ($B = 2{,}000$; 565 groups in the clip-level test set, 230 in the strict).}
+  \caption{Test macro-F1 with 95\,\% speaker-group bootstrap intervals.}
   \label{tab:ci-acoustic}
   \begin{tabular}{lcc}
     \toprule
@@ -182,7 +194,7 @@ XLS-R's strict-split lead over Whisper is not.
     MFCC + MLP             & 0.727 (0.676--0.753) & 0.480 (0.368--0.552) \\
     Frozen Whisper + MLP   & 0.917 (0.894--0.932) & 0.793 (0.688--0.808) \\
     Fine-tuned XLS-R       & 0.952 (0.935--0.963) & 0.808 (0.717--0.838) \\
-    XLS-R + augmentation   & ---                  & 0.748 (0.649--0.792) \\
+    XLS-R + augmentation   & n/a                  & 0.748 (0.649--0.792) \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -190,13 +202,15 @@ XLS-R's strict-split lead over Whisper is not.
 \section{Data efficiency}
 \label{sec:res-efficiency}
 
-\Cref{tab:efficiency} and \cref{fig:efficiency} show test macro-F1 when the MLP
-heads are trained on fractions of the training split (mean of three seeds).
+\Cref{tab:efficiency} reports test macro-F1 when the MLP heads are trained on
+fractions of the training split (mean of three seeds), and
+\cref{fig:efficiency} plots the same curves with a band showing the range over
+the three seeds; the bands are narrow, so the ordering of the four curves is
+stable at every fraction.
 
 \begin{table}[ht]
   \centering
-  \caption{Test macro-F1 against the fraction of training data used (mean of
-  three seeds).}
+  \caption{Test macro-F1 against the fraction of training data.}
   \label{tab:efficiency}
   \begin{tabular}{lccccc}
     \toprule
@@ -212,10 +226,8 @@ heads are trained on fractions of the training split (mean of three seeds).
 
 \begin{figure}[ht]
   \centering
-  \includegraphics[width=0.85\textwidth]{data_efficiency.png}
-  \caption{Data efficiency: test macro-F1 against the fraction of training clips,
-  for frozen Whisper and MFCC features under both split protocols. Bands show the
-  range over three seeds.}
+  \includegraphics[width=0.85\textwidth]{data_efficiency.pdf}
+  \caption{Data efficiency of frozen Whisper and MFCC features.}
   \label{fig:efficiency}
 \end{figure}
 
@@ -242,21 +254,27 @@ artefact of checkpoint selection. \Cref{sec:disc-augment} interprets it.
 \section{Fine-tuning more encoders}
 \label{sec:res-encoders}
 
-Sections~\ref{sec:res-clip}--\ref{sec:res-augment} compare one hand-crafted,
-one frozen and one fine-tuned representation. This section adds the encoders
-of \cref{sec:method-acoustic}(d)--(e): fine-tuned Whisper-medium, the two
+\Cref{sec:res-clip} to \cref{sec:res-augment} compare one hand-crafted, one
+frozen and one fine-tuned representation. This section adds the encoders of
+\cref{sec:method-acoustic}(d) and (e): fine-tuned Whisper-medium, the two
 Tugstugi checkpoints and Hishab's FastConformer, plus frozen rows for the
-Whisper-medium and Tugstugi (Ben-10) encoders. \Cref{tab:encoders} and
-\cref{fig:encoders} give every acoustic model under both protocols, and
-\cref{fig:metric-heatmap,fig:bars} show accuracy, macro-precision,
-macro-recall and macro-F1 for all nine models; artifacts
-are in \path{reports/phase6/}.
+Whisper-medium and Tugstugi (Ben-10) encoders. \Cref{tab:encoders} lists every
+acoustic model under both protocols with its bootstrap interval and leakage
+drop, and \cref{fig:encoders} plots the same scores as paired dots, one per
+protocol, with the bar between them showing the drop; the models are grouped by
+regime and ordered by strict-split score, so the figure reads as a ranking.
+\Cref{fig:metric-heatmap} extends the comparison to four metrics, accuracy,
+macro-precision, macro-recall and macro-F1, for all nine models under each
+protocol, and \cref{fig:bars} shows accuracy and macro-F1 as bars; the four
+metrics move together for every model, so macro-F1 alone is a fair summary.
+\Cref{fig:forest} draws the bootstrap intervals of \cref{tab:encoders} as a
+forest plot, which makes two things visible that the table does not: the strict
+intervals are three to four times wider than the clip-level ones, and the three
+fine-tuned Whisper-medium intervals overlap almost completely.
 
 \begin{table}[ht]
   \centering
-  \caption{Every acoustic model under both split protocols: test macro-F1 with
-  95\,\% speaker-group bootstrap intervals, and the clip-level-to-strict drop.
-  Pretraining: multilingual (Whisper, XLS-R) or Bangla (Tugstugi, Hishab).}
+  \caption{Every acoustic model under both split protocols.}
   \label{tab:encoders}
   \footnotesize
   \setlength{\tabcolsep}{4pt}
@@ -264,7 +282,7 @@ are in \path{reports/phase6/}.
     \toprule
     Model & Pretraining & Clip-level & Strict & Drop \\
     \midrule
-    MFCC statistics + MLP            & ---          & 0.727 (0.676--0.753) & 0.480 (0.368--0.552) & 24.8 \\
+    MFCC statistics + MLP            & none         & 0.727 (0.676--0.753) & 0.480 (0.368--0.552) & 24.8 \\
     \addlinespace
     Whisper-small, frozen + MLP      & multilingual & 0.917 (0.894--0.932) & 0.793 (0.688--0.808) & 12.4 \\
     Whisper-medium, frozen + MLP     & multilingual & 0.919 (0.896--0.934) & 0.782 (0.662--0.793) & 13.8 \\
@@ -282,34 +300,28 @@ are in \path{reports/phase6/}.
 \begin{figure}[ht]
   \centering
   \includegraphics[width=\textwidth]{phase6_models_split.pdf}
-  \caption{Every acoustic model under the clip-level and strict split
-  protocols; the bar between the two dots is the leakage drop. Models are
-  grouped by regime and ordered by strict-split score.}
+  \caption{Clip-level and strict scores of every acoustic model.}
   \label{fig:encoders}
 \end{figure}
 
 \begin{figure}[p]
   \centering
   \includegraphics[width=\textwidth]{results_metric_heatmap.pdf}
-  \caption{Test performance heatmap: accuracy, macro-precision, macro-recall
-  and macro-F1 (\%) for every acoustic model under (a) the clip-level and (b)
-  the strict split.}
+  \caption{Accuracy, precision, recall and macro-F1 of every model.}
   \label{fig:metric-heatmap}
 \end{figure}
 
 \begin{figure}[p]
   \centering
   \includegraphics[width=\textwidth]{results_bars.pdf}
-  \caption{Test (a) accuracy and (b) macro-F1 per model, clip-level against
-  strict split.}
+  \caption{Accuracy and macro-F1 per model under both splits.}
   \label{fig:bars}
 \end{figure}
 
 \begin{figure}[p]
   \centering
   \includegraphics[width=\textwidth]{results_forest.pdf}
-  \caption{Test macro-F1 with 95\,\% speaker-group bootstrap intervals for
-  every acoustic model under (a) the clip-level and (b) the strict split.}
+  \caption{Bootstrap intervals of macro-F1 for every acoustic model.}
   \label{fig:forest}
 \end{figure}
 
@@ -359,31 +371,36 @@ are in \path{reports/phase6/}.
         width 512), was trained with a CTC objective on broadcast news, and
         reached its best validation score at epoch 18 of 20, so it may also be
         under-trained; its drop of 15.5 points is the largest of any pretrained
-        model. \Cref{fig:leakage-drop} compares the drops of all nine models.
+        model.
 \end{enumerate}
+
+\Cref{fig:leakage-drop} compares the leakage drops of all nine models in one
+chart, ordered as in \cref{tab:encoders}. The three fine-tuned Whisper-medium
+bars are the shortest, the hand-crafted baseline's is the longest, and
+XLS-R and the FastConformer sit with the frozen Whisper encoders in between.
 
 \begin{figure}[ht]
   \centering
   \includegraphics[width=\textwidth]{results_leakage_drop.pdf}
-  \caption{Leakage drop: clip-level minus strict-split test macro-F1, in
-  points, for every acoustic model.}
+  \caption{Leakage drop per acoustic model.}
   \label{fig:leakage-drop}
 \end{figure}
 
-\Cref{fig:confusions} shows where the best models still err under the strict
-split. Fine-tuned Whisper-medium's remaining confusions are concentrated in two
-places: Barishal clips predicted as Formal (18 of 251) or Chattogram (9),
-and Noakhali clips predicted as Barishal (11 of 173), the coastal-dialect
-confusion that every model in this thesis shares; ten of Sylhet's eleven
-errors go to Formal. Tugstugi (Ben-10) makes fewer Barishal-to-Formal errors
-(12) but spreads Noakhali's across more classes. At clip level the matrix is almost diagonal.
+\Cref{fig:confusions} shows where the best models still err: fine-tuned
+Whisper-medium under the strict and clip-level splits and fine-tuned Tugstugi
+(Ben-10) under the strict split, with counts in the cells and shading
+normalised by row. Fine-tuned Whisper-medium's remaining confusions are
+concentrated in two places: Barishal clips predicted as Standard (18 of 251) or
+Chattogram (9), and Noakhali clips predicted as Barishal (11 of 173), the
+coastal-dialect confusion that every model in this thesis shares; ten of
+Sylhet's eleven errors go to Standard. Tugstugi (Ben-10) makes fewer
+Barishal-to-Standard errors (12) but spreads Noakhali's across more classes. At
+clip level the matrix is almost diagonal.
 
 \begin{figure}[ht]
   \centering
   \includegraphics[width=\textwidth]{results_confusions.pdf}
-  \caption{Test confusion matrices (counts; rows are true classes, shading is
-  row-normalised) for fine-tuned Whisper-medium under the strict and clip-level
-  splits and for fine-tuned Tugstugi (Ben-10) under the strict split.}
+  \caption{Strict and clip-level confusion matrices of the best models.}
   \label{fig:confusions}
 \end{figure}
 
@@ -397,8 +414,7 @@ clusters they contain.
 
 \begin{table}[ht]
   \centering
-  \caption{Per-class test F1 under the strict split for the Phase 6 models,
-  with the earlier fine-tuned XLS-R for reference.}
+  \caption{Per-class strict F1 of the Phase 6 models.}
   \label{tab:encoders-perclass}
   \small
   \begin{tabular}{lcccccc}
@@ -408,11 +424,11 @@ clusters they contain.
     Barishal   & 0.508 & 0.839 & 0.882 & 0.927 & 0.837 & 0.388 \\
     Chattogram & 0.820 & 0.796 & 0.849 & 0.888 & 0.870 & 0.769 \\
     Dhaka      & 0.848 & 0.849 & 0.971 & 0.921 & 0.942 & 0.786 \\
-    Formal     & 0.785 & 0.914 & 0.909 & 0.917 & 0.887 & 0.822 \\
     Khulna     & 0.957 & 0.963 & 0.971 & 0.924 & 0.971 & 0.905 \\
     Mymensingh & 0.904 & 0.844 & 0.908 & 0.927 & 0.914 & 0.780 \\
     Noakhali   & 0.862 & 0.782 & 0.898 & 0.940 & 0.933 & 0.758 \\
     Rajshahi   & 0.842 & 0.857 & 0.948 & 0.896 & 0.937 & 0.678 \\
+    Standard   & 0.785 & 0.914 & 0.909 & 0.917 & 0.887 & 0.822 \\
     Sylhet     & 0.750 & 0.867 & 0.937 & 0.947 & 0.883 & 0.831 \\
     \midrule
     Macro      & 0.808 & 0.857 & 0.919 & 0.921 & 0.908 & 0.746 \\
@@ -428,24 +444,23 @@ model, and Hishab's FastConformer below 0.8 on seven of nine classes.
 \begin{figure}[ht]
   \centering
   \includegraphics[width=\textwidth]{results_perclass_heatmap.pdf}
-  \caption{Per-class test F1 (\%) under the strict split for every acoustic
-  model.}
+  \caption{Per-class strict F1 heatmap for all models.}
   \label{fig:perclass-heatmap}
 \end{figure}
 
 Each Whisper-medium run took 64--76 minutes on a T4 and each FastConformer run
 54--60 minutes; the eight runs used about 9 GPU-hours. \Cref{fig:training-curves}
-shows the training dynamics: training loss reaches zero by epoch 8 for the
-Whisper-medium family while validation macro-F1 plateaus from epoch 5--10, so
-the 12-epoch schedule is long enough; the FastConformer's loss is still falling
-at epoch 20 and its strict-split validation score is still rising, the
-under-training noted above.
+shows the training dynamics of the eight runs, training loss above and
+validation macro-F1 below, for both split protocols: training loss reaches
+zero by epoch 8 for the Whisper-medium family while validation macro-F1
+plateaus from epoch 5--10, so the 12-epoch schedule is long enough; the
+FastConformer's loss is still falling at epoch 20 and its strict-split
+validation score is still rising, the under-training noted above.
 
 \begin{figure}[ht]
   \centering
   \includegraphics[width=\textwidth]{results_training_curves.pdf}
-  \caption{Training loss (top) and validation macro-F1 (bottom) per epoch for
-  the Phase 6 fine-tuning runs, strict and clip-level splits.}
+  \caption{Training curves of the Phase 6 fine-tuning runs.}
   \label{fig:training-curves}
 \end{figure}
 
@@ -455,31 +470,30 @@ under-training noted above.
 \Cref{fig:tsne} projects the strict test clips into two dimensions with
 t-SNE~\cite{Maaten2008Visualizing}, once from the frozen Whisper-small encoder
 (the Phase 1 representation) and once from the fine-tuned Whisper-medium
-encoder, on the same 1,327 clips. Frozen, the space is organised but not by
-dialect: Formal, Barishal and a few tight single-recording groups separate,
-while Noakhali, Chattogram, Mymensingh, Sylhet and Dhaka share one diffuse
-region---the classes the frozen classifier confuses. Fine-tuned, every class
-forms its own compact cluster, with the remaining overlap exactly where the
-confusion matrix puts it: a few Barishal and Noakhali clips in each other's
-clusters, and a thin Chattogram group next to Barishal. \Cref{fig:tsne-classes}
-isolates each class in the fine-tuned space; Khulna, Dhaka, Rajshahi and Sylhet
-are single islands, Barishal and Noakhali the only classes with outliers in
-other clusters.
+encoder, on the same 1,327 clips; Barishal, Noakhali and Standard are coloured
+and every class is labelled at its median position. Frozen, the space is
+organised but not by dialect: Standard, Barishal and a few tight
+single-recording groups separate, while Noakhali, Chattogram, Mymensingh, Sylhet
+and Dhaka share one diffuse region, the classes the frozen classifier confuses.
+Fine-tuned, every class forms its own compact cluster, with the remaining
+overlap exactly where the confusion matrix puts it: a few Barishal and Noakhali
+clips in each other's clusters, and a thin Chattogram group next to Barishal.
+\Cref{fig:tsne-classes} isolates each class in the fine-tuned space, one panel
+per class with the other eight drawn in grey; Khulna, Dhaka, Rajshahi and
+Sylhet are single islands, Barishal and Noakhali the only classes with outliers
+in other clusters.
 
 \begin{figure}[ht]
   \centering
   \includegraphics[width=\textwidth]{results_tsne.pdf}
-  \caption{t-SNE of the strict test clips: (a) frozen Whisper-small embeddings
-  and (b) fine-tuned Whisper-medium embeddings. Barishal, Noakhali and Formal
-  are coloured; every class is labelled at its median position.}
+  \caption{t-SNE of frozen and fine-tuned embeddings.}
   \label{fig:tsne}
 \end{figure}
 
 \begin{figure}[p]
   \centering
   \includegraphics[width=0.95\textwidth]{results_tsne_classes.pdf}
-  \caption{The fine-tuned Whisper-medium t-SNE of \cref{fig:tsne}(b), one
-  panel per class.}
+  \caption{Fine-tuned t-SNE, one panel per class.}
   \label{fig:tsne-classes}
 \end{figure}
 
@@ -490,17 +504,17 @@ other clusters.
 \label{sec:res-asr}
 
 \Cref{tab:asr-quality} scores the five front-ends against the human transcripts
-of Ben-10's validation set, which contain 21,119 reference tokens outside the
+of Ben-10's validation set (1,666 clips from ten districts, greedy decoding,
+punctuation ignored), which contain 21,119 reference tokens outside the
 standard vocabulary.
 
 \begin{table}[ht]
   \centering
-  \caption{Speech-recognition quality on Ben-10 validation (1,666 clips, ten
-  districts; greedy decoding, punctuation ignored).}
+  \caption{Speech-recognition quality on Ben-10 validation.}
   \label{tab:asr-quality}
   \begin{tabular}{lcccc}
     \toprule
-    Front-end & WER & CER & Dialect-word recall & Formal-word recall \\
+    Front-end & WER & CER & Dialect-word recall & Standard-word recall \\
     \midrule
     Tugstugi (Ben-10)      & \textbf{0.645} & \textbf{0.333} & \textbf{0.266} & \textbf{0.620} \\
     Tugstugi               & 0.752 & 0.484 & 0.040 & 0.416 \\
@@ -522,39 +536,41 @@ The benchmark's hand-counted recall for the two Tugstugi models (0.16--0.53
 against 0.01--0.09) is thus confirmed at full scale with an automated measure
 (per district 0.17--0.36 against 0.01--0.14).
 
-On the thesis corpus, which has no references, the same pattern appears in the
-share of transcript words outside the standard vocabulary
-(\cref{fig:asr-dialect}b). Only the Ben-10 model separates regional clips (25\,\%
-on average) from Formal clips (8\,\%) by a wide margin, with recognisable dialect
-forms such as \bn{mui}{মুই}, \bn{ai}{আঁই}, \bn{ar}{আঁর}, \bn{hamar}{হামার}, \bn{kita}{কিতা} and \bn{teha}{টেহা}.
-Hishab and the base Tugstugi model output almost as few non-standard words on
-regional clips (9\,\% and 13\,\%) as on Formal ones (4\,\% and 5\,\%). The
-wav2vec~2.0 and Whisper-large-v3 front-ends have high shares for the wrong
-reason: misrecognition, and for Whisper-large-v3 repetition loops in 12.3\,\% of
+\Cref{fig:asr-dialect} summarises what survives transcription. Panel (a) plots
+the dialect-word recall of \cref{tab:asr-quality}, where the Ben-10 model stands
+alone at 0.27 and the other four lie below 0.05. Panel (b) turns to the thesis
+corpus, which has no references, and shows the share of transcript words
+outside the standard vocabulary for Standard clips and for the mean over the
+eight regional classes. Only the Ben-10 model separates regional clips (25\,\%
+on average) from Standard clips (8\,\%) by a wide margin, with recognisable
+dialect forms such as \bn{mui}{মুই}, \bn{ai}{আঁই}, \bn{ar}{আঁর},
+\bn{hamar}{হামার}, \bn{kita}{কিতা} and \bn{teha}{টেহা}. Hishab and the base
+Tugstugi model output almost as few non-standard words on regional clips (9\,\%
+and 13\,\%) as on Standard ones (4\,\% and 5\,\%). The wav2vec~2.0 and
+Whisper-large-v3 front-ends have high shares for the wrong reason:
+misrecognition, and for Whisper-large-v3 repetition loops in 12.3\,\% of
 transcripts (one word repeated five or more times in a row) and 2.5--4.8\,\%
 empty outputs per class.
 
 \begin{figure}[ht]
   \centering
   \includegraphics[width=\textwidth]{phase5_asr_dialect.pdf}
-  \caption{What survives transcription. (a) Dialect-word recall of each
-  front-end on Ben-10 validation. (b) Share of transcript words outside the
-  standard vocabulary on this corpus, for Formal clips and the mean over the eight
-  regional classes.}
+  \caption{Dialect-word recall and non-standard word share per front-end.}
   \label{fig:asr-dialect}
 \end{figure}
 
 \subsection{Classification from transcripts}
 
-\Cref{tab:lexical} and \cref{fig:lexical} report the three classifiers for each
-front-end, using the in-domain lexicon. Fusion here is with XLS-R, the
+\Cref{tab:lexical} reports the three classifiers for each front-end, using the
+in-domain lexicon, and \cref{fig:lexical} plots the strict-split columns with
+XLS-R alone drawn as a dashed reference line. Fusion here is with XLS-R, the
 strongest acoustic model at the time the lexical route was built;
-\cref{sec:res-fusion-wm} repeats it with fine-tuned Whisper-medium.
+\cref{sec:res-fusion-wm} repeats it with fine-tuned Whisper-medium. Fine-tuned
+XLS-R alone scores 0.808 (strict) and 0.952 (clip-level).
 
 \begin{table}[ht]
   \centering
-  \caption{Test macro-F1 of the lexical classifiers by front-end. Fine-tuned
-  XLS-R alone scores 0.808 (strict) and 0.952 (clip-level).}
+  \caption{Test macro-F1 of the lexical classifiers by front-end.}
   \label{tab:lexical}
   \small
   \begin{tabular}{lccccc}
@@ -575,19 +591,17 @@ strongest acoustic model at the time the lexical route was built;
 \begin{figure}[ht]
   \centering
   \includegraphics[width=\textwidth]{phase5_classification.pdf}
-  \caption{Strict-split test macro-F1 of word matching, the TF-IDF classifier and
-  fusion with XLS-R, by speech-recognition front-end. The dashed line is XLS-R
-  alone.}
+  \caption{Strict-split scores of the lexical classifiers and fusion.}
   \label{fig:lexical}
 \end{figure}
 
 \begin{enumerate}
   \item \textbf{Word matching is weak} even with the best front-end: 0.360
         strict and 0.399 clip-level. Fewer than half of the strict test clips
-        (44\,\%) contain any lexicon word, so the rest default to Formal.
+        (44\,\%) contain any lexicon word, so the rest default to Standard.
         Relaxing the lexicon thresholds raises coverage to 59\,\% and macro-F1
         to 0.419, still far below every pretrained acoustic model. The clean
-        external lexicon (Ben-10 and Vashantor; six classes including Formal)
+        external lexicon (Ben-10 and Vashantor; six classes including Standard)
         scores 0.418 on its own classes with 51\,\% coverage. With the
         standard-Bangla front-ends, coverage collapses to 2--5\,\% and matching
         fails: there are no regional words left to match.
@@ -605,13 +619,13 @@ strongest acoustic model at the time the lexical route was built;
 
 \subsection{Statistical uncertainty}
 
-\Cref{tab:ci-lexical} gives intervals for the Ben-10 front-end, and
-\cref{tab:fusion-gains} the fusion gain over XLS-R for every front-end.
+\Cref{tab:ci-lexical} gives the bootstrap intervals for the Ben-10 front-end,
+and \cref{tab:fusion-gains} the fusion gain over XLS-R for every front-end
+with its interval and the bootstrap probability of no gain.
 
 \begin{table}[ht]
   \centering
-  \caption{Lexical-route test macro-F1 with 95\,\% speaker-group bootstrap
-  intervals (Ben-10 front-end).}
+  \caption{Lexical-route macro-F1 with bootstrap intervals (Ben-10 front-end).}
   \label{tab:ci-lexical}
   \begin{tabular}{lcc}
     \toprule
@@ -627,8 +641,7 @@ strongest acoustic model at the time the lexical route was built;
 
 \begin{table}[ht]
   \centering
-  \caption{Fusion gain over XLS-R alone in macro-F1 points, with 95\,\%
-  speaker-group bootstrap interval and the bootstrap probability of no gain.}
+  \caption{Fusion gain over XLS-R per front-end.}
   \label{tab:fusion-gains}
   \small
   \begin{tabular}{lcccc}
@@ -653,12 +666,14 @@ gain), and with Whisper-large-v3 fusion is slightly worse than XLS-R alone.
 
 \subsection{Where the words help}
 
-\Cref{tab:fusion-perclass} and \cref{fig:fusion-perclass} break the strict-split
-result down by class for the Ben-10 front-end.
+\Cref{tab:fusion-perclass} breaks the strict-split result down by class for
+the Ben-10 front-end, and \cref{fig:fusion-perclass} plots XLS-R alone against
+its fusion with the TF-IDF classifier, with the change in F1 points written at
+each class.
 
 \begin{table}[ht]
   \centering
-  \caption{Per-class test F1, strict split, Ben-10 front-end.}
+  \caption{Per-class strict F1 of the lexical route (Ben-10 front-end).}
   \label{tab:fusion-perclass}
   \begin{tabular}{lccccc}
     \toprule
@@ -667,7 +682,7 @@ result down by class for the Ben-10 front-end.
     Barishal   & 0.268 & 0.544 & 0.508 & 0.720 & $\mathbf{+21.2}$ \\
     Sylhet     & 0.600 & 0.750 & 0.750 & 0.832 & $+8.2$ \\
     Chattogram & 0.392 & 0.617 & 0.820 & 0.878 & $+5.8$ \\
-    Formal     & 0.448 & 0.805 & 0.785 & 0.835 & $+5.0$ \\
+    Standard   & 0.448 & 0.805 & 0.785 & 0.835 & $+5.0$ \\
     Noakhali   & 0.500 & 0.707 & 0.862 & 0.898 & $+3.5$ \\
     Mymensingh & 0.395 & 0.694 & 0.904 & 0.928 & $+2.4$ \\
     Rajshahi   & 0.175 & 0.550 & 0.842 & 0.857 & $+1.5$ \\
@@ -680,19 +695,17 @@ result down by class for the Ben-10 front-end.
 \begin{figure}[ht]
   \centering
   \includegraphics[width=0.8\textwidth]{phase5_fusion_per_class.pdf}
-  \caption{Per-class test F1 on the strict split for XLS-R alone and for its
-  fusion with the TF-IDF transcript classifier (Ben-10 front-end). Labels give
-  the change in F1 points.}
+  \caption{Per-class strict F1: XLS-R alone against fusion.}
   \label{fig:fusion-perclass}
 \end{figure}
 
 The gain concentrates on the classes the acoustic model finds hardest under the
-strict split---Barishal, the single-cluster test cell, and Sylhet---and on the
+strict split, Barishal (the single-cluster test cell) and Sylhet, and on the
 classes with the most distinctive, best-transcribed vocabulary: Sylhet's match
 F1 of 0.600 is the only strong word-matching result. Khulna, the acoustic
-model's best class, is the one class that fusion hurts. Formal is the only class
-on which the text classifier alone beats XLS-R: the standard register is marked
-in its vocabulary.
+model's best class, is the one class that fusion hurts. Standard is the only
+class on which the text classifier alone beats XLS-R: the standard register is
+marked in its vocabulary.
 
 \subsection{Fusion with the stronger acoustic model}
 \label{sec:res-fusion-wm}
@@ -700,22 +713,21 @@ in its vocabulary.
 The fusion above was built on XLS-R. Repeating it with fine-tuned
 Whisper-medium (\cref{sec:res-encoders}) as the acoustic partner, with the
 same TF-IDF model, the same Ben-10 transcripts and $\alpha$ re-tuned on
-validation, gives \cref{tab:fusion-wm}. Under the strict split the words no
-longer help: fusion scores 0.909 against 0.919 for Whisper-medium alone, a loss
-of 1.1 points whose speaker-group interval ($-2.5$ to $-0.03$) just excludes
-zero. Fusion changes 102 of the 1,327 test predictions, repairing 38 and
-breaking 50. The validation score rises (0.803 to 0.847), which is why
-$\alpha = 0.25$ is selected, but the gain does not transfer to the test
-speakers. The classes XLS-R found hardest and the words repaired---Barishal and
-Sylhet---are already at 0.88--0.94 for Whisper-medium, so there is little left
-for the text to fix. At clip level the fusion is a null result: 0.984 against
-0.984, with five predictions changed, two repaired and two broken.
+validation, gives \cref{tab:fusion-wm}, which places the two acoustic partners
+side by side under each protocol. Under the strict split the words no longer
+help: fusion scores 0.909 against 0.919 for Whisper-medium alone, a loss of 1.1
+points whose speaker-group interval ($-2.5$ to $-0.03$) just excludes zero.
+Fusion changes 102 of the 1,327 test predictions, repairing 38 and breaking 50.
+The validation score rises (0.803 to 0.847), which is why $\alpha = 0.25$ is
+selected, but the gain does not transfer to the test speakers. The classes
+XLS-R found hardest and the words repaired, Barishal and Sylhet, are already at
+0.88--0.94 for Whisper-medium, so there is little left for the text to fix. At
+clip level the fusion is a null result: 0.984 against 0.984, with five
+predictions changed, two repaired and two broken.
 
 \begin{table}[ht]
   \centering
-  \caption{Late fusion of the TF-IDF transcript classifier (Ben-10 front-end)
-  with each acoustic model. Test macro-F1; gap with 95\,\% speaker-group
-  interval.}
+  \caption{Late fusion of the transcript classifier with each acoustic model.}
   \label{tab:fusion-wm}
   \small
   \begin{tabular}{llcccc}
@@ -737,11 +749,15 @@ for the text to fix. At clip level the fusion is a null result: 0.984 against
 or is closest to. The studies differ in task, language, data and metric, so the
 table compares designs and limitations rather than numbers; the two Bangla
 accent-classification studies that gathered the corpus used by this thesis are
-the direct predecessors.
+the direct predecessors. Read down the last column, the table shows the three
+things this thesis adds to each line of work: pretrained encoders in place of
+hand-crafted features, a measured leakage correction in place of a random
+split, and a lexical route whose text comes from speech recognition rather than
+from human writing.
 
 \begin{table}[p]
   \centering
-  \caption{Comparative analysis of prior studies and the proposed approach.}
+  \caption{Comparative analysis of prior studies and this thesis.}
   \label{tab:comparative}
   \footnotesize
   \setlength{\tabcolsep}{4pt}
@@ -749,7 +765,7 @@ the direct predecessors.
     \toprule
     Study & Task and data & Main result & Key limitation & This thesis \\
     \midrule
-    Badhon \etal\ (2020)~\cite{Badhon2020Bengali} & Bengali accent classification from this corpus; hand-crafted features, classical and deep classifiers & Accent classes separable with MFCC-type features & Random split; no speaker/channel control; features hand-crafted & Pretrained encoders; leakage measured with a strict split \\
+    Badhon \etal\ (2020)~\cite{Badhon2020Bengali} & Bangla accent classification from this corpus; hand-crafted features, classical and deep classifiers & Accent classes separable with MFCC-type features & Random split; no speaker/channel control; features hand-crafted & Pretrained encoders; leakage measured with a strict split \\
     Alam \etal\ (2023)~\cite{Alam2023Bangla} & Bangla accent variation from audio with deep networks, same corpus & Deep networks outperform classical classifiers & Clip-level evaluation; single representation & Eight models under two protocols with bootstrap CIs \\
     Sadiq \etal\ (2026)~\cite{Sadiq2026Bangla} & Text-based dialect classification, 11 regions, BanglaBERT & About 89\,\% on human-written dialect text & Needs written dialect text; not applicable to speech & Lexical route from ASR output; shows what transcription loses \\
     Dipto \etal\ (2025)~\cite{Dipto2025ASR} & Ben-10 corpus; benchmark of seven ASR systems on dialect speech & WER 0.70--1.13; standard-trained models default to standard Bangla & Hand-counted dialect recall on about 50 words per district; no dialect classifier & Automated dialect-word recall on 1,666 clips; uses the systems as front-ends \\
@@ -758,8 +774,7 @@ the direct predecessors.
     Niloy \etal\ (2026)~\cite{Niloy2026Meaning} & LLM benchmark for dialect-to-standard translation, 15 dialects & Morphology, not meaning, is the main barrier & Text-to-text; assumes dialect text exists & Shows standard ASR already normalises dialect away \\
     Khaled \& Elnagar (2025)~\cite{Khaled2025Arabic} & Arabic dialect audio identification with fine-tuned wav2vec~2.0 & About 93\,\% on region and country & Standard splits; leakage not examined & Same design, with leakage quantified \\
     H\"{a}m\"{a}l\"{a}inen \etal\ (2021)~\cite{Hamalainen2021Finnish} & Finnish dialect identification from audio and text & Audio and text compared for one language & Transcripts human-written & Text obtained from ASR; fusion with acoustic model \\
-    \textbf{This thesis} & 9-class Bangla DID from 5\,s clips; 9,303 clips; acoustic and lexical routes & 0.984 clip-level / 0.919 strict macro-F1 (fine-tuned Whisper-medium); words help only weak acoustic models & Single seeds; no reference transcripts on own corpus; found data & --- \\
+    \textbf{This thesis} & 9-class Bangla DID from 5\,s clips; 9,303 clips; acoustic and lexical routes & 0.984 clip-level / 0.919 strict macro-F1 (fine-tuned Whisper-medium); words help only weak acoustic models & Single seeds; no reference transcripts on own corpus; found data & n/a \\
     \bottomrule
   \end{tabularx}
 \end{table}
-
