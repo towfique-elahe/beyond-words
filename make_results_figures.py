@@ -11,6 +11,14 @@ Writes to reports/figures/ (PDF + PNG):
     results_leakage_drop       clip-level minus strict per model
     results_tsne               t-SNE of frozen Whisper-small vs fine-tuned Whisper-medium, strict test clips
     results_tsne_classes       fine-tuned t-SNE, one panel per class
+  and, redrawn in the same style from saved predictions (Phases 1-3, same file names as before):
+    confusion_matrix_baseline  frozen Whisper-small + MLP, clip-level test
+    confusion_matrix_xlsr      fine-tuned XLS-R-300M, clip-level test
+    per_class_f1_comparison    per-class F1, baseline vs fine-tuned XLS-R, clip-level
+    per_class_f1_baseline      per-class F1 of the baseline, sorted
+    training_curve_xlsr        XLS-R fine-tuning: loss and val macro-F1 per epoch (reports/phase2)
+    ablation_representation_split  three representations x two split protocols
+    data_efficiency            test macro-F1 vs fraction of training clips (reports/phase3)
 
 Usage:
     python make_results_figures.py
@@ -30,6 +38,14 @@ OUT, R6 = Path("reports/figures"), Path("reports/phase6")
 BLUE, ORANGE, AQUA = "#2a78d6", "#eb6834", "#1baf7a"
 INK, INK2, GRID, SURFACE, REF = "#0b0b0b", "#52514e", "#e4e3df", "#ffffff", "#9a9890"
 CLASSES = ["Barishal", "Chattogram", "Dhaka", "Formal", "Khulna", "Mymensingh", "Noakhali", "Rajshahi", "Sylhet"]
+DISPLAY = {"Formal": "Standard"}      # class name as printed in the thesis; data files keep "Formal"
+
+
+def disp(c):
+    return DISPLAY.get(c, c)
+
+
+LABELS = [disp(c) for c in CLASSES]
 # tag -> (label, predictions path per split, bootstrap key)
 MODELS = {
     "mfcc":                  ("MFCC + MLP",                 "MFCC"),
@@ -121,8 +137,8 @@ def confusions():
     specs = [("whisper_medium", "strict", "Whisper-medium, strict"),
              ("whisper_medium", "clip", "Whisper-medium, clip-level"),
              ("tugstugi_ben10", "strict", "Tugstugi (Ben-10), strict")]
-    fig, axes = plt.subplots(1, 3, figsize=(7.4, 2.9), gridspec_kw={"wspace": 0.12})
-    short = [c[:4] for c in CLASSES]
+    fig, axes = plt.subplots(1, 3, figsize=(7.4, 3.1), gridspec_kw={"wspace": 0.12})
+    short = LABELS
     for ax, (tag, split, title) in zip(axes, specs):
         d = preds(tag, split)
         cm = confusion_matrix(d.true, d.pred, labels=CLASSES)
@@ -172,7 +188,7 @@ def perclass_heatmap():
         for j in range(m.shape[1]):
             ax.text(j, i, f"{m[i, j]:.0f}", ha="center", va="center", fontsize=7.5,
                     color=SURFACE if m[i, j] > 75 else INK)
-    ax.set_yticks(range(9), CLASSES, fontsize=8)
+    ax.set_yticks(range(9), LABELS, fontsize=8)
     ax.set_xticks(range(len(tags)), [MODELS[t][0].replace(", ", ",\n") for t in tags], fontsize=7, rotation=45, ha="right")
     ax.grid(False); ax.tick_params(length=0); ax.set_title("per-class test F1 (%), strict split", loc="left")
     save(fig, "results_perclass_heatmap")
@@ -238,7 +254,7 @@ def tsne_pair():
         ax.scatter(Z[other, 0], Z[other, 1], s=5, color=REF, alpha=0.45, linewidth=0)
         for c, color in highlight.items():
             m = cls == c
-            ax.scatter(Z[m, 0], Z[m, 1], s=7, color=color, alpha=0.8, linewidth=0, label=c)
+            ax.scatter(Z[m, 0], Z[m, 1], s=7, color=color, alpha=0.8, linewidth=0, label=disp(c))
         placed = []
         for c in CLASSES:
             m = cls == c
@@ -247,7 +263,7 @@ def tsne_pair():
             while any(abs(cx - px) < 0.18 * np.ptp(Z[:, 0]) and abs(cy - py) < 0.05 * span for px, py in placed):
                 cy += 0.05 * span          # nudge a label that would overprint another
             placed.append((cx, cy))
-            ax.text(cx, cy, c, fontsize=7, ha="center", va="center", color=INK, weight="bold",
+            ax.text(cx, cy, disp(c), fontsize=7, ha="center", va="center", color=INK, weight="bold",
                     bbox=dict(boxstyle="round,pad=0.15", facecolor=SURFACE, edgecolor="none", alpha=0.75))
         ax.set_title(title, loc="left", fontsize=9); ax.set_xticks([]); ax.set_yticks([]); ax.grid(False)
     axes[0].legend(loc="lower left", fontsize=7, markerscale=2, handletextpad=0.2)
@@ -258,15 +274,111 @@ def tsne_pair():
         m = cls == c
         ax.scatter(Zt[~m, 0], Zt[~m, 1], s=4, color=REF, alpha=0.35, linewidth=0)
         ax.scatter(Zt[m, 0], Zt[m, 1], s=7, color=BLUE, alpha=0.85, linewidth=0)
-        ax.set_title(f"{c}  (n = {m.sum()})", loc="left", fontsize=8.5)
+        ax.set_title(f"{disp(c)}  (n = {m.sum()})", loc="left", fontsize=8.5)
         ax.set_xticks([]); ax.set_yticks([]); ax.grid(False)
     save(fig, "results_tsne_classes")
+
+
+# ---- Phase 1-3 figures, redrawn in the same style (file names unchanged) ----
+
+def legacy_confusions():
+    specs = [("confusion_matrix_baseline", preds("frozen_whisper_small", "clip"), "Frozen Whisper-small + MLP, clip-level test"),
+             ("confusion_matrix_xlsr", preds("xlsr", "clip"), "Fine-tuned XLS-R-300M, clip-level test")]
+    for name, d, title in specs:
+        cm = confusion_matrix(d.true, d.pred, labels=CLASSES)
+        norm = cm / cm.sum(1, keepdims=True)
+        fig, ax = plt.subplots(figsize=(5.0, 4.4))
+        ax.imshow(norm, cmap="Blues", vmin=0, vmax=1)
+        for i in range(9):
+            for j in range(9):
+                ax.text(j, i, cm[i, j], ha="center", va="center", fontsize=7.5,
+                        color=SURFACE if norm[i, j] > 0.55 else INK)
+        ax.set_xticks(range(9), LABELS, fontsize=8, rotation=90); ax.set_yticks(range(9), LABELS, fontsize=8)
+        ax.set_xlabel("predicted"); ax.set_ylabel("true"); ax.set_title(title, loc="left", fontsize=9)
+        ax.grid(False); ax.tick_params(length=0)
+        save(fig, name)
+
+
+def legacy_perclass():
+    base, ft = preds("frozen_whisper_small", "clip"), preds("xlsr", "clip")
+    fb = f1_score(base.true, base.pred, labels=CLASSES, average=None)
+    ff = f1_score(ft.true, ft.pred, labels=CLASSES, average=None)
+    mb, mf = f1_score(base.true, base.pred, average="macro"), f1_score(ft.true, ft.pred, average="macro")
+    order = np.argsort(ff)[::-1]
+    y = np.arange(9)[::-1]
+    fig, ax = plt.subplots(figsize=(6.4, 3.4))
+    ax.barh(y + 0.19, fb[order], height=0.36, color=ORANGE, label=f"frozen Whisper-small + MLP (macro-F1 {mb:.3f})")
+    ax.barh(y - 0.19, ff[order], height=0.36, color=BLUE, label=f"fine-tuned XLS-R-300M (macro-F1 {mf:.3f})")
+    for yi, b, f in zip(y, fb[order], ff[order]):
+        ax.text(b + 0.005, yi + 0.19, f"{b:.3f}", va="center", fontsize=6.5, color=INK2)
+        ax.text(f + 0.005, yi - 0.19, f"{f:.3f}", va="center", fontsize=6.5, color=INK2)
+    ax.set_yticks(y, [LABELS[i] for i in order]); ax.set_xlim(0.5, 1.06); ax.set_xlabel("test F1 per class, clip-level split")
+    ax.grid(axis="y", visible=False)
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, 1.16), ncol=2, fontsize=8)
+    save(fig, "per_class_f1_comparison")
+
+    order = np.argsort(fb)[::-1]
+    fig, ax = plt.subplots(figsize=(6.0, 3.0))
+    ax.barh(y, fb[order], height=0.6, color=BLUE)
+    for yi, b in zip(y, fb[order]):
+        ax.text(b + 0.005, yi, f"{b:.3f}", va="center", fontsize=7.5, color=INK2)
+    ax.set_yticks(y, [LABELS[i] for i in order]); ax.set_xlim(0.5, 1.06)
+    ax.set_xlabel(f"test F1 per class, frozen Whisper-small + MLP, clip-level split (macro-F1 {mb:.3f})")
+    ax.grid(axis="y", visible=False)
+    save(fig, "per_class_f1_baseline")
+
+
+def legacy_training_curve():
+    d = pd.read_csv("reports/phase2/training_curve_xlsr.csv")
+    fig, ax = plt.subplots(figsize=(6.4, 2.9))
+    ax.plot(d.epoch + 1, d.loss, color=ORANGE, linewidth=1.6, label="train loss")
+    ax.set_xlabel("epoch"); ax.set_ylabel("train loss", color=ORANGE); ax.tick_params(axis="y", colors=ORANGE)
+    ax2 = ax.twinx(); ax2.grid(False); ax2.spines["right"].set_visible(True)
+    ax2.plot(d.epoch + 1, d.val_macroF1, color=BLUE, linewidth=1.6, marker="o", markersize=3, label="val macro-F1")
+    ax2.set_ylabel("val macro-F1", color=BLUE); ax2.tick_params(axis="y", colors=BLUE); ax2.set_ylim(0, 1.02)
+    ax.set_title("XLS-R-300M fine-tuning, clip-level split, 20 epochs", loc="left")
+    h1, l1 = ax.get_legend_handles_labels(); h2, l2 = ax2.get_legend_handles_labels()
+    ax.legend(h1 + h2, l1 + l2, loc="center right", fontsize=8)
+    save(fig, "training_curve_xlsr")
+
+
+def legacy_ablation(df):
+    tags = [("mfcc", "MFCC statistics\n+ MLP"), ("frozen_whisper_small", "Frozen Whisper-small\n+ MLP"), ("xlsr", "Fine-tuned\nXLS-R-300M")]
+    x = np.arange(3); w = 0.36
+    fig, ax = plt.subplots(figsize=(6.0, 3.0))
+    for k, (split, color, label) in enumerate([("clip", ORANGE, "clip-level split (upper bound)"), ("strict", BLUE, "strict pseudo-speaker split")]):
+        v = [df[(df.tag == t) & (df.split == split)].macro_f1.iloc[0] for t, _ in tags]
+        xs = x + (k - 0.5) * (w + 0.03)
+        ax.bar(xs, v, width=w, color=color, label=label)
+        for xi, vi in zip(xs, v):
+            ax.text(xi, vi + 0.012, f"{vi:.3f}", ha="center", fontsize=7.5, color=INK)
+    ax.set_xticks(x, [l for _, l in tags]); ax.set_ylim(0, 1.08); ax.set_ylabel("test macro-F1")
+    ax.grid(axis="x", visible=False)
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, 1.15), ncol=2, fontsize=8)
+    save(fig, "ablation_representation_split")
+
+
+def legacy_data_efficiency():
+    d = pd.read_csv("reports/phase3/data_efficiency.csv")
+    fig, ax = plt.subplots(figsize=(6.4, 3.3))
+    for rep, color in [("Frozen Whisper-small", BLUE), ("v1 MFCC stats", ORANGE)]:
+        for split, ls in [("clip-level", "-"), ("strict", "--")]:
+            g = d[(d.representation == rep) & (d.split == split)].groupby("fraction").test_macroF1
+            m, lo, hi = g.mean(), g.min(), g.max()
+            ax.fill_between(m.index, lo, hi, color=color, alpha=0.15, linewidth=0)
+            name = "frozen Whisper-small" if rep.startswith("Frozen") else "MFCC statistics"
+            ax.plot(m.index, m.values, color=color, linestyle=ls, linewidth=1.5, marker="o", markersize=3, label=f"{name} ({split})")
+    ax.set_xscale("log"); ax.set_xticks([0.1, 0.25, 0.5, 0.75, 1.0], ["0.10", "0.25", "0.50", "0.75", "1.00"])
+    ax.set_xlabel("fraction of training clips"); ax.set_ylabel("test macro-F1"); ax.set_ylim(0.3, 1.0)
+    ax.legend(loc="lower center", bbox_to_anchor=(0.5, 1.0), ncol=2, fontsize=7.5)
+    save(fig, "data_efficiency")
 
 
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     df = metrics_table()
     metric_heatmap(df); bars(df); confusions(); training_curves(); perclass_heatmap(); forest(); leakage_drop(df)
+    legacy_confusions(); legacy_perclass(); legacy_training_curve(); legacy_ablation(df); legacy_data_efficiency()
     tsne_pair()
 
 
