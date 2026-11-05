@@ -70,6 +70,9 @@ docs/thesis/*.docx
 docs/thesis/*.pdf
 docs/thesis/*.pages
 docs/thesis/*.zip
+# LaTeX source lives in Overleaf and locally only; defence deck likewise
+docs/thesis/beyond-words-thesis-overleaf/
+docs/defence/
 # Private meeting-prep docs (same policy as docs/supervisor/)
 docs/nlp-expert-meeting/
 # Private defence docs (same policy as docs/supervisor/)
