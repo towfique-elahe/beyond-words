@@ -168,10 +168,10 @@ kbd{font:inherit;border:1px solid var(--line);border-radius:4px;padding:0 5px;ba
     <div><b>Supervisor</b>Ashrafur Rahman Chowdhury, Lecturer<br>Dept. of CSE, East Delta University</div>
   </div>
   <div class="chips">
-    <span class="tag">Barishal</span><span class="tag">Chattogram</span><span class="tag">Dhaka</span><span class="tag b">Formal</span>
+    <span class="tag">Barishal</span><span class="tag">Chattogram</span><span class="tag">Dhaka</span><span class="tag b">Standard</span>
     <span class="tag">Khulna</span><span class="tag">Mymensingh</span><span class="tag">Noakhali</span><span class="tag">Rajshahi</span><span class="tag">Sylhet</span>
   </div>
-  <aside class="notes">Good morning. This thesis asks a simple question about Bangla: when a listener places a speaker in Sylhet or Barishal within seconds, are they hearing the words or the sound? We built both routes, measured them honestly, and released a public demo. Nine classes: eight regional dialects plus the Formal register.</aside>
+  <aside class="notes">Good morning. This thesis asks a simple question about Bangla: when a listener places a speaker in Sylhet or Barishal within seconds, are they hearing the words or the sound? We built both routes, measured them honestly, and released a public demo. Nine classes: eight regional dialects plus the Standard register.</aside>
 </section>
 
 <!-- 2 Question -->
@@ -181,7 +181,7 @@ kbd{font:inherit;border:1px solid var(--line);border-radius:4px;padding:0 5px;ba
   <div class="words">
     <div class="word"><div class="w">মুই</div><div class="g">“I”</div><div class="r">Barishal, Khulna, Noakhali</div></div>
     <div class="word"><div class="w">কিতা</div><div class="g">“what”</div><div class="r">Sylhet</div></div>
-    <div class="word"><div class="w">আমি · কি</div><div class="g">“I” · “what”</div><div class="r">Formal (standard register)</div></div>
+    <div class="word"><div class="w">আমি · কি</div><div class="g">“I” · “what”</div><div class="r">Standard (the standard register)</div></div>
   </div>
   <p class="lead frag">A listener knows in seconds. Is it the <b>words</b>, or the <b>sound</b>?</p>
   <div class="routes frag">
@@ -198,18 +198,18 @@ kbd{font:inherit;border:1px solid var(--line);border-radius:4px;padding:0 5px;ba
   <div class="tiles">
     <div class="tile"><div class="n" data-count="9303">0</div><div class="l">clips, 16 kHz mono</div></div>
     <div class="tile"><div class="n" data-count="13.1" data-dec="1">0</div><div class="l">hours of audio</div></div>
-    <div class="tile"><div class="n">8 + 1</div><div class="l">regional dialects + Formal</div></div>
+    <div class="tile"><div class="n">8 + 1</div><div class="l">regional dialects + Standard</div></div>
     <div class="tile"><div class="n">5 s</div><div class="l">per clip, cut from TV, film and online media</div></div>
   </div>
   <div class="cols c21">
-    <figure class="fig"><img src="figures/dataset_class_sizes.png" alt="Clips and hours per class"><figcaption>Class sizes: Khulna 750 clips to Formal 1,652; Formal has the longest clips.</figcaption></figure>
+    <figure class="fig"><img src="figures/dataset_class_sizes.png" alt="Clips and hours per class"><figcaption>Class sizes: Khulna 750 clips to Standard 1,652; Standard has the longest clips.</figcaption></figure>
     <ul class="points">
       <li>Gathered for two earlier EDU accent studies (Badhon <i>et al.</i> 2020, Alam <i>et al.</i> 2023).</li>
-      <li class="frag">No speaker labels. Only 557 Formal clips carry a source identifier.</li>
+      <li class="frag">No speaker labels. Only 557 Standard clips carry a source identifier.</li>
       <li class="frag">Studio news to outdoor drama: the recording channel varies with the class.</li>
     </ul>
   </div>
-  <aside class="notes">The corpus is found speech: about nine thousand clips, thirteen hours, cut from television, film and online media, labelled by district. It was gathered for two earlier studies at this university. Two properties shape everything that follows: there are no speaker labels, and the recording conditions differ systematically between classes, from studio news for Formal to outdoor drama for the regional classes.</aside>
+  <aside class="notes">The corpus is found speech: about nine thousand clips, thirteen hours, cut from television, film and online media, labelled by district. It was gathered for two earlier studies at this university. Two properties shape everything that follows: there are no speaker labels, and the recording conditions differ systematically between classes, from studio news for Standard to outdoor drama for the regional classes.</aside>
 </section>
 
 <!-- 4 Leakage -->
@@ -223,7 +223,7 @@ kbd{font:inherit;border:1px solid var(--line);border-radius:4px;padding:0 5px;ba
         <li class="frag">Fix: ECAPA-TDNN speaker embeddings → agglomerative clustering → <b>1,683 pseudo-speakers</b> → grouped split.</li>
         <li class="frag">Every model is scored twice: clip-level (upper bound) and <b>strict</b> (honest).</li>
       </ul>
-      <p class="small frag" style="margin-top:18px">Cluster threshold calibrated on the 557 Formal clips with known sources (ARI 0.347). Zero groups cross the splits.</p>
+      <p class="small frag" style="margin-top:18px">Cluster threshold calibrated on the 557 Standard clips with known sources (ARI 0.347). Zero groups cross the splits.</p>
     </div>
     <div>
       <div class="legend"><span><i class="sw" style="background:var(--blue)"></i>clip-level</span><span><i class="sw" style="background:var(--orange)"></i>strict</span><span style="margin-left:auto">test macro-F1</span></div>
@@ -235,7 +235,7 @@ kbd{font:inherit;border:1px solid var(--line);border-radius:4px;padding:0 5px;ba
       <p class="small" style="margin-top:14px">12 to 25 macro-F1 points were the recording, not the dialect.</p>
     </div>
   </div>
-  <aside class="notes">Here is the methodological heart of the thesis. With no speaker labels, a random split lets the same speaker and the same recording appear in both training and test, so the model can score by recognising the voice or the channel. We estimated speakers with ECAPA-TDNN embeddings, clustered them into about seventeen hundred pseudo-speakers, calibrated the threshold on the Formal clips whose sources we know, and split by group. The bars show what that costs: the hand-crafted baseline loses twenty-five points, the pretrained models twelve to fourteen. Those points were leakage.</aside>
+  <aside class="notes">Here is the methodological heart of the thesis. With no speaker labels, a random split lets the same speaker and the same recording appear in both training and test, so the model can score by recognising the voice or the channel. We estimated speakers with ECAPA-TDNN embeddings, clustered them into about seventeen hundred pseudo-speakers, calibrated the threshold on the Standard clips whose sources we know, and split by group. The bars show what that costs: the hand-crafted baseline loses twenty-five points, the pretrained models twelve to fourteen. Those points were leakage.</aside>
 </section>
 
 <!-- 5 LTAS -->
@@ -245,12 +245,12 @@ kbd{font:inherit;border:1px solid var(--line);border-radius:4px;padding:0 5px;ba
   <div class="cols c12">
     <ul class="points">
       <li>Long-term average spectrum per class, relative to the corpus mean.</li>
-      <li class="frag">Formal sits 2 to 3 dB below the mean at 1 to 3 kHz: studio speech.</li>
+      <li class="frag">Standard sits 2 to 3 dB below the mean at 1 to 3 kHz: studio speech.</li>
       <li class="frag">Barishal and Noakhali carry a periodic ripple at 4 to 7 kHz: a codec or processing chain, not a dialect.</li>
     </ul>
     <figure class="fig"><img src="figures/dataset_ltas_diff.png" alt="Long-term average spectrum of each class minus the corpus mean"><figcaption>Welch PSD, each clip normalised to unit power, averaged per class.</figcaption></figure>
   </div>
-  <aside class="notes">We can see the leakage in the signal itself. This is the long-term average spectrum of each class relative to the whole corpus. Formal is darker in the mid band, as studio speech is. Barishal and Noakhali show a comb-like ripple above four kilohertz that no speech process makes; it is a codec signature shared by many clips of those classes. A classifier can learn such things, and only a speaker-disjoint split penalises it for doing so.</aside>
+  <aside class="notes">We can see the leakage in the signal itself. This is the long-term average spectrum of each class relative to the whole corpus. Standard is darker in the mid band, as studio speech is. Barishal and Noakhali show a comb-like ripple above four kilohertz that no speech process makes; it is a codec signature shared by many clips of those classes. A classifier can learn such things, and only a speaker-disjoint split penalises it for doing so.</aside>
 </section>
 
 <!-- 6 Acoustic results -->
@@ -290,9 +290,9 @@ kbd{font:inherit;border:1px solid var(--line);border-radius:4px;padding:0 5px;ba
 <section class="slide" id="s8" data-time="0:30">
   <div class="eyebrow">Acoustic route</div>
   <h2>Where the remaining errors are</h2>
-  <figure class="fig full"><img src="figures/results_confusions.png" alt="Confusion matrices for fine-tuned Whisper-medium and Tugstugi (Ben-10)"><figcaption>Strict test confusions. Barishal → Formal (18) and → Chattogram (9); Noakhali → Barishal (11); ten of Sylhet’s eleven errors go to Formal.</figcaption></figure>
+  <figure class="fig full"><img src="figures/results_confusions.png" alt="Confusion matrices for fine-tuned Whisper-medium and Tugstugi (Ben-10)"><figcaption>Strict test confusions. Barishal → Standard (18) and → Chattogram (9); Noakhali → Barishal (11); ten of Sylhet’s eleven errors go to Standard.</figcaption></figure>
   <p class="small frag">Errors follow geography and the register boundary. Barishal’s strict test set is one 251-clip pseudo-speaker cluster, so its score is the noisiest.</p>
-  <aside class="notes">The errors that remain are structured. Barishal clips are called Formal or Chattogram, Noakhali and Barishal, two southern coastal dialects, are confused with each other, and almost every Sylhet error goes to Formal, which suggests those clips are nearer the standard register. Barishal's strict test set is a single large cluster, so its number is the least certain.</aside>
+  <aside class="notes">The errors that remain are structured. Barishal clips are called Standard or Chattogram, Noakhali and Barishal, two southern coastal dialects, are confused with each other, and almost every Sylhet error goes to Standard, which suggests those clips are nearer the standard register. Barishal's strict test set is a single large cluster, so its number is the least certain.</aside>
 </section>
 
 <!-- 9 Lexical -->
@@ -312,7 +312,7 @@ kbd{font:inherit;border:1px solid var(--line);border-radius:4px;padding:0 5px;ba
     </ul>
     <figure class="fig"><img src="figures/phase5_classification.png" alt="Lexical classifiers and fusion by ASR front-end"><figcaption>Strict macro-F1 of word matching, TF-IDF and fusion with XLS-R per front-end.</figcaption></figure>
   </div>
-  <aside class="notes">The lexical route asks how much dialect survives transcription. On the Ben-10 benchmark, the best Bangla recogniser reproduces about a quarter of the hand-counted dialect words; the others almost none. Matching regional word lists against our transcripts gives thirty-six strict; a TF-IDF classifier sixty-three, and most of that is the Formal register. Fused with the earlier XLS-R model the words add almost five points, but fused with fine-tuned Whisper-medium they add nothing. So the answer to the question in the title: on this data, it is mostly the sound.</aside>
+  <aside class="notes">The lexical route asks how much dialect survives transcription. On the Ben-10 benchmark, the best Bangla recogniser reproduces about a quarter of the hand-counted dialect words; the others almost none. Matching regional word lists against our transcripts gives thirty-six strict; a TF-IDF classifier sixty-three, and most of that is the Standard register. Fused with the earlier XLS-R model the words add almost five points, but fused with fine-tuned Whisper-medium they add nothing. So the answer to the question in the title: on this data, it is mostly the sound.</aside>
 </section>
 
 <!-- 10 t-SNE -->
@@ -320,7 +320,7 @@ kbd{font:inherit;border:1px solid var(--line);border-radius:4px;padding:0 5px;ba
   <div class="eyebrow">What fine-tuning learns</div>
   <h2>The embedding space before and after</h2>
   <figure class="fig full"><img src="figures/results_tsne.png" alt="t-SNE of frozen Whisper-small and fine-tuned Whisper-medium embeddings"><figcaption>Strict test clips. Left: frozen Whisper-small, organised by register. Right: fine-tuned Whisper-medium, one compact cluster per class; Barishal and Noakhali still overlap.</figcaption></figure>
-  <aside class="notes">A picture of the same story. Frozen Whisper embeddings separate Formal and a few tight single-source groups, but the dialects share one cloud. After fine-tuning every class is its own island, and the only overlap left is exactly the Barishal–Noakhali confusion from the matrix.</aside>
+  <aside class="notes">A picture of the same story. Frozen Whisper embeddings separate Standard and a few tight single-source groups, but the dialects share one cloud. After fine-tuning every class is its own island, and the only overlap left is exactly the Barishal–Noakhali confusion from the matrix.</aside>
 </section>
 
 <!-- 11 Demo -->
@@ -330,16 +330,16 @@ kbd{font:inherit;border:1px solid var(--line);border-radius:4px;padding:0 5px;ba
   <div class="qr">
     <img src="figures/qr-space.png" alt="QR code to the Hugging Face Space">
     <div>
-      <div class="url"><a href="https://huggingface.co/spaces/towfiqueelahe/beyond-words-dialect-id">huggingface.co/spaces/towfiqueelahe/beyond-words-dialect-id</a></div>
+      <div class="url"><a href="https://towfiqueelahe6--beyond-words.modal.run">towfiqueelahe6--beyond-words.modal.run</a></div>
       <ul class="points" style="margin-top:16px">
         <li>Fine-tuned Whisper-medium, strict checkpoint (0.919 macro-F1).</li>
         <li class="frag">Audio is resampled to 16 kHz, scored in 5 s windows, probabilities averaged.</li>
-        <li class="frag">Weights: <a href="https://huggingface.co/towfiqueelahe/beyond-words-whisper-medium-did">huggingface.co/towfiqueelahe/beyond-words-whisper-medium-did</a></li>
+        <li class="frag">Weights: <a href="https://huggingface.co/towfique-elahe/beyond-words-whisper-medium-did">huggingface.co/towfique-elahe/beyond-words-whisper-medium-did</a></li>
       </ul>
-      <p class="small frag">Read speech comes out Formal by design; the model has not seen your microphone or room.</p>
+      <p class="small frag">Read speech comes out Standard by design; the model has not seen your microphone or room.</p>
     </div>
   </div>
-  <aside class="notes">The best model is public. Scan the code, record ten seconds of Bangla, and the Space returns the top dialects with probabilities. It runs the strict checkpoint on free CPU hardware, about a second per clip. If you read a sentence aloud it will say Formal, which is what the register class means.</aside>
+  <aside class="notes">The best model is public. Scan the code, record ten seconds of Bangla, and the Space returns the top dialects with probabilities. It runs the strict checkpoint on a serverless CPU container, about a second per clip. If you read a sentence aloud it will say Standard, which is what the register class means.</aside>
 </section>
 
 <!-- 12 Answers -->
@@ -352,7 +352,7 @@ kbd{font:inherit;border:1px solid var(--line);border-radius:4px;padding:0 5px;ba
     <div class="frag"><b>RQ3 · from words</b><span class="ans">Little survives ASR</span>Dialect-word recall 0.27 at best; text classifier 0.63.</div>
     <div class="frag"><b>RQ4 · fusion</b><span class="ans">Only for weak models</span>+4.8 with XLS-R, nothing with Whisper-medium.</div>
   </div>
-  <p class="small frag">Limits: pseudo-speakers are estimates, not identities; some speakers are actors; Formal is a register, not a region; 5 s clips carry no discourse-level cues. Next: a speaker-labelled evaluation set such as RegSpeech12, and dialect-preserving ASR.</p>
+  <p class="small frag">Limits: pseudo-speakers are estimates, not identities; some speakers are actors; Standard is a register, not a region; 5 s clips carry no discourse-level cues. Next: a speaker-labelled evaluation set such as RegSpeech12, and dialect-preserving ASR.</p>
   <aside class="notes">To close. From sound: ninety-two honest, ninety-eight optimistic. Leakage: twelve to twenty-five points, and fine-tuning halves it. From words: little survives recognition. Fusion: only helps a weaker acoustic model. The limits are the corpus's: pseudo-speakers, actors, a register among the classes, and short clips. The obvious next step is a speaker-labelled test set, which RegSpeech12 now makes possible, and recognisers that keep dialect words instead of normalising them.</aside>
 </section>
 
@@ -363,7 +363,7 @@ kbd{font:inherit;border:1px solid var(--line);border-radius:4px;padding:0 5px;ba
   <div class="cols c2" style="align-items:start">
     <div>
       <p class="lead">Code, splits, transcripts and per-clip predictions:<br><a href="https://github.com/towfique-elahe/beyond-words">github.com/towfique-elahe/beyond-words</a></p>
-      <p class="lead">Demo: <a href="https://huggingface.co/spaces/towfiqueelahe/beyond-words-dialect-id">huggingface.co/spaces/towfiqueelahe/beyond-words-dialect-id</a></p>
+      <p class="lead">Demo: <a href="https://towfiqueelahe6--beyond-words.modal.run">towfiqueelahe6--beyond-words.modal.run</a></p>
     </div>
     <div class="small" style="font-size:16px;line-height:1.45">
       <p style="margin:0 0 6px"><b>Key references</b></p>

@@ -15,12 +15,12 @@ import numpy as np
 import torch
 from transformers import WhisperFeatureExtractor, WhisperForAudioClassification
 
-MODEL_ID = os.environ.get("MODEL_ID", "towfiqueelahe/beyond-words-whisper-medium-did")
+MODEL_ID = os.environ.get("MODEL_ID", "towfique-elahe/beyond-words-whisper-medium-did")
 SR, WIN = 16000, 5 * 16000
 DESCRIPTION = """
 **Beyond Words** identifies which of nine Bangla dialect classes a speaker is using, from the
 sound alone: Barishal, Chattogram, Dhaka, Khulna, Mymensingh, Noakhali, Rajshahi, Sylhet, or the
-standard register (*Formal*). The model is a Whisper-medium encoder fine-tuned on 13 hours of
+standard register (*Standard*). The model is a Whisper-medium encoder fine-tuned on 13 hours of
 Bangladeshi television, film and online speech. Speak for at least 5 seconds; longer recordings
 are scored in 5-second windows and averaged.
 """
@@ -35,7 +35,8 @@ classes, will be mapped to the closest class it knows. Part of the undergraduate
 device = "cuda" if torch.cuda.is_available() else "cpu"
 fe = WhisperFeatureExtractor.from_pretrained(MODEL_ID)
 model = WhisperForAudioClassification.from_pretrained(MODEL_ID).to(device).eval()
-LABELS = [model.config.id2label[i] for i in range(model.config.num_labels)]
+DISPLAY = {"Formal": "Standard"}   # the checkpoint keeps the corpus label; the thesis calls the register class Standard
+LABELS = [DISPLAY.get(model.config.id2label[i], model.config.id2label[i]) for i in range(model.config.num_labels)]
 
 
 def windows(wav):

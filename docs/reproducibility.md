@@ -77,7 +77,7 @@ on 93.6 % of pilot clips; the committed numbers use the T4 transcripts.
 | Summary table and figure | `summarize_phase6.py` → `reports/phase6/summary.csv`; `make_phase6_figures.py` → `reports/figures/phase6_models_split.pdf` |
 | Thesis dataset figures (Ch. 3) | `make_dataset_figures.py` → `reports/figures/dataset_*.pdf` (LTAS cached in `dataset_ltas.npz`; `--ltas-cache` re-plots) |
 | Thesis results figures (Ch. 5) | `dump_embeddings.py --checkpoint whisper_medium_best.pt --splits test` (Kaggle) → `embeddings_whisper_medium_ft_strict_test.npz`; then `make_results_figures.py` → `reports/figures/results_*.pdf`, `reports/phase6/metrics_all_models.csv`, `tsne_strict_test.npz` |
-| Public model and demo | `export_hf_model.py --checkpoint whisper_medium_best.pt --out hf_export/...` then `hf upload`; Space from `app/` |
+| Public model and demo | `export_hf_model.py --checkpoint whisper_medium_best.pt --out checkpoints/hf_export/...` then `hf upload towfique-elahe/beyond-words-whisper-medium-did <dir> . --repo-type model`; demo served from `app/` by `modal deploy app/modal_app.py` → https://towfiqueelahe6--beyond-words.modal.run (free Gradio Spaces on Hugging Face need a PRO plan; `notebooks/demo_gradio_share.ipynb` is a temporary-link fallback) |
 | Bootstrap CIs incl. Phase 6 models | `bootstrap_ci.py --out reports/phase6/bootstrap_ci.json --extra "strict:Whisper-medium FT=reports/phase6/strict/test_predictions_whisper_medium.csv" ...` |
 
 The XLS-R path of `finetune_xlsr.py` (default `--model`, `--tag xlsr`) is

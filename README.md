@@ -6,7 +6,7 @@ Classifying regional Bangla accents from short audio clips. v2 replaces the orig
 
 > Thesis: *A Neural Network Approach to Classifying Bangla Accentual Diversity* — framed as a Dialect Identification (DID) task.
 
-> **Live demo:** [huggingface.co/spaces/towfiqueelahe/beyond-words-dialect-id](https://huggingface.co/spaces/towfiqueelahe/beyond-words-dialect-id) (fine-tuned Whisper-medium, strict checkpoint; record or upload Bangla speech). Weights: [towfiqueelahe/beyond-words-whisper-medium-did](https://huggingface.co/towfiqueelahe/beyond-words-whisper-medium-did). Defence deck: `docs/defence/index.html`.
+> **Live demo:** [towfiqueelahe6--beyond-words.modal.run](https://towfiqueelahe6--beyond-words.modal.run) (fine-tuned Whisper-medium, strict checkpoint; record or upload Bangla speech). Weights: [towfique-elahe/beyond-words-whisper-medium-did](https://huggingface.co/towfique-elahe/beyond-words-whisper-medium-did). Defence deck: `docs/defence/index.html`.
 
 ---
 
@@ -17,7 +17,7 @@ Classifying regional Bangla accents from short audio clips. v2 replaces the orig
 | Barishal | 1,257 |
 | Chattogram | 797 |
 | Dhaka | 763 |
-| Formal (standard register) | 1,652 |
+| Standard (standard register; labelled `Formal` in the split and prediction files) | 1,652 |
 | Khulna | 750 |
 | Mymensingh | 1,053 |
 | Noakhali | 1,213 |
@@ -27,7 +27,7 @@ Classifying regional Bangla accents from short audio clips. v2 replaces the orig
 
 Clips are `.wav`, standardized to 16 kHz mono PCM-16, and nominally 5 s long (median 5.0 s; 1,067 fall outside 4.5–5.5 s, range 1.1–8.0 s). Audio was collected from TV shows, films, and online content, originally in mp4. The corpus was gathered for two earlier Bangla accent-classification studies, Badhon et al. (2020) [1] and Alam et al. (2023) [2] (see Acknowledgements); it is not redistributed here.
 
-**Note on "Formal":** Formal is a *speech register* (standard/prescribed Bangla), not a regional category. Treating it as a ninth class is a deliberate design choice, discussed in the thesis.
+**Note on "Standard":** the ninth class is a *speech register* (standard/prescribed Bangla), not a regional category; the thesis, figures and demo call it Standard, while the released CSVs, lexicons and audio folder keep the original label `Formal`. Treating it as a ninth class is a deliberate design choice, discussed in the thesis.
 
 ## What changed from v1
 
