@@ -15,9 +15,11 @@ short_description: Which Bangla dialect is this? 9-class ID from speech.
 
 Record or upload Bangla speech and the app predicts one of nine classes —
 Barishal, Chattogram, Dhaka, Khulna, Mymensingh, Noakhali, Rajshahi, Sylhet,
-or the standard register (Formal) — from the sound alone, using a Whisper-medium
+or the standard register (Standard) from the sound alone, using a Whisper-medium
 encoder fine-tuned for dialect identification
-([model](https://huggingface.co/towfiqueelahe/beyond-words-whisper-medium-did)).
+([model](https://huggingface.co/towfique-elahe/beyond-words-whisper-medium-did)).
 
 Test macro-F1: 0.984 on a conventional split, 0.919 on a speaker-disjoint split.
 Code, data pipeline and thesis: <https://github.com/towfique-elahe/beyond-words>.
+
+This folder is the demo app. It is deployed on Modal (`modal_app.py`, see its docstring) at https://towfiqueelahe6--beyond-words.modal.run; the front matter above also lets it run as a Hugging Face Space (which needs a PRO plan for Gradio on free hardware). `embed.html` is a one-file page for embedding the demo on your own site.
