@@ -14,10 +14,10 @@ Whisper-small encoder embeddings and an end-to-end fine-tuned XLS-R-300M model
 reach test macro-F1 of 0.727, 0.917 and 0.952 on a conventional clip-level
 split. A strict split built from ECAPA-TDNN pseudo-speaker clusters, calibrated
 against the known sources of the Standard clips, lowers these to 0.480, 0.793
-and 0.808, so 12--14 macro-F1 points of the pretrained models' clip-level
+and 0.808, so 12-14 macro-F1 points of the pretrained models' clip-level
 scores came from speaker and channel overlap. Fine-tuning Whisper-medium and
 two Bangla-adapted versions of it raises the strict-split score to 0.92 with a
-leakage drop of only 6--7 points; once fine-tuned the three are
+leakage drop of only 6-7 points; once fine-tuned the three are
 indistinguishable, so Bangla-specific pretraining helps only a frozen encoder,
 while a smaller Bangla FastConformer trails at 0.75. Channel-suppression
 augmentation reduces XLS-R's score from 0.808 to 0.748, and frozen Whisper
@@ -26,7 +26,7 @@ all of them. The lexical route transcribes every clip with five off-the-shelf
 Bangla speech recognisers and classifies the words. Measured against human
 transcripts of dialect speech, the best recogniser, one fine-tuned on regional
 speech by its publishers, reproduces 27\,\% of dialect words, whereas
-recognisers trained on standard Bangla reproduce 1--4\,\% and rewrite dialect
+recognisers trained on standard Bangla reproduce 1-4\,\% and rewrite dialect
 into the standard form. Matching regional word lists therefore identifies the
 dialect poorly (macro-F1 0.36 under the strict split), and a text classifier
 over the full transcript reaches 0.63. Combined with the XLS-R model, the words

@@ -65,7 +65,7 @@ produces a 192-dimensional speaker vector. Within each class the embeddings are
 clustered by agglomerative clustering with cosine distance and average linkage,
 with no preset number of clusters. The distance threshold is not hand-picked:
 it is \emph{calibrated on the Standard class}, whose true sources are known
-for 557 clips, by sweeping 0.30--0.90 and keeping the threshold that maximises
+for 557 clips, by sweeping 0.30-0.90 and keeping the threshold that maximises
 the adjusted Rand index \cite{Hubert1985Comparing} between clusters and true
 sources. The best threshold is 0.50, with ARI 0.347. Clustering every class at
 this threshold yields 1,683 pseudo-speaker groups, and a grouped split then
@@ -125,7 +125,7 @@ protocol, so that representations are compared fairly.
 \paragraph{(b) Frozen Whisper-small + MLP.} Each clip is encoded once by the
 frozen encoder of Whisper-small; hidden states are mean-pooled to 768
 dimensions and cached. The classifier is a two-hidden-layer MLP
-(768--256--256--9, ReLU, dropout 0.3) trained with AdamW
+(768-256-256-9, ReLU, dropout 0.3) trained with AdamW
 \cite{Loshchilov2019Decoupled} (learning rate $10^{-3}$, weight decay $10^{-4}$)
 for 60 full-batch epochs on CPU, which makes it bit-reproducible, keeping the
 checkpoint with the best validation macro-F1.
@@ -176,9 +176,9 @@ and fine-tuned.
 
 \paragraph{Augmentation variant.} A train-only waveform augmentation chain
 aimed at recording-channel signatures: gain $\pm 6$\,dB ($p=0.5$), Gaussian
-noise at 10--30\,dB SNR ($p=0.5$), seven-band parametric equalisation
-$\pm 6$\,dB ($p=0.3$), telephone-style band-pass 300--3400\,Hz ($p=0.15$),
-pitch shift $\pm 2$ semitones ($p=0.25$), and time stretch 0.9--1.1
+noise at 10-30\,dB SNR ($p=0.5$), seven-band parametric equalisation
+$\pm 6$\,dB ($p=0.3$), telephone-style band-pass 300-3400\,Hz ($p=0.15$),
+pitch shift $\pm 2$ semitones ($p=0.25$), and time stretch 0.9-1.1
 ($p=0.25$).
 
 \section{Evaluation and statistical uncertainty}
@@ -332,7 +332,7 @@ the validation split. The method needs no training, and the per-word evidence
 behind each decision can be shown to a user.
 
 \paragraph{TF-IDF + logistic regression.} The normalised transcript is
-represented by TF-IDF features over word 1--2-grams and character 2--5-grams
+represented by TF-IDF features over word 1-2-grams and character 2-5-grams
 (sublinear term frequency, minimum document frequency 2), and classified by
 logistic regression with balanced class weights, with the regularisation
 strength $C \in \{0.3, 1, 3, 10, 30\}$ chosen on validation
@@ -406,7 +406,7 @@ and rows 14 to 16 the headline results and the compute they required.
 
 Development and all experiments except fine-tuning and transcription ran on an
 Apple M1 laptop (16\,GB, PyTorch MPS backend). Fine-tuning ran on Kaggle's free
-T4 GPU tier: about 2.5 hours per XLS-R run, 55--75 minutes per Phase 6 run
+T4 GPU tier: about 2.5 hours per XLS-R run, 55-75 minutes per Phase 6 run
 (about 9 hours for the eight), and about 4.5 hours in all for the lexical
 route's transcription. The pipeline survived a mid-project hardware change (GTX
 1660 Ti to M1) with the frozen-embedding baseline reproducing within 0.3

@@ -72,8 +72,8 @@ macro-averaged F1 rather than accuracy (\cref{ch:method}).
 
 Every clip is standardised to 16\,kHz, mono, 16-bit PCM WAV during the
 validation step. Clips are nominally five seconds long: the median duration is
-5.0\,s and the mean 5.08\,s, but 1,067 clips fall outside 4.5--5.5\,s, with a
-range of 1.1--8.0\,s; Standard clips are slightly longer (median 5.6\,s). Five
+5.0\,s and the mean 5.08\,s, but 1,067 clips fall outside 4.5-5.5\,s, with a
+range of 1.0-8.0\,s; Standard clips are slightly longer (median 5.6\,s). Five
 seconds is enough for a listener to recognise many dialects but excludes
 longer-range cues such as discourse markers and phrase-level intonation. Because
 the material is broadcast and online media, recording conditions vary widely
@@ -96,7 +96,7 @@ of it.
 \end{figure}
 
 \Cref{fig:spectrograms} shows one held-out clip per class as a waveform and an
-80-band log-mel spectrogram covering 0--8\,kHz over the 5\,s of the clip, the
+80-band log-mel spectrogram covering 0-8\,kHz over the 5\,s of the clip, the
 representation Whisper consumes. The examples already hint at the variation the
 models face: the Barishal and Khulna clips contain short silences where the
 source was cut, the Dhaka clip is quieter with more background energy between
@@ -145,7 +145,7 @@ Three observations follow. First, all nine classes share the expected shape of
 speech: a peak below 500\,Hz and a roll-off of about 6\,dB per octave above
 it, with the sharp drop above 7.6\,kHz that comes from the original
 compression of the media. Second, the classes nevertheless differ by up to
-$\pm 5$\,dB over broad bands. Standard sits 2--3\,dB below the mean between
+$\pm 5$\,dB over broad bands. Standard sits 2-3\,dB below the mean between
 1 and 3\,kHz and above it from 4.5\,kHz upward, which is consistent with
 studio speech recorded with less low-frequency proximity effect and more
 high-frequency clarity than field or drama audio. Third, two regional classes,

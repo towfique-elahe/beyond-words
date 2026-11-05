@@ -127,7 +127,7 @@ strict split, and the hand-crafted features lose the most.
 \end{figure}
 
 \begin{enumerate}
-  \item \textbf{Leakage is measured at 12--14 macro-F1 points} for the
+  \item \textbf{Leakage is measured at 12-14 macro-F1 points} for the
         pretrained models, and about 25 for MFCC features. The strict numbers,
         0.793 and 0.808, are the honest estimates; clip-level numbers are kept
         for comparability with prior work.
@@ -191,10 +191,10 @@ Whisper is not.
     \toprule
     Model & Clip-level & Strict \\
     \midrule
-    MFCC + MLP             & 0.727 (0.676--0.753) & 0.480 (0.368--0.552) \\
-    Frozen Whisper + MLP   & 0.917 (0.894--0.932) & 0.793 (0.688--0.808) \\
-    Fine-tuned XLS-R       & 0.952 (0.935--0.963) & 0.808 (0.717--0.838) \\
-    XLS-R + augmentation   & n/a                  & 0.748 (0.649--0.792) \\
+    MFCC + MLP             & 0.727 (0.676-0.753) & 0.480 (0.368-0.552) \\
+    Frozen Whisper + MLP   & 0.917 (0.894-0.932) & 0.793 (0.688-0.808) \\
+    Fine-tuned XLS-R       & 0.952 (0.935-0.963) & 0.808 (0.717-0.838) \\
+    XLS-R + augmentation   & n/a                  & 0.748 (0.649-0.792) \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -282,17 +282,17 @@ fine-tuned Whisper-medium intervals overlap almost completely.
     \toprule
     Model & Pretraining & Clip-level & Strict & Drop \\
     \midrule
-    MFCC statistics + MLP            & none         & 0.727 (0.676--0.753) & 0.480 (0.368--0.552) & 24.8 \\
+    MFCC statistics + MLP            & none         & 0.727 (0.676-0.753) & 0.480 (0.368-0.552) & 24.8 \\
     \addlinespace
-    Whisper-small, frozen + MLP      & multilingual & 0.917 (0.894--0.932) & 0.793 (0.688--0.808) & 12.4 \\
-    Whisper-medium, frozen + MLP     & multilingual & 0.919 (0.896--0.934) & 0.782 (0.662--0.793) & 13.8 \\
-    Tugstugi (Ben-10), frozen + MLP  & Bangla       & 0.936 (0.916--0.949) & 0.857 (0.725--0.870) & 7.9 \\
+    Whisper-small, frozen + MLP      & multilingual & 0.917 (0.894-0.932) & 0.793 (0.688-0.808) & 12.4 \\
+    Whisper-medium, frozen + MLP     & multilingual & 0.919 (0.896-0.934) & 0.782 (0.662-0.793) & 13.8 \\
+    Tugstugi (Ben-10), frozen + MLP  & Bangla       & 0.936 (0.916-0.949) & 0.857 (0.725-0.870) & 7.9 \\
     \addlinespace
-    XLS-R-300M, fine-tuned           & multilingual & 0.952 (0.935--0.963) & 0.808 (0.717--0.838) & 14.4 \\
-    Whisper-medium, fine-tuned       & multilingual & \textbf{0.984} (0.975--0.991) & 0.919 (0.808--0.931) & 6.5 \\
-    Tugstugi, fine-tuned             & Bangla       & 0.981 (0.972--0.988) & 0.908 (0.802--0.919) & 7.3 \\
-    Tugstugi (Ben-10), fine-tuned    & Bangla       & 0.980 (0.970--0.987) & \textbf{0.921} (0.785--0.932) & 6.0 \\
-    Hishab FastConformer, fine-tuned & Bangla       & 0.901 (0.877--0.916) & 0.746 (0.613--0.773) & 15.5 \\
+    XLS-R-300M, fine-tuned           & multilingual & 0.952 (0.935-0.963) & 0.808 (0.717-0.838) & 14.4 \\
+    Whisper-medium, fine-tuned       & multilingual & \textbf{0.984} (0.975-0.991) & 0.919 (0.808-0.931) & 6.5 \\
+    Tugstugi, fine-tuned             & Bangla       & 0.981 (0.972-0.988) & 0.908 (0.802-0.919) & 7.3 \\
+    Tugstugi (Ben-10), fine-tuned    & Bangla       & 0.980 (0.970-0.987) & \textbf{0.921} (0.785-0.932) & 6.0 \\
+    Hishab FastConformer, fine-tuned & Bangla       & 0.901 (0.877-0.916) & 0.746 (0.613-0.773) & 15.5 \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -356,8 +356,8 @@ fine-tuned Whisper-medium intervals overlap almost completely.
         no significant strict-split difference, therefore mixed the effect of
         the regime with that of the encoder.
   \item \textbf{Fine-tuning a transcription-pretrained encoder halves the
-        leakage drop.} The fine-tuned Whisper-medium family loses 6.0--7.3
-        points from the clip-level to the strict split, against 12.4--13.8 for
+        leakage drop.} The fine-tuned Whisper-medium family loses 6.0-7.3
+        points from the clip-level to the strict split, against 12.4-13.8 for
         the frozen Whisper encoders and 14.4 for fine-tuned XLS-R. For
         Whisper-medium the drop falls from 13.8 frozen to 6.5 fine-tuned, so
         the robustness is produced by fine-tuning the encoder, not inherited
@@ -406,9 +406,9 @@ clip level the matrix is almost diagonal.
 
 \Cref{tab:encoders-perclass} gives the per-class strict scores. The Whisper-medium
 family repairs the classes that XLS-R found hardest: Barishal rises from 0.508
-to 0.88--0.93 and Sylhet from 0.750 to 0.88--0.95. Validation scores remain
-lower than test scores for every model under the strict split (0.76--0.80
-against 0.91--0.92 for the Whisper-medium family), as they were for XLS-R
+to 0.88-0.93 and Sylhet from 0.750 to 0.88-0.95. Validation scores remain
+lower than test scores for every model under the strict split (0.76-0.80
+against 0.91-0.92 for the Whisper-medium family), as they were for XLS-R
 (0.757 against 0.808); the two held-out sets differ in which pseudo-speaker
 clusters they contain.
 
@@ -448,12 +448,12 @@ model, and Hishab's FastConformer below 0.8 on seven of nine classes.
   \label{fig:perclass-heatmap}
 \end{figure}
 
-Each Whisper-medium run took 64--76 minutes on a T4 and each FastConformer run
-54--60 minutes; the eight runs used about 9 GPU-hours. \Cref{fig:training-curves}
+Each Whisper-medium run took 64-76 minutes on a T4 and each FastConformer run
+54-60 minutes; the eight runs used about 9 GPU-hours. \Cref{fig:training-curves}
 shows the training dynamics of the eight runs, training loss above and
 validation macro-F1 below, for both split protocols: training loss reaches
 zero by epoch 8 for the Whisper-medium family while validation macro-F1
-plateaus from epoch 5--10, so the 12-epoch schedule is long enough; the
+plateaus from epoch 5-10, so the 12-epoch schedule is long enough; the
 FastConformer's loss is still falling at epoch 20 and its strict-split
 validation score is still rising, the under-training noted above.
 
@@ -531,10 +531,10 @@ its private test set and 0.81, 0.87 and 1.13 for Tugstugi, Hishab and
 Whisper-large-v3; the validation-set values here run a little lower for the
 Whisper models. Even the best front-end reproduces only about one dialect word
 in four; by district its recall ranges from 0.364 (Sylhet) to 0.173
-(Kishoreganj). The standard-Bangla models reproduce 1--4\,\% of dialect words.
-The benchmark's hand-counted recall for the two Tugstugi models (0.16--0.53
-against 0.01--0.09) is thus confirmed at full scale with an automated measure
-(per district 0.17--0.36 against 0.01--0.14).
+(Kishoreganj). The standard-Bangla models reproduce 1-4\,\% of dialect words.
+The benchmark's hand-counted recall for the two Tugstugi models (0.16-0.53
+against 0.01-0.09) is thus confirmed at full scale with an automated measure
+(per district 0.17-0.36 against 0.01-0.14).
 
 \Cref{fig:asr-dialect} summarises what survives transcription. Panel (a) plots
 the dialect-word recall of \cref{tab:asr-quality}, where the Ben-10 model stands
@@ -549,7 +549,7 @@ Tugstugi model output almost as few non-standard words on regional clips (9\,\%
 and 13\,\%) as on Standard ones (4\,\% and 5\,\%). The wav2vec~2.0 and
 Whisper-large-v3 front-ends have high shares for the wrong reason:
 misrecognition, and for Whisper-large-v3 repetition loops in 12.3\,\% of
-transcripts (one word repeated five or more times in a row) and 2.5--4.8\,\%
+transcripts (one word repeated five or more times in a row) and 2.5-4.8\,\%
 empty outputs per class.
 
 \begin{figure}[ht]
@@ -603,7 +603,7 @@ XLS-R alone scores 0.808 (strict) and 0.952 (clip-level).
         to 0.419, still far below every pretrained acoustic model. The clean
         external lexicon (Ben-10 and Vashantor; six classes including Standard)
         scores 0.418 on its own classes with 51\,\% coverage. With the
-        standard-Bangla front-ends, coverage collapses to 2--5\,\% and matching
+        standard-Bangla front-ends, coverage collapses to 2-5\,\% and matching
         fails: there are no regional words left to match.
   \item \textbf{The TF-IDF classifier roughly doubles the matching score}
         (0.633 strict with the Ben-10 model), placing the words alone between
@@ -631,10 +631,10 @@ with its interval and the bootstrap probability of no gain.
     \toprule
     Model & Clip-level & Strict \\
     \midrule
-    Word matching          & 0.399 (0.359--0.421) & 0.360 (0.284--0.380) \\
-    TF-IDF                 & 0.728 (0.684--0.748) & 0.633 (0.538--0.642) \\
-    Fusion XLS-R + TF-IDF  & 0.967 (0.952--0.976) & 0.856 (0.754--0.875) \\
-    Fine-tuned XLS-R (reference) & 0.952 (0.935--0.963) & 0.808 (0.717--0.838) \\
+    Word matching          & 0.399 (0.359-0.421) & 0.360 (0.284-0.380) \\
+    TF-IDF                 & 0.728 (0.684-0.748) & 0.633 (0.538-0.642) \\
+    Fusion XLS-R + TF-IDF  & 0.967 (0.952-0.976) & 0.856 (0.754-0.875) \\
+    Fine-tuned XLS-R (reference) & 0.952 (0.935-0.963) & 0.808 (0.717-0.838) \\
     \bottomrule
   \end{tabular}
 \end{table}
@@ -721,7 +721,7 @@ Fusion changes 102 of the 1,327 test predictions, repairing 38 and breaking 50.
 The validation score rises (0.803 to 0.847), which is why $\alpha = 0.25$ is
 selected, but the gain does not transfer to the test speakers. The classes
 XLS-R found hardest and the words repaired, Barishal and Sylhet, are already at
-0.88--0.94 for Whisper-medium, so there is little left for the text to fix. At
+0.88-0.94 for Whisper-medium, so there is little left for the text to fix. At
 clip level the fusion is a null result: 0.984 against 0.984, with five
 predictions changed, two repaired and two broken.
 
@@ -768,7 +768,7 @@ from human writing.
     Badhon \etal\ (2020)~\cite{Badhon2020Bengali} & Bangla accent classification from this corpus; hand-crafted features, classical and deep classifiers & Accent classes separable with MFCC-type features & Random split; no speaker/channel control; features hand-crafted & Pretrained encoders; leakage measured with a strict split \\
     Alam \etal\ (2023)~\cite{Alam2023Bangla} & Bangla accent variation from audio with deep networks, same corpus & Deep networks outperform classical classifiers & Clip-level evaluation; single representation & Eight models under two protocols with bootstrap CIs \\
     Sadiq \etal\ (2026)~\cite{Sadiq2026Bangla} & Text-based dialect classification, 11 regions, BanglaBERT & About 89\,\% on human-written dialect text & Needs written dialect text; not applicable to speech & Lexical route from ASR output; shows what transcription loses \\
-    Dipto \etal\ (2025)~\cite{Dipto2025ASR} & Ben-10 corpus; benchmark of seven ASR systems on dialect speech & WER 0.70--1.13; standard-trained models default to standard Bangla & Hand-counted dialect recall on about 50 words per district; no dialect classifier & Automated dialect-word recall on 1,666 clips; uses the systems as front-ends \\
+    Dipto \etal\ (2025)~\cite{Dipto2025ASR} & Ben-10 corpus; benchmark of seven ASR systems on dialect speech & WER 0.70-1.13; standard-trained models default to standard Bangla & Hand-counted dialect recall on about 50 words per district; no dialect classifier & Automated dialect-word recall on 1,666 clips; uses the systems as front-ends \\
     Hassan \etal\ (2025)~\cite{Hassan2025RegSpeech12} & RegSpeech12: 100 h spontaneous speech, 12 regions, transcribed & Public corpus with phonetic and morphological analysis & Resource paper; no identification task & Source of regional word lists (via Ben-10); identification from audio \\
     Hassan (2024)~\cite{Hassan2024Character} & Character-gram modelling for regional Bangla speech-to-text on wav2vec~2.0 & Improved regional ASR decoding & Recognition only; dialect not identified & Dialect identification as the target task \\
     Niloy \etal\ (2026)~\cite{Niloy2026Meaning} & LLM benchmark for dialect-to-standard translation, 15 dialects & Morphology, not meaning, is the main barrier & Text-to-text; assumes dialect text exists & Shows standard ASR already normalises dialect away \\

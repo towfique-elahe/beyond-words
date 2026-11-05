@@ -7,7 +7,7 @@
 The central methodological result is that a disclaimer became a measurement.
 Most audio classification on found data either ignores speaker and channel
 leakage or mentions it qualitatively. Here the pseudo-speaker split bounds it:
-12--14 macro-F1 points for pretrained representations and about 25 for
+12-14 macro-F1 points for pretrained representations and about 25 for
 hand-crafted features. The long-term average spectra of \cref{sec:data-ltas}
 show the mechanism from the data side: classes differ by several decibels over
 broad bands, and two of them carry a periodic high-frequency ripple that only a
@@ -63,7 +63,7 @@ one's (13.8 to 6.5, and 7.9 to 6.0), not larger. What the first comparison
 measured was the encoder. XLS-R-300M, pretrained by contrastive
 self-supervision on raw audio, is the model that exploits speaker and channel
 overlap when fine-tuned; the Whisper-medium family, pretrained to transcribe,
-loses only 6--7 points from the clip-level to the strict split once fine-tuned
+loses only 6-7 points from the clip-level to the strict split once fine-tuned
 and reaches 0.92 on speakers it has never heard. The practical lesson changes
 accordingly: choose an encoder whose pretraining targets the content of
 speech, and then fine-tune it; a frozen baseline still protects against
@@ -88,7 +88,7 @@ reflects the objective, the domain or under-training (its best epoch was the
 \label{sec:disc-augment}
 
 The channel-suppression chain lowered strict-split macro-F1 by six points. The
-chain included pitch shift ($\pm 2$ semitones) and time stretch (0.9--1.1),
+chain included pitch shift ($\pm 2$ semitones) and time stretch (0.9-1.1),
 transforms that are standard and beneficial in speech recognition
 \cite{Ko2015Audio}, where the transcript is invariant to prosody.
 Dialect identification inverts this: pitch contour, rhythm and tempo carry
@@ -116,7 +116,7 @@ out.
 classifier can see it.} Recognisers trained on standard Bangla (Tugstugi,
 Hishab) transcribe regional speech into standard forms, so that \bn{biya}{বিয়া দিয়া দাও}
 (``arrange the marriage'') becomes \bn{biye}{বিয়ে দিয়ে দাও}, and reproduce only
-1--4\,\% of the dialect words in Ben-10's human transcripts. Their output on
+1-4\,\% of the dialect words in Ben-10's human transcripts. Their output on
 regional clips is barely less standard than on Standard clips. The one front-end
 fine-tuned on dialect speech reproduces 27\,\%, which is both the best available
 and a hard ceiling for any word-list method: nearly three of four dialect words
