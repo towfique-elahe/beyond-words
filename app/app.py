@@ -39,7 +39,7 @@ the nine classes are mapped to the closest class the model knows. Part of the un
 
 
 def _fmt_words(res):
-    if not res or "tfidf" not in res:
+    if not res or "probs" not in res:
         return {}, ""
     lines = [f"**Words say:** {res['words_top']} (TF-IDF: {res['tfidf_top']}; word matching: {res['match']['top']})  "
              f"({res['nonstandard_share'] * 100:.0f} % of {res['n_tokens']} words are outside standard Bangla)"]
@@ -47,7 +47,7 @@ def _fmt_words(res):
     if hits:
         lines.append("Regional words found: " + ", ".join(
             f"{e['word']} ({e['regions'][0]['region']} {e['regions'][0]['weight']:.2f})" for e in hits[:12]))
-    return res["tfidf"], "\n\n".join(lines)
+    return res["probs"], "\n\n".join(lines)
 
 
 def run(audio, text, transcribe):

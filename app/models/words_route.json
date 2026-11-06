@@ -1,0 +1,16 @@
+{
+  "typed": {
+    "a": 0.482,
+    "b": 2.375,
+    "g": 0.298,
+    "delta": 0.2
+  },
+  "transcript": {
+    "a": 0.676,
+    "b": 1.101,
+    "g": 0.0,
+    "delta": 0.2
+  },
+  "acoustic_temperature": 2.53,
+  "alpha": 0.5
+}

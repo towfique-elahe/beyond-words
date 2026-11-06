@@ -8,7 +8,9 @@ Classifying regional Bangla accents from short audio clips. v2 replaces the orig
 
 > **Live demo:** [towfiqueelahe6--beyond-words.modal.run](https://towfiqueelahe6--beyond-words.modal.run): record, upload or type Bangla; sound route (microphone-robust Whisper-medium, see below), words route (Tugstugi Ben-10 transcript or typed text, regional word lists, TF-IDF) and their fusion. JSON API at `/api/health`, `/api/text`, `/api/audio` (see `app/server.py`); the React + shadcn/ui front end lives in its own repository, [beyond-words-web](https://github.com/towfique-elahe/beyond-words-web). Weights: [towfique-elahe/beyond-words-whisper-medium-did](https://huggingface.co/towfique-elahe/beyond-words-whisper-medium-did) (thesis model) and […-did-robust](https://huggingface.co/towfique-elahe/beyond-words-whisper-medium-did-robust) (served by the demo).
 >
-> **Microphone robustness (`eval_mic_sim.py`, 30 strict-test clips per class, macro-F1):** clean / simulated laptop microphone / with level normalisation: thesis model 0.915 / 0.389 / 0.709; robust model (`finetune_xlsr.py --augment-chain channel`, strict split) 0.893 / 0.843 / 0.846. Full strict test split: 0.896 for the robust model against 0.919. Results in `reports/demo/`. Defence deck: `docs/defence/index.html`.
+> **Microphone robustness (`eval_mic_sim.py`, 30 strict-test clips per class, macro-F1):** clean / simulated laptop microphone / with level normalisation: thesis model 0.915 / 0.389 / 0.709; robust model (`finetune_xlsr.py --augment-chain channel`, strict split) 0.893 / 0.843 / 0.846. Full strict test split: 0.896 for the robust model against 0.919. Results in `reports/demo/`.
+>
+> **Demo words route (`tune_words_route.py`, macro-F1, old classifier / combined):** held-out typed sentences 0.537 / 0.698; Ben-10 human text 0.780 / 0.946; recogniser output on Ben-10 speech 0.620 / 0.736; strict-test transcripts 0.633 / 0.639. Sound plus transcript on the strict test: 0.914, against 0.897 for sound alone. These are demo settings; the thesis numbers are unchanged. Defence deck: `docs/defence/index.html`.
 
 ---
 
@@ -440,6 +442,7 @@ The project runs on a zero-hardware budget. Phases 0–1 were developed on an **
 ├── export_hf_model.py     # export a fine-tuned Whisper classifier to Hugging Face format
 ├── app/                   # demo: server.py (FastAPI JSON API), app.py (Gradio page), inference.py, modal_app.py
 ├── eval_mic_sim.py        # microphone-robustness check (simulated laptop mic on held-out clips)
+├── tune_words_route.py    # demo words route: fits how word lists and text classifier combine, and the fusion weight
 ├── splits/                # committed splits (relative paths, reproducibility)
 │   ├── manifest_split_rel.csv         # canonical clip-level split
 │   └── manifest_split_strict_rel.csv  # Phase 3 strict pseudo-speaker split
