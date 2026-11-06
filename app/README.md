@@ -27,7 +27,7 @@ Tugstugi Ben-10 recogniser, TF-IDF + word lists) and exposes `GET /api/health`,
 `POST /api/text` and `POST /api/audio`; `app.py` is the Gradio page mounted at `/`;
 `inference.py` holds the shared audio preprocessing (decode any container, trim
 silence, normalise level to the training RMS, 5 s windows with 2.5 s hop);
-`modal_app.py` builds the container and deploys to https://towfiqueelahe6--beyond-words.modal.run
+`modal_app.py` builds the container and deploys the API to https://towfiqueelahe6--beyond-words.modal.run
 (`modal deploy app/modal_app.py`). `models/` holds the saved lexical classifier
-(`lexical_did.py --save-model`) and the fitted weights that combine it with the word lists and the sound (`tune_words_route.py`). The React front end in the separate [beyond-words-web](https://github.com/towfique-elahe/beyond-words-web) repository talks to the same API.
+(`lexical_did.py --save-model`) and the fitted weights that combine it with the word lists and the sound (`tune_words_route.py`). The React front end in the separate [beyond-words-web](https://github.com/towfique-elahe/beyond-words-web) repository talks to the same API. The public page is https://beyondwords.towfiqueelahe.com.
 The front matter above also lets the folder run as a Hugging Face Space (PRO plan needed for Gradio on free hardware).

@@ -149,7 +149,9 @@ def confusions():
                 if cm[i, j]:
                     ax.text(j, i, cm[i, j], ha="center", va="center", fontsize=5.5,
                             color=SURFACE if norm[i, j] > 0.55 else INK)
-        ax.set_xticks(range(9), short, fontsize=6, rotation=90); ax.set_yticks(range(9), short, fontsize=6)
+        ax.set_xticks(range(9), short, fontsize=6, rotation=90)
+        # class names only on the first panel: on the others they ran into the panel beside them
+        ax.set_yticks(range(9), short if ax is axes[0] else [], fontsize=6)
         ax.set_title(title, fontsize=8.5, loc="left"); ax.grid(False); ax.tick_params(length=0)
         ax.set_xlabel("predicted", fontsize=8)
     axes[0].set_ylabel("true", fontsize=8)
