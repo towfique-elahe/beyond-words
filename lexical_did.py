@@ -51,6 +51,23 @@ def match_scores(tokens, formal, lexicon):
     return nonformal, scores
 
 
+def lexicon_evidence(tokens, lexicons, classes, delta=0.02):
+    """Log evidence per class from word lists: sum over distinct words of
+    log(p(c|w) + delta), once per lexicon, scaled so the best class is 0. A class
+    a lexicon has no data for stays neutral rather than counting as evidence
+    against it. Used by the demo's words route (tune_words_route.py)."""
+    neutral = 1 / len(classes)
+    out = np.zeros(len(classes))
+    for lex in lexicons:
+        covered = set(lex) | {FORMAL}
+        for w in set(tokens):
+            hit = {r: words[w] for r, words in lex.items() if w in words}
+            if hit:
+                out += np.log(np.array([hit.get(c, 0.0 if c in covered else neutral)
+                                        for c in classes]) + delta)
+    return out - out.max() if out.any() else out
+
+
 def match_predict(nonformal, scores, tau):
     best = max(scores, key=scores.get)
     return FORMAL if nonformal < tau or scores[best] == 0 else best

@@ -46,8 +46,7 @@ sys.path.insert(0, str(ROOT))
 import inference  # noqa: E402
 from inference import DISPLAY, SR, AcousticModel  # noqa: E402
 
-VERSION = "2.0"
-ALPHA = 0.25                      # fusion weight on the acoustic log-probabilities (thesis, strict split)
+VERSION = "2.1"
 MAX_SECONDS = 60
 MAX_BYTES = 25 * 1024 * 1024
 
@@ -56,6 +55,10 @@ ASR_GEN_FROM = os.environ.get("ASR_GEN_FROM", "openai/whisper-medium")
 ASR_ENABLED = os.environ.get("ASR_ENABLED", "1") != "0"
 LEXICAL_MODEL = Path(os.environ.get("LEXICAL_MODEL", HERE / "models" / "lexical_tugstugi_ben10_strict.joblib"))
 LEXICON_DIR = Path(os.environ.get("LEXICON_DIR", ROOT / "lexicons"))
+# Weights tuned on held-out data by tune_words_route.py; see reports/demo/words_route.json.
+ROUTE = json.load(open(HERE / "models" / "words_route.json", encoding="utf-8"))
+ALPHA = float(ROUTE.get("alpha", 0.25))                 # weight of the sound in the fusion
+ACOUSTIC_T = float(ROUTE.get("acoustic_temperature", 1.0))
 
 
 def disp(label: str) -> str:
@@ -72,7 +75,8 @@ class Lexical:
 
         bundle = joblib.load(LEXICAL_MODEL)
         self.pipeline = bundle["pipeline"]
-        self.classes = [disp(c) for c in bundle["classes"]]
+        self.raw_classes = list(bundle["classes"])
+        self.classes = [disp(c) for c in self.raw_classes]
         self.tau = float(bundle.get("tau") or 0.06)
         self.standard = load_vocab(LEXICON_DIR / "formal_vocab.txt", int(bundle.get("formal_min_count", 3)))
         self.lexicons = []                       # (name, {region: {word: weight}})
@@ -87,19 +91,35 @@ class Lexical:
                 merged.setdefault(region, {}).update(words)
         self.merged = merged
 
-    def analyse(self, text: str) -> dict:
+    def combined(self, probs, tokens, nonstandard: float, source: str):
+        """One distribution from the classifier and the word lists, weighted for the
+        kind of text (tune_words_route.py). Returns it with the class the word lists
+        favour on their own, and whether that differs from the classifier's choice."""
+        from lexical_did import lexicon_evidence
+
+        w = ROUTE[source]
+        lists = lexicon_evidence(tokens, [lex for _, lex in self.lexicons], self.raw_classes, w["delta"])
+        s = w["a"] * np.log(probs + 1e-9) + w["b"] * lists
+        s[self.raw_classes.index("Formal")] += w["g"] * (1 - nonstandard)
+        lists_top = self.classes[int(lists.argmax())] if lists.any() else None
+        conflict = bool(lists.any() and lists.argmax() != probs.argmax())
+        z = np.exp(s - s.max())
+        return {c: float(v) for c, v in zip(self.classes, z / z.sum())}, lists_top, conflict
+
+    def analyse(self, text: str, source: str = "typed") -> dict:
         from lexical_did import match_scores
         from text_utils import tokenize
 
         tokens = tokenize(text or "")
         if not tokens:
             return {"tokens": [], "n_tokens": 0, "error": "no Bangla words found in the text"}
-        probs = self.pipeline.predict_proba([" ".join(tokens)])[0]
-        tfidf = {c: float(p) for c, p in zip(self.classes, probs)}
+        raw = self.pipeline.predict_proba([" ".join(tokens)])[0]
+        tfidf = {c: float(p) for c, p in zip(self.classes, raw)}
         nonstandard, scores = match_scores(tokens, self.standard, self.merged)
         scores = {disp(r): float(v) for r, v in scores.items()}
         best = max(scores, key=scores.get) if scores else None
         match_top = "Standard" if (nonstandard < self.tau or not best or scores[best] == 0) else best
+        probs, lists_top, conflict = self.combined(raw, tokens, float(nonstandard), source)
         evidence = []
         for w in dict.fromkeys(t for t in tokens if t not in self.standard):
             hits = []
@@ -108,21 +128,13 @@ class Lexical:
                     if w in words:
                         hits.append({"region": disp(region), "weight": round(float(words[w]), 3), "source": src})
             hits.sort(key=lambda h: -h["weight"])
-            evidence.append({"word": w, "regions": hits[:4]})
-        tfidf_top = max(tfidf, key=tfidf.get)
-        # Headline for the words route: no word outside standard Bangla means Standard
-        # (the thesis's word-matching rule); regional evidence wins over the TF-IDF guess,
-        # which was trained on 5 s ASR transcripts and is unreliable on short typed text.
-        if nonstandard == 0:
-            words_top = "Standard"
-        elif match_top != "Standard":
-            words_top = match_top
-        else:
-            words_top = tfidf_top
+            evidence.append({"word": w, "regions": hits[:6]})
         return {
-            "tokens": tokens, "n_tokens": len(tokens),
+            "tokens": tokens, "n_tokens": len(tokens), "source": source,
             "nonstandard_share": round(float(nonstandard), 3),
-            "tfidf": tfidf, "tfidf_top": tfidf_top, "words_top": words_top,
+            "probs": probs, "words_top": max(probs, key=probs.get),
+            "lists_top": lists_top, "conflict": conflict,
+            "tfidf": tfidf, "tfidf_top": max(tfidf, key=tfidf.get),
             "match": {"scores": scores, "top": match_top, "tau": self.tau},
             "evidence": evidence,
         }
@@ -158,11 +170,19 @@ asr = ASR() if ASR_ENABLED else None
 LOAD_SECONDS = round(time.time() - t0, 1)
 
 
-def fuse(p_a: dict, p_l: dict, alpha: float = ALPHA) -> dict:
+def calibrate(probs: dict) -> dict:
+    """Temperature-scale the acoustic probabilities (fitted on strict validation)."""
+    labels = list(probs)
+    z = np.log(np.array([probs[l] for l in labels]) + 1e-9) / ACOUSTIC_T
+    z = np.exp(z - z.max()); z /= z.sum()
+    return {l: float(v) for l, v in zip(labels, z)}
+
+
+def fuse(p_a: dict, p_w: dict, alpha: float = ALPHA) -> dict:
     labels = list(p_a)
     la = np.log(np.array([p_a[l] for l in labels]) + 1e-9)
-    ll = np.log(np.array([p_l.get(l, 1e-9) for l in labels]) + 1e-9)
-    z = alpha * la + (1 - alpha) * ll
+    lw = np.log(np.array([p_w.get(l, 1e-9) for l in labels]) + 1e-9)
+    z = alpha * la + (1 - alpha) * lw
     z = np.exp(z - z.max()); z /= z.sum()
     return {l: float(v) for l, v in zip(labels, z)}
 
@@ -172,7 +192,8 @@ def analyse_audio(wav: np.ndarray, text: str = "", transcribe: bool = False) -> 
         raise ValueError("the clip is shorter than one second; please record a little more")
     wav = wav[:MAX_SECONDS * SR]
     pred = acoustic.score(wav)
-    out = {"acoustic": {"probs": pred.probs, "top": pred.top, "duration": round(pred.duration, 2),
+    sound = calibrate(pred.probs)
+    out = {"acoustic": {"probs": sound, "top": pred.top, "duration": round(pred.duration, 2),
                         "windows": pred.n_windows, "model": acoustic.model_id},
            "transcript": None, "transcript_words": None, "words": None, "fused": None,
            "alpha": ALPHA, "decided_by": "sound"}
@@ -182,14 +203,14 @@ def analyse_audio(wav: np.ndarray, text: str = "", transcribe: bool = False) -> 
         else:
             out["transcript"] = asr.transcribe(inference.prepare(wav))
             if lexical is not None and out["transcript"]:
-                out["transcript_words"] = lexical.analyse(out["transcript"])
+                out["transcript_words"] = lexical.analyse(out["transcript"], source="transcript")
     source = None
     if text and text.strip() and lexical is not None:
-        out["words"] = lexical.analyse(text); source = "typed text"
-    elif out["transcript_words"] and "tfidf" in out["transcript_words"]:
+        out["words"] = lexical.analyse(text, source="typed"); source = "typed text"
+    elif out["transcript_words"] and "probs" in out["transcript_words"]:
         out["words"] = out["transcript_words"]; source = "transcript"
-    if out["words"] and "tfidf" in out["words"]:
-        out["fused"] = fuse(pred.probs, out["words"]["tfidf"])
+    if out["words"] and "probs" in out["words"]:
+        out["fused"] = fuse(sound, out["words"]["probs"])
         out["decided_by"] = f"sound + words ({source})"
     return out
 
@@ -214,7 +235,7 @@ async def text_route(payload: dict):
     text = (payload or {}).get("text", "")
     if not isinstance(text, str) or not text.strip():
         raise HTTPException(400, "send {\"text\": \"a Bangla sentence\"}")
-    res = lexical.analyse(text[:2000])
+    res = lexical.analyse(text[:2000], source="typed")
     if "error" in res:
         raise HTTPException(422, res["error"])
     return res

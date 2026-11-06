@@ -1,0 +1,190 @@
+{
+  "settings": {
+    "typed": {
+      "a": 0.482,
+      "b": 2.375,
+      "g": 0.298,
+      "delta": 0.2
+    },
+    "transcript": {
+      "a": 0.676,
+      "b": 1.101,
+      "g": 0.0,
+      "delta": 0.2
+    },
+    "acoustic_temperature": 2.53,
+    "alpha": 0.5
+  },
+  "sizes": {
+    "transcript_val": 1045,
+    "transcript_test": 1327,
+    "typed_val": 1301,
+    "typed_test": 1953,
+    "ben10_text_test": 635,
+    "ben10_asr_val": 318,
+    "ben10_asr_test": 317
+  },
+  "results": {
+    "typed_test / classifier (old)": {
+      "macro_f1": 0.537,
+      "accuracy": 0.555,
+      "mean_confidence": 0.66,
+      "share_over_95": 0.142,
+      "accuracy_over_95": 0.881
+    },
+    "typed_test / word lists only": {
+      "macro_f1": 0.521,
+      "accuracy": 0.607,
+      "mean_confidence": 0.395,
+      "share_over_95": 0.046,
+      "accuracy_over_95": 1.0
+    },
+    "typed_test / disagreement rows": {
+      "macro_f1": 0.576,
+      "accuracy": 0.693,
+      "mean_confidence": 0.732,
+      "share_over_95": 0.217,
+      "accuracy_over_95": 0.879
+    },
+    "typed_test / new": {
+      "macro_f1": 0.698,
+      "accuracy": 0.714,
+      "mean_confidence": 0.724,
+      "share_over_95": 0.367,
+      "accuracy_over_95": 0.94
+    },
+    "typed_test / new, up to 6 words": {
+      "macro_f1": 0.628,
+      "accuracy": 0.661,
+      "mean_confidence": 0.675,
+      "share_over_95": 0.289,
+      "accuracy_over_95": 0.902
+    },
+    "typed_test / classifier (old), up to 6 words": {
+      "macro_f1": 0.461,
+      "accuracy": 0.486,
+      "mean_confidence": 0.633,
+      "share_over_95": 0.114,
+      "accuracy_over_95": 0.831
+    },
+    "ben10_text_test / classifier (old)": {
+      "macro_f1": 0.78,
+      "accuracy": 0.706,
+      "mean_confidence": 0.687,
+      "share_over_95": 0.164,
+      "accuracy_over_95": 0.99
+    },
+    "ben10_text_test / word lists only": {
+      "macro_f1": 0.931,
+      "accuracy": 0.937,
+      "mean_confidence": 0.718,
+      "share_over_95": 0.326,
+      "accuracy_over_95": 1.0
+    },
+    "ben10_text_test / disagreement rows": {
+      "macro_f1": 0.898,
+      "accuracy": 0.885,
+      "mean_confidence": 0.843,
+      "share_over_95": 0.514,
+      "accuracy_over_95": 0.989
+    },
+    "ben10_text_test / new": {
+      "macro_f1": 0.946,
+      "accuracy": 0.939,
+      "mean_confidence": 0.916,
+      "share_over_95": 0.753,
+      "accuracy_over_95": 0.994
+    },
+    "transcript_test / classifier (old)": {
+      "macro_f1": 0.633,
+      "accuracy": 0.656,
+      "mean_confidence": 0.71,
+      "share_over_95": 0.235,
+      "accuracy_over_95": 0.962
+    },
+    "transcript_test / word lists only": {
+      "macro_f1": 0.281,
+      "accuracy": 0.336,
+      "mean_confidence": 0.319,
+      "share_over_95": 0.049,
+      "accuracy_over_95": 0.954
+    },
+    "transcript_test / disagreement rows": {
+      "macro_f1": 0.581,
+      "accuracy": 0.599,
+      "mean_confidence": 0.6,
+      "share_over_95": 0.054,
+      "accuracy_over_95": 0.909
+    },
+    "transcript_test / new": {
+      "macro_f1": 0.639,
+      "accuracy": 0.664,
+      "mean_confidence": 0.667,
+      "share_over_95": 0.178,
+      "accuracy_over_95": 0.945
+    },
+    "transcript_test / new, up to 6 words": {
+      "macro_f1": 0.469,
+      "accuracy": 0.556,
+      "mean_confidence": 0.585,
+      "share_over_95": 0.032,
+      "accuracy_over_95": 0.5
+    },
+    "transcript_test / classifier (old), up to 6 words": {
+      "macro_f1": 0.487,
+      "accuracy": 0.571,
+      "mean_confidence": 0.678,
+      "share_over_95": 0.286,
+      "accuracy_over_95": 0.944
+    },
+    "ben10_asr_test / classifier (old)": {
+      "macro_f1": 0.62,
+      "accuracy": 0.549,
+      "mean_confidence": 0.623,
+      "share_over_95": 0.091,
+      "accuracy_over_95": 0.931
+    },
+    "ben10_asr_test / word lists only": {
+      "macro_f1": 0.734,
+      "accuracy": 0.757,
+      "mean_confidence": 0.539,
+      "share_over_95": 0.12,
+      "accuracy_over_95": 1.0
+    },
+    "ben10_asr_test / disagreement rows": {
+      "macro_f1": 0.613,
+      "accuracy": 0.583,
+      "mean_confidence": 0.592,
+      "share_over_95": 0.062,
+      "accuracy_over_95": 1.0
+    },
+    "ben10_asr_test / new": {
+      "macro_f1": 0.736,
+      "accuracy": 0.726,
+      "mean_confidence": 0.72,
+      "share_over_95": 0.309,
+      "accuracy_over_95": 0.99
+    },
+    "sound alone, strict test": {
+      "macro_f1": 0.897,
+      "accuracy": 0.888,
+      "mean_confidence": 0.868,
+      "share_over_95": 0.109,
+      "accuracy_over_95": 1.0
+    },
+    "sound + transcript, strict test": {
+      "macro_f1": 0.914,
+      "accuracy": 0.908,
+      "mean_confidence": 0.75,
+      "share_over_95": 0.16,
+      "accuracy_over_95": 0.991
+    },
+    "sound + transcript, alpha 0.25, strict test": {
+      "macro_f1": 0.81,
+      "accuracy": 0.813,
+      "mean_confidence": 0.687,
+      "share_over_95": 0.165,
+      "accuracy_over_95": 0.982
+    }
+  }
+}
