@@ -1,90 +1,107 @@
 """
-Beyond Words — live demo: which Bangla dialect is this?
+Beyond Words: live demo page (Gradio), which Bangla dialect is this?
 
-Gradio app for the fine-tuned Whisper-medium dialect classifier (strict-split
-checkpoint, 0.92 macro-F1 on unseen speakers). Record or upload speech; the
-audio is resampled to 16 kHz, cut into 5 s windows, each window scored by the
-encoder-only classifier, and the softmax averaged.
+Sound: record or upload speech; the fine-tuned Whisper-medium classifier
+(strict-split checkpoint) scores it in 5 s windows and averages.
+Words: type a Bangla sentence, or let the Tugstugi (Ben-10) recogniser
+transcribe the recording; the TF-IDF classifier and the regional word lists
+of the thesis give a second opinion, and the two are fused as in the thesis.
+
+The models live in server.py so that the JSON API and this page share them.
+Run standalone:  MODEL_ID=<export> python app/app.py
 """
 
 import os
+import sys
 
 import gradio as gr
-import librosa
-import numpy as np
-import torch
-from transformers import WhisperFeatureExtractor, WhisperForAudioClassification
 
-MODEL_ID = os.environ.get("MODEL_ID", "towfique-elahe/beyond-words-whisper-medium-did")
-SR, WIN = 16000, 5 * 16000
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import server  # noqa: E402  (loads the models once)
+from inference import decode_audio  # noqa: E402
+
 DESCRIPTION = """
-**Beyond Words** identifies which of nine Bangla dialect classes a speaker is using, from the
-sound alone: Barishal, Chattogram, Dhaka, Khulna, Mymensingh, Noakhali, Rajshahi, Sylhet, or the
-standard register (*Standard*). The model is a Whisper-medium encoder fine-tuned on 13 hours of
-Bangladeshi television, film and online speech. Speak for at least 5 seconds; longer recordings
-are scored in 5-second windows and averaged.
+**Beyond Words** identifies which of nine Bangla dialect classes a speaker is using:
+Barishal, Chattogram, Dhaka, Khulna, Mymensingh, Noakhali, Rajshahi, Sylhet, or the standard
+register (*Standard*). The **sound** route is a Whisper-medium encoder fine-tuned on 13 hours of
+Bangladeshi television, film and online speech. The **words** route classifies a typed sentence,
+or the transcript of your recording, from its vocabulary. Speak for at least 5 seconds.
 """
 NOTES = """
-*Honest numbers:* 0.984 macro-F1 on a conventional test split, 0.919 on a split where no speaker
-from training appears (the number that matters for a new voice). The model has seen only broadcast
-and online media; phone-quality or noisy recordings, and speakers from regions outside the nine
-classes, will be mapped to the closest class it knows. Part of the undergraduate thesis
+*Honest numbers:* the thesis model scores 0.984 macro-F1 on a conventional test split and 0.919 on a
+split where no training speaker appears. This page serves a microphone-robust variant trained with
+channel augmentation (0.896 on that strict split, but 0.84 instead of 0.39 on clips passed through a
+simulated laptop microphone). Recordings are level-normalised before scoring, and read speech in the
+standard register will, correctly, come out as Standard. Speakers from regions outside
+the nine classes are mapped to the closest class the model knows. Part of the undergraduate thesis
 *A Neural Network Approach to Classifying Bangla Accentual Diversity* (East Delta University, 2026).
 """
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
-fe = WhisperFeatureExtractor.from_pretrained(MODEL_ID)
-model = WhisperForAudioClassification.from_pretrained(MODEL_ID).to(device).eval()
-DISPLAY = {"Formal": "Standard"}   # the checkpoint keeps the corpus label; the thesis calls the register class Standard
-LABELS = [DISPLAY.get(model.config.id2label[i], model.config.id2label[i]) for i in range(model.config.num_labels)]
+
+def _fmt_words(res):
+    if not res or "tfidf" not in res:
+        return {}, ""
+    lines = [f"**Words say:** {res['words_top']} (TF-IDF: {res['tfidf_top']}; word matching: {res['match']['top']})  "
+             f"({res['nonstandard_share'] * 100:.0f} % of {res['n_tokens']} words are outside standard Bangla)"]
+    hits = [e for e in res["evidence"] if e["regions"]]
+    if hits:
+        lines.append("Regional words found: " + ", ".join(
+            f"{e['word']} ({e['regions'][0]['region']} {e['regions'][0]['weight']:.2f})" for e in hits[:12]))
+    return res["tfidf"], "\n\n".join(lines)
 
 
-def windows(wav):
-    n = max(1, int(np.ceil(len(wav) / WIN)))
-    for i in range(n):
-        w = wav[i * WIN:(i + 1) * WIN]
-        yield np.pad(w, (0, WIN - len(w))) if len(w) < WIN else w
-
-
-@torch.no_grad()
-def predict(audio):
+def run(audio, text, transcribe):
+    text = (text or "").strip()
+    if audio is None and not text:
+        return {}, {}, {}, "Record or upload a clip, or type a sentence."
     if audio is None:
-        return {}, "Record or upload a clip first."
-    sr, wav = audio
-    wav = wav.astype(np.float32)
-    if wav.ndim > 1:
-        wav = wav.mean(1)
-    if np.abs(wav).max() > 1.0:          # Gradio hands over int16-scaled arrays
-        wav = wav / 32768.0
-    if sr != SR:
-        wav = librosa.resample(wav, orig_sr=sr, target_sr=SR)
-    if len(wav) < SR:
-        return {}, "That clip is shorter than one second; please record a little more."
-    probs = []
-    for w in windows(wav):
-        x = fe(w, sampling_rate=SR, padding="max_length", max_length=WIN, return_tensors="pt").input_features
-        probs.append(torch.softmax(model(input_features=x.to(device)).logits, -1)[0].cpu().numpy())
-    p = np.mean(probs, 0)
-    top = int(p.argmax())
-    n_win = len(probs)
-    msg = (f"**{LABELS[top]}** ({p[top] * 100:.1f} %), from {len(wav) / SR:.1f} s of audio "
-           f"scored in {n_win} window{'s' if n_win > 1 else ''}.")
-    return {l: float(v) for l, v in zip(LABELS, p)}, msg
+        res = server.lexical.analyse(text) if server.lexical else {"error": "text models not loaded"}
+        if "error" in res:
+            return {}, {}, {}, res["error"]
+        probs, msg = _fmt_words(res)
+        return {}, probs, {}, msg
+    try:
+        out = server.analyse_audio(decode_audio(audio), text=text, transcribe=bool(transcribe))
+    except ValueError as e:
+        return {}, {}, {}, str(e)
+    a = out["acoustic"]
+    msg = (f"**Sound says:** {a['top']} ({a['probs'][a['top']] * 100:.1f} %), from {a['duration']:.1f} s "
+           f"of audio scored in {a['windows']} window{'s' if a['windows'] > 1 else ''}.")
+    if out["transcript"] is not None:
+        msg += f"\n\n**Transcript (Tugstugi Ben-10):** {out['transcript'] or '(nothing recognised)'}"
+    words_probs, words_msg = _fmt_words(out["words"])
+    if words_msg:
+        msg += "\n\n" + words_msg
+    fused = out["fused"] or {}
+    if fused:
+        top = max(fused, key=fused.get)
+        msg += f"\n\n**Fused ({out['decided_by']}):** {top} ({fused[top] * 100:.1f} %)"
+    return a["probs"], words_probs, fused, msg
 
 
-with gr.Blocks(title="Beyond Words: Bangla dialect identification") as demo:
-    gr.Markdown("# Beyond Words — Bangla dialect identification")
-    gr.Markdown(DESCRIPTION)
-    with gr.Row():
-        with gr.Column():
-            audio = gr.Audio(sources=["microphone", "upload"], type="numpy", label="Speak or upload (any format)")
-            btn = gr.Button("Identify the dialect", variant="primary")
-        with gr.Column():
-            out_label = gr.Label(num_top_classes=5, label="Dialect probabilities")
-            out_text = gr.Markdown()
-    btn.click(predict, inputs=audio, outputs=[out_label, out_text])
-    audio.stop_recording(predict, inputs=audio, outputs=[out_label, out_text])
-    gr.Markdown(NOTES)
+def build_demo():
+    with gr.Blocks(title="Beyond Words: Bangla dialect identification") as demo:
+        gr.Markdown("# Beyond Words: Bangla dialect identification")
+        gr.Markdown(DESCRIPTION)
+        with gr.Row():
+            with gr.Column():
+                audio = gr.Audio(sources=["microphone", "upload"], type="numpy", label="Speak or upload (any format)")
+                text = gr.Textbox(label="Or type a Bangla sentence (optional)", lines=2,
+                                  placeholder="মুই বাড়ি যামু")
+                transcribe = gr.Checkbox(label="Transcribe my recording and use its words too",
+                                         value=False, visible=server.asr is not None)
+                btn = gr.Button("Identify the dialect", variant="primary")
+            with gr.Column():
+                out_sound = gr.Label(num_top_classes=5, label="From the sound")
+                out_words = gr.Label(num_top_classes=5, label="From the words")
+                out_fused = gr.Label(num_top_classes=3, label="Fused")
+                out_text = gr.Markdown()
+        btn.click(run, inputs=[audio, text, transcribe], outputs=[out_sound, out_words, out_fused, out_text])
+        gr.Markdown(NOTES)
+    return demo
+
+
+demo = build_demo()
 
 if __name__ == "__main__":
     demo.launch()
