@@ -89,7 +89,7 @@ def run_tfidf(df, labels):
             best = (f1, C, model)
     _, C, model = best
     assert list(model.classes_) == labels
-    return model.predict(text), model.predict_proba(text), {"C": C}
+    return model.predict(text), model.predict_proba(text), {"C": C, "_model": model}
 
 
 def run_fusion(df, p_lex, xlsr_probs, labels):
@@ -141,6 +141,8 @@ def main():
     ap.add_argument("--out-dir", default="reports/phase5")
     ap.add_argument("--name", default="", help="run name; default <transcripts>_<lexicon>")
     ap.add_argument("--allow-missing", action="store_true", help="pilot: partial transcripts")
+    ap.add_argument("--save-model", default="", help="joblib path: save the fitted TF-IDF + LR "
+                    "pipeline with its settings for the demo server")
     args = ap.parse_args()
 
     name = args.name or f"{Path(args.transcripts).stem}__{Path(args.lexicon).stem}"
@@ -161,6 +163,7 @@ def main():
     results["match"] = {**score(df, preds["match"], lex_labels), **extra, "classes": lex_labels}
 
     preds["tfidf"], p_lex, extra = run_tfidf(df, labels)
+    tfidf_model = extra.pop("_model")
     results["tfidf"] = {**score(df, preds["tfidf"], labels), **extra}
 
     if args.xlsr_probs:
@@ -181,6 +184,17 @@ def main():
     with open(out / f"metrics_{name}.json", "w", encoding="utf-8") as f:
         json.dump({"transcripts": args.transcripts, "manifest": args.manifest,
                    "lexicon": args.lexicon, "n_clips": len(df), "results": results}, f, indent=2)
+
+    if args.save_model:
+        import joblib
+        Path(args.save_model).parent.mkdir(parents=True, exist_ok=True)
+        joblib.dump({"pipeline": tfidf_model, "classes": labels, "C": results["tfidf"]["C"],
+                     "tau": results["match"]["tau"], "alpha": results.get("fusion", {}).get("alpha"),
+                     "acoustic": args.acoustic_tag if args.xlsr_probs else None,
+                     "lexicon": args.lexicon, "formal": args.formal,
+                     "formal_min_count": args.formal_min_count, "transcripts": args.transcripts,
+                     "manifest": args.manifest}, args.save_model)
+        print(f"saved -> {args.save_model}")
 
     for clf, r in results.items():
         extras = {k: v for k, v in r.items() if k in ("tau", "coverage_test", "C", "alpha")}

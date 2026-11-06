@@ -1,0 +1,32 @@
+{
+  "model": "checkpoints/hf_export/beyond-words-whisper-medium-did",
+  "n": 270,
+  "per_class": 30,
+  "conditions": {
+    "clean, no fixes": {
+      "macro_f1": 0.915,
+      "accuracy": 0.915,
+      "standard_share": 0.141
+    },
+    "clean, fixes": {
+      "macro_f1": 0.912,
+      "accuracy": 0.911,
+      "standard_share": 0.148
+    },
+    "mic, no fixes": {
+      "macro_f1": 0.389,
+      "accuracy": 0.411,
+      "standard_share": 0.233
+    },
+    "mic, normalise only": {
+      "macro_f1": 0.709,
+      "accuracy": 0.711,
+      "standard_share": 0.237
+    },
+    "mic, trim + normalise": {
+      "macro_f1": 0.709,
+      "accuracy": 0.711,
+      "standard_share": 0.237
+    }
+  }
+}

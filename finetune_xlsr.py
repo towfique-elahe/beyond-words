@@ -64,19 +64,40 @@ def pick_device():
 
 
 # ----------------------------- data -----------------------------
-def make_augmenter():
-    """Waveform augmentation to suppress recording-channel cues (train only).
-    scipy/librosa-backed transforms only — no ffmpeg/codec dependencies."""
-    from audiomentations import (AddGaussianSNR, BandPassFilter, Compose, Gain,
-                                 PitchShift, SevenBandParametricEQ, TimeStretch)
-    return Compose([
-        Gain(min_gain_db=-6.0, max_gain_db=6.0, p=0.5),
-        AddGaussianSNR(min_snr_db=10.0, max_snr_db=30.0, p=0.5),
-        SevenBandParametricEQ(min_gain_db=-6.0, max_gain_db=6.0, p=0.3),
-        BandPassFilter(min_center_freq=300.0, max_center_freq=3400.0, p=0.15),
-        PitchShift(min_semitones=-2.0, max_semitones=2.0, p=0.25),
-        TimeStretch(min_rate=0.9, max_rate=1.1, p=0.25),
-    ])
+def make_augmenter(chain="full"):
+    """Train-only waveform augmentation (audiomentations).
+
+    full    : the Phase 3 chain (channel transforms plus pitch shift and time
+              stretch); lowered the strict-split score, see the thesis.
+    channel : prosody-preserving chain for deployment robustness: gain, noise,
+              equalisation, low/high/band-pass, aliasing (codec stand-in) and
+              clipping. No pitch or tempo change.
+    scipy/librosa-backed transforms only: no ffmpeg/codec dependencies."""
+    from audiomentations import (AddGaussianSNR, Aliasing, BandPassFilter,
+                                 ClippingDistortion, Compose, Gain,
+                                 HighPassFilter, LowPassFilter, PitchShift,
+                                 SevenBandParametricEQ, TimeStretch)
+    if chain == "full":
+        return Compose([
+            Gain(min_gain_db=-6.0, max_gain_db=6.0, p=0.5),
+            AddGaussianSNR(min_snr_db=10.0, max_snr_db=30.0, p=0.5),
+            SevenBandParametricEQ(min_gain_db=-6.0, max_gain_db=6.0, p=0.3),
+            BandPassFilter(min_center_freq=300.0, max_center_freq=3400.0, p=0.15),
+            PitchShift(min_semitones=-2.0, max_semitones=2.0, p=0.25),
+            TimeStretch(min_rate=0.9, max_rate=1.1, p=0.25),
+        ])
+    if chain == "channel":
+        return Compose([
+            Gain(min_gain_db=-10.0, max_gain_db=10.0, p=0.7),
+            AddGaussianSNR(min_snr_db=5.0, max_snr_db=30.0, p=0.6),
+            SevenBandParametricEQ(min_gain_db=-8.0, max_gain_db=8.0, p=0.5),
+            LowPassFilter(min_cutoff_freq=3000.0, max_cutoff_freq=7000.0, p=0.3),
+            HighPassFilter(min_cutoff_freq=80.0, max_cutoff_freq=400.0, p=0.3),
+            BandPassFilter(min_center_freq=300.0, max_center_freq=3400.0, p=0.15),
+            Aliasing(min_sample_rate=4000, max_sample_rate=8000, p=0.2),
+            ClippingDistortion(min_percentile_threshold=0, max_percentile_threshold=10, p=0.15),
+        ])
+    raise ValueError(f"unknown augmentation chain: {chain}")
 
 
 class ClipDataset(Dataset):
@@ -273,7 +294,10 @@ def main():
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--limit", type=int, default=0, help="per-split cap for smoke tests")
     ap.add_argument("--augment", action="store_true",
-                    help="waveform augmentation on the train split (audiomentations)")
+                    help="shorthand for --augment-chain full (the Phase 3 chain)")
+    ap.add_argument("--augment-chain", choices=["none", "full", "channel"], default="none",
+                    help="train-split waveform augmentation: full (Phase 3: channel + pitch/tempo) "
+                         "or channel (prosody-preserving, for microphone robustness)")
     ap.add_argument("--grad-ckpt", action="store_true", help="gradient checkpointing (slower, less VRAM)")
     ap.add_argument("--no-amp", action="store_true", help="disable fp16 autocast on CUDA")
     args = ap.parse_args()
@@ -303,7 +327,8 @@ def main():
     model = FAMILIES[family](args.model, labels, args.grad_ckpt).to(device)
 
     pin = device == "cuda"
-    aug = make_augmenter() if args.augment else None
+    chain = "full" if args.augment and args.augment_chain == "none" else args.augment_chain
+    aug = make_augmenter(chain) if chain != "none" else None
     loaders = {
         s: DataLoader(ClipDataset(p, audio_root, lab2id,
                                   augment=(aug if s == "train" else None),
