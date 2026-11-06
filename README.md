@@ -6,7 +6,7 @@ Classifying regional Bangla accents from short audio clips. v2 replaces the orig
 
 > Thesis: *A Neural Network Approach to Classifying Bangla Accentual Diversity* — framed as a Dialect Identification (DID) task.
 
-> **Live demo:** [towfiqueelahe6--beyond-words.modal.run](https://towfiqueelahe6--beyond-words.modal.run): record, upload or type Bangla; sound route (microphone-robust Whisper-medium, see below), words route (Tugstugi Ben-10 transcript or typed text, regional word lists, TF-IDF) and their fusion. JSON API at `/api/health`, `/api/text`, `/api/audio` (see `app/server.py`); a static page for any web host is in `web/`. Weights: [towfique-elahe/beyond-words-whisper-medium-did](https://huggingface.co/towfique-elahe/beyond-words-whisper-medium-did) (thesis model) and […-did-robust](https://huggingface.co/towfique-elahe/beyond-words-whisper-medium-did-robust) (served by the demo).
+> **Live demo:** [towfiqueelahe6--beyond-words.modal.run](https://towfiqueelahe6--beyond-words.modal.run): record, upload or type Bangla; sound route (microphone-robust Whisper-medium, see below), words route (Tugstugi Ben-10 transcript or typed text, regional word lists, TF-IDF) and their fusion. JSON API at `/api/health`, `/api/text`, `/api/audio` (see `app/server.py`); the React + shadcn/ui front end lives in its own repository, [beyond-words-web](https://github.com/towfique-elahe/beyond-words-web). Weights: [towfique-elahe/beyond-words-whisper-medium-did](https://huggingface.co/towfique-elahe/beyond-words-whisper-medium-did) (thesis model) and […-did-robust](https://huggingface.co/towfique-elahe/beyond-words-whisper-medium-did-robust) (served by the demo).
 >
 > **Microphone robustness (`eval_mic_sim.py`, 30 strict-test clips per class, macro-F1):** clean / simulated laptop microphone / with level normalisation: thesis model 0.915 / 0.389 / 0.709; robust model (`finetune_xlsr.py --augment-chain channel`, strict split) 0.893 / 0.843 / 0.846. Full strict test split: 0.896 for the robust model against 0.919. Results in `reports/demo/`. Defence deck: `docs/defence/index.html`.
 
@@ -439,7 +439,6 @@ The project runs on a zero-hardware budget. Phases 0–1 were developed on an **
 ├── dump_embeddings.py     # pooled encoder embeddings of a fine-tuned checkpoint (for t-SNE)
 ├── export_hf_model.py     # export a fine-tuned Whisper classifier to Hugging Face format
 ├── app/                   # demo: server.py (FastAPI JSON API), app.py (Gradio page), inference.py, modal_app.py
-├── web/                   # static front end for the API (upload to any web host)
 ├── eval_mic_sim.py        # microphone-robustness check (simulated laptop mic on held-out clips)
 ├── splits/                # committed splits (relative paths, reproducibility)
 │   ├── manifest_split_rel.csv         # canonical clip-level split
