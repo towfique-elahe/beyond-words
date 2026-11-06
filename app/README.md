@@ -22,4 +22,12 @@ encoder fine-tuned for dialect identification
 Test macro-F1: 0.984 on a conventional split, 0.919 on a speaker-disjoint split.
 Code, data pipeline and thesis: <https://github.com/towfique-elahe/beyond-words>.
 
-This folder is the demo app. It is deployed on Modal (`modal_app.py`, see its docstring) at https://towfiqueelahe6--beyond-words.modal.run; the front matter above also lets it run as a Hugging Face Space (which needs a PRO plan for Gradio on free hardware). `embed.html` is a one-file page for embedding the demo on your own site.
+This folder is the demo. `server.py` loads the three models once (acoustic classifier,
+Tugstugi Ben-10 recogniser, TF-IDF + word lists) and exposes `GET /api/health`,
+`POST /api/text` and `POST /api/audio`; `app.py` is the Gradio page mounted at `/`;
+`inference.py` holds the shared audio preprocessing (decode any container, trim
+silence, normalise level to the training RMS, 5 s windows with 2.5 s hop);
+`modal_app.py` builds the container and deploys to https://towfiqueelahe6--beyond-words.modal.run
+(`modal deploy app/modal_app.py`). `models/` holds the saved lexical classifier
+(`lexical_did.py --save-model`). The static page in `web/` talks to the same API.
+The front matter above also lets the folder run as a Hugging Face Space (PRO plan needed for Gradio on free hardware).
