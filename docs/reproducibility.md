@@ -81,7 +81,7 @@ on 93.6 % of pilot clips; the committed numbers use the T4 transcripts.
 | Demo text models | `lexical_did.py --transcripts transcripts/tugstugi_ben10.csv --manifest splits/manifest_split_strict_rel.csv --lexicon lexicons/indomain_tugstugi_ben10_strict.json --xlsr-probs reports/phase6/strict/whisper_medium_probs.csv --acoustic-tag whisper_medium --save-model app/models/lexical_tugstugi_ben10_strict.joblib` |
 | Microphone robustness check | `eval_mic_sim.py --model <HF export> --tag <tag>` → `reports/demo/mic_sim_<tag>.json` (clean vs simulated laptop microphone, with and without the inference fixes of `app/inference.py`) |
 | Microphone-robust model | `notebooks/kaggle_finetune_robust.ipynb` (T4; `finetune_xlsr.py --augment-chain channel`, strict split, 12 epochs) |
-| Demo server | `modal deploy app/modal_app.py` (JSON API + Gradio); static page in `web/` |
+| Demo server | `modal deploy app/modal_app.py` (JSON API + Gradio); front end: separate `beyond-words-web` repository (`npm install && npm run build`, upload `dist/`) |
 | Bootstrap CIs incl. Phase 6 models | `bootstrap_ci.py --out reports/phase6/bootstrap_ci.json --extra "strict:Whisper-medium FT=reports/phase6/strict/test_predictions_whisper_medium.csv" ...` |
 
 The XLS-R path of `finetune_xlsr.py` (default `--model`, `--tag xlsr`) is
