@@ -39,7 +39,8 @@ from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
 HERE = Path(__file__).resolve().parent
-ROOT = Path(os.environ.get("BW_ROOT", HERE.parent))
+# On a Hugging Face Space everything sits in one folder; in the repo the app is one level down.
+ROOT = Path(os.environ.get("BW_ROOT", HERE if (HERE / "lexicons").exists() else HERE.parent))
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(ROOT))
 
@@ -147,18 +148,21 @@ class ASR:
         from transformers import GenerationConfig, WhisperForConditionalGeneration, WhisperProcessor
 
         self.torch = torch
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.dtype = torch.float16 if self.device == "cuda" else torch.float32
         self.processor = WhisperProcessor.from_pretrained(ASR_ID)
         self.model = WhisperForConditionalGeneration.from_pretrained(ASR_ID)
         if not getattr(self.model.generation_config, "lang_to_id", None):
             self.model.generation_config = GenerationConfig.from_pretrained(ASR_GEN_FROM)
         self.model.config.forced_decoder_ids = None
         self.model.generation_config.forced_decoder_ids = None
-        self.model = self.model.eval()
+        self.model = self.model.to(self.device, self.dtype).eval()
 
     def transcribe(self, wav: np.ndarray) -> str:
         feats = self.processor(wav[:30 * SR], sampling_rate=SR, return_tensors="pt").input_features
         with self.torch.no_grad():
-            ids = self.model.generate(feats, language="bn", task="transcribe", num_beams=1, max_new_tokens=200)
+            ids = self.model.generate(feats.to(self.device, self.dtype), language="bn", task="transcribe",
+                                      num_beams=1, max_new_tokens=200)
         return self.processor.batch_decode(ids, skip_special_tokens=True)[0].strip()
 
 

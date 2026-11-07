@@ -144,7 +144,7 @@ class AcousticModel:
         import torch
         from transformers import WhisperFeatureExtractor, WhisperForAudioClassification
         self.torch = torch
-        self.model_id = model_id or os.environ.get("MODEL_ID", "towfique-elahe/beyond-words-whisper-medium-did")
+        self.model_id = model_id or os.environ.get("MODEL_ID", "towfique-elahe/beyond-words-whisper-medium-did-robust")
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
         self.fe = WhisperFeatureExtractor.from_pretrained(self.model_id)
         self.model = WhisperForAudioClassification.from_pretrained(self.model_id).to(self.device).eval()
