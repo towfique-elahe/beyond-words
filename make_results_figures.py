@@ -1,5 +1,5 @@
 """
-Results chapter figures (thesis Ch. 5-6), from saved predictions and artifacts.
+Result Analysis chapter figures (thesis Ch. 4), from saved predictions and artifacts.
 
 Writes to reports/figures/ (PDF + PNG):
     results_metric_heatmap     models x {accuracy, macro-P, macro-R, macro-F1}, both splits

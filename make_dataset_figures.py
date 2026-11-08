@@ -1,5 +1,5 @@
 """
-Dataset chapter figures (thesis Ch. 3).
+Dataset figures (thesis Ch. 3, Methodology).
 
 Reads manifest_speaker.csv (one row per clip: filepath, district, source_id,
 speaker_id, duration_s, split) and the audio itself, and writes to
