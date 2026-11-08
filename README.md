@@ -437,7 +437,7 @@ The project runs on a zero-hardware budget. Phases 0–1 were developed on an **
 ├── make_phase5_figures.py # Phase 5 figures
 ├── make_phase6_figures.py # Phase 6 figure
 ├── make_dataset_figures.py # thesis Ch. 3: class sizes, durations, spectrograms, LTAS, pseudo-speaker groups
-├── make_results_figures.py # thesis Ch. 5: metric heatmap, confusions, curves, forest plot, t-SNE frozen vs fine-tuned
+├── make_results_figures.py # thesis Ch. 4: metric heatmap, confusions, curves, forest plot, t-SNE frozen vs fine-tuned
 ├── dump_embeddings.py     # pooled encoder embeddings of a fine-tuned checkpoint (for t-SNE)
 ├── export_hf_model.py     # export a fine-tuned Whisper classifier to Hugging Face format
 ├── app/                   # demo: server.py (FastAPI JSON API), app.py (Gradio page), inference.py, modal_app.py (earlier host)
