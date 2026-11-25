@@ -62,21 +62,9 @@ desktop.ini
 .idea/
 .vscode/
 
-# ---- Private supervisor/meeting docs (not distributed) ----
-docs/supervisor/
-
-# Thesis manuscript drafts (keep off the public repo until after submission)
-docs/thesis/*.docx
-docs/thesis/*.pdf
-docs/thesis/*.pages
-docs/thesis/*.zip
-# LaTeX source lives in Overleaf and locally only; defence deck likewise
-docs/thesis/beyond-words-thesis-overleaf/
-docs/defence/
-# Private meeting-prep docs (same policy as docs/supervisor/)
-docs/nlp-expert-meeting/
-# Private defence docs (same policy as docs/supervisor/)
-docs/defence/
+# ---- Private docs (not distributed) ----
+docs/
+!docs/reproducibility.md
 
 # Phase 5: standard-Bangla vocabulary derived from OOD-Speech (licence unconfirmed; regenerate with build_lexicon.py formal)
 lexicons/formal_vocab*.txt
