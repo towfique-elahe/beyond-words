@@ -63,7 +63,7 @@ desktop.ini
 .vscode/
 
 # ---- Private docs (not distributed) ----
-docs/
+docs/*
 !docs/reproducibility.md
 
 # Phase 5: standard-Bangla vocabulary derived from OOD-Speech (licence unconfirmed; regenerate with build_lexicon.py formal)
